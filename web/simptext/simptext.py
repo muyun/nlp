@@ -68,6 +68,15 @@ def show_entries():
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
 
+# get the result
+# TODO:
+@app.route('/')
+def get_results():
+    db = get_db()
+    cur = db.execute('select rets.output from rets right join entries on rets.id=entries.id')
+    ret = cur.fetchall()
+    return ret
+
 # this view let the user add new entries if they are logged in
 @app.route('/add', methods=['POST'])
 def add_entry():
