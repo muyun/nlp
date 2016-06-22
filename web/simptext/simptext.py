@@ -70,13 +70,13 @@ def show_entries():
     #cur = db.execute('select input from entries order by id desc')
     #entries = cur.fetchall()
 
-    cur = db.execute('select output from rets where id=(select max(id) from rets)')
+    #cur = db.execute('select output from rets where id=(select max(id) from rets)')
+    #entries = cur.fetchall()
+    #print "output: ", entries
+
+    cur = db.execute('select entries.input, rets.output from entries, rets  where rets.id=entries.id and rets.id=(select max(rets.id) from rets)')
     entries = cur.fetchall()
     print "output: ", entries
-
-    #cur = db.execute('select entries.input, rets.output from entries, rets  where entries.id=(select max(entries.id) from entries) AND rets.id=entries.id')
-    #rets = cur.fetchall()
-    #print "rets-: ", rets
              
     return render_template('show_entries.html', entries=entries)
 
