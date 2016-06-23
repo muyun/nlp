@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# coding by wenlong 
+#
 import os
 import sqlite3
 #from sqlite3 import dbapi2 as sqlite3
@@ -107,7 +109,7 @@ def add_entry():                      # The function shall take the URL variable
     filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/utils/wordlist.xlsx'
     words = dt.read_file(filename)
     # simplify the words in entries.input
-    ret = dt.replace_word(request.form['input'], words)
+    ret = dt.check_word(request.form['input'], words)
     print "ret: ", ret
        
     db.execute('insert into rets(output) values (?)',
