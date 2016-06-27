@@ -5,7 +5,14 @@ import os
 import sqlite3
 #from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort,\
-    render_template, flash
+    render_template, flash, jsonify
+
+"""
+# FLASK_WTF
+from flask_wtf import Form
+from wtforms import StringField, TextAreaField, SelectMultipleField, SubmitField
+from wtforms.validators import Required
+"""
 
 # the dataset
 import utils.dt as dt
@@ -63,8 +70,13 @@ def close_db(error):
     """close the database again at the end of the request"""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
-
-
+"""
+# The entry class
+class EntryForm(Form):
+    entry = StringField('Input:',validators=[Required()])
+    submit = SubmitField('Submit')
+"""
+    
 #the view functions - the view shows all the entries stored in the database
 @app.route('/')
 def show_entries():
@@ -76,29 +88,28 @@ def show_entries():
     #entries = cur.fetchall()
     #print "output: ", entries
 
-    cur = db.execute('select entries.input, rets.output from entries, rets  where rets.id=entries.id and rets.id=(select max(rets.id) from rets)')
+    #cur = db.execute('select entries.input, rets.output from entries, rets  where rets.id=entries.id and rets.id=(select max(rets.id) from rets)')
+    cur = db.execute('select input from entries where id=(select max(id) from entries)')
     entries = cur.fetchall()
-    print "output: ", entries
-             
-    return render_template('show_entries.html', entries=entries)
+    print "Intput: ", entries
+
+    # the simplied words
+    filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/utils/wordlist.xlsx'
+    words = dt.read_file(filename)
+    # simplify the words in entries.input
+    outputs = dt.check_word(entries[0][0], words)
+    print "outputs: ", outputs
+
+    return render_template('show_entries.html', entries=entries, outputs=outputs )
 
 # get the result
-# TODO:
-@app.route('/output')
-def get_outputs():
-    db = get_db()
-    cur = db.execute('select entries.input, rets.output from entries, rets  where rets.id=(select max(rets.id) from rets)')
-    rets = cur.fetchall()
-    print "rets-: ", rets
-    
-    #print "rets: ", rets 
-    return render_template('show_entries.html', rets=rets)
 
 # this view let the user add new entries if they are logged in
 @app.route('/add', methods=['POST'])  # URL with a variable
 def add_entry():                      # The function shall take the URL variable as parameter
     if not session.get('logged_in'):
         abort(401)
+
     db = get_db()
     db.execute('insert into entries(input) values (?)',
                [request.form['input']])
@@ -106,20 +117,20 @@ def add_entry():                      # The function shall take the URL variable
     #cur = db.execute('select id from entries right join entries on rets.id=entries.id')
     
     # the simplied words
-    filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/utils/wordlist.xlsx'
-    words = dt.read_file(filename)
+    #filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/utils/wordlist.xlsx'
+    #words = dt.read_file(filename)
     # simplify the words in entries.input
-    ret = dt.check_word(request.form['input'], words)
-    print "ret: ", ret
+    #ret = dt.check_word(request.form['input'], words)
+    #print "ret: ", ret
        
-    db.execute('insert into rets(output) values (?)',
-               [ret]) 
+    #db.execute('insert into rets(output) values (?)',[ret]) 
 
+    #print "entries: ", request.form['input']
     db.commit()
     flash('New entry was successfully posted')
 
-    entries=[request.form['input'], ret]
-    print "entries: ", entries
+    #entries=[request.form['input'], ret]
+    #print "entries: ", entries
     #return render_template('show_entries.html', entries=entries)
     return redirect(url_for('show_entries'))
 
