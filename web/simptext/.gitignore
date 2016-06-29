@@ -1,6 +1,5 @@
 _*.py
 *.pyc
-env
 *.db
-#*
 *v1*
+dataset/
