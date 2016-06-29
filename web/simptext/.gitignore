@@ -3,3 +3,4 @@ _*.py
 *.db
 *v1*
 dataset/
+env/
