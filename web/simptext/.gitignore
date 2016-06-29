@@ -2,5 +2,7 @@ _*.py
 *.pyc
 *.db
 *v1*
+*DS*
 dataset/
 env/
+.gitignorecd
