@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+      <dl>
+        <dt>Input:
+        <dd><textarea name=input rows=5 cols=60></textarea>
+        {#       
+        <dt>Output:
+        <dd><textarea name=output rows=5 cols=60></textarea>
+        #}
+        <dd><input type=submit value=Simplify>
+      </dl>
+
+
+    </form>
+
+  {% endif %}
+  
+<ul class="entries">
+  {% for entry in entries %}
+     <li><h2>Input:</h2>{{ entry.input|safe }}
+
+  {% else %}
+     <li><em>No output here so far</em>
+  {% endfor %}
+
+  <li><h2>Output:<h2>
+ 
+   <li>
+   {% for key, value in outputs.iteritems() %} 
+       {% if key is equalto value %}
+         {{ key }}
+         
+       {% else %} {# not change #}
+         <select>
+            {% for v in value %}
+            <option value={{ v }} >{{ v }} </option>
+            {% endfor %}
+         </select>
+         
+       {% endif %}
+
+      {% endfor %}  
+  
+</ul>
+  <!--
+  <script type="text/javascript">
+    $(document).ready(function(){
+    
+    $("#Simplify").click(function(){
+
+     $.getJSON('/', function(dat){
+       console.log("Ajax received data!");
+       console.dir(dat);
+    });
+    
+    });
+
+    });
+  </script>
+  -->
+  
+ {#
+  <ul class="entries">
+  {% for entry in entries %}
+    <li>{{ entry.output|safe }}
+  {% else %}
+    <li><em>Unbelievable.  No entries here so far</em>
+  {% endfor %}
+  </ul>
+  #}
+
+{% endblock %}
