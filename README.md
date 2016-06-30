@@ -2,13 +2,12 @@
 This is for the project -
 
 
-#### Flask web
+#### Flask web framework
 
-- Use the latest version -> flask --version
--  running
-   export FLASK_APP=Simptext
-   python -m flask initdb
-   python -m flask run
+- running 
+   export FLASK_APP=Simptext   
+   python -m flask initdb  
+   python -m flask run  
 
 - configure   
 
