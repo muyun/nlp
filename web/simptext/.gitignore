@@ -1,7 +1,0 @@
-_*.py
-*.pyc
-*.db
-*v1*
-*DS*
-env/
-.gitignore
