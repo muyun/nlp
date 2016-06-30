@@ -3,6 +3,5 @@ _*.py
 *.db
 *v1*
 *DS*
-dataset/
 env/
 .gitignorecd
