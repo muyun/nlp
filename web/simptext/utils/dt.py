@@ -56,7 +56,7 @@ def check_word(strs, words):
     #import pdb; pdb.set_trace()
     for w in str(strs).split():
         #_w = w.lower()
-        _w = wnl.lemmatize(w.lower(), 'v')
+        _w = wnl.lemmatize(w.lower(), pos='v')
         #print "_w: ", _w
         if _w in words:
             output[w] = w
