@@ -2,7 +2,10 @@
 This is for the project -
 
 
-#### Flask web framework
+##### notes about NLP
+ - 
+
+##### Flask web framework
 
 - running 
    export FLASK_APP=Simptext   
