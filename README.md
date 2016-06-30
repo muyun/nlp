@@ -7,7 +7,7 @@ This is for the project -
 
 ##### Flask web framework
 
-- running 
+- running   
    export FLASK_APP=Simptext   
    python -m flask initdb  
    python -m flask run  
