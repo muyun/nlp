@@ -89,6 +89,7 @@ def show_entries():
     #print "output: ", entries
 
     #cur = db.execute('select entries.input, rets.output from entries, rets  where rets.id=entries.id and rets.id=(select max(rets.id) from rets)')
+    #
     cur = db.execute('select input from entries where id=(select max(id) from entries)')
     entries = cur.fetchall()
     print "Intput: ", entries
@@ -98,9 +99,10 @@ def show_entries():
     words = dt.read_file(filename)
     # simplify the words in entries.input
     outputs = dt.check_word(entries[0][0], words)
+    #outputs = {}
     print "outputs: ", outputs
-
-    return render_template('show_entries.html', entries=entries, outputs=outputs )
+    #, outputs=outputs
+    return render_template('show_entries.html', entries=entries , outputs=outputs )
 
 # get the result
 

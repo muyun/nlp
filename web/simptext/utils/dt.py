@@ -11,6 +11,9 @@ import openpyxl
 
 #import nltk
 from nltk.corpus import wordnet as wn
+# lemma
+from nltk.stem import WordNetLemmatizer
+wnl = WordNetLemmatizer()
 
 #read the dataset
 #filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/wordlist.xlsx'
@@ -50,8 +53,11 @@ def check_word(strs, words):
     output=OrderedDict()
     print "strs: ", strs
 
+    #import pdb; pdb.set_trace()
     for w in str(strs).split():
-        _w = w.lower()
+        #_w = w.lower()
+        _w = wnl.lemmatize(w.lower(), 'v')
+        #print "_w: ", _w
         if _w in words:
             output[w] = w
         else:

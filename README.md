@@ -8,7 +8,10 @@ This is for the project -
 ##### Flask web framework
 
 - running   
-   export FLASK_APP=Simptext   
+   # Virtualenv enable multiple side-by-side installations of python
+   . venv/bin/activate
+
+   export FLASK_APP=simptext   
    python -m flask initdb  
    python -m flask run  
 
