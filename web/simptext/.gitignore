@@ -4,4 +4,4 @@ _*.py
 *v1*
 *DS*
 env/
-.gitignorecd
+.gitignore

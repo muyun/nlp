@@ -1,6 +1,17 @@
 #### proj
 This is for the project -
 
+
+#### Flask web
+
+- Use the latest version -> flask --version
+-  running
+   export FLASK_APP=Simptext
+   python -m flask initdb
+   python -m flask run
+
+- configure   
+
 #### reference
 
 * [Introduction to Natural Language Processing](https://class.coursera.org/nlpintro-001)
