@@ -8,11 +8,12 @@ This is for the project -
 ##### Flask web framework
 
 - running   
-   # Virtualenv enable multiple side-by-side installations of python
-   . venv/bin/activate
-
+   # To enable debug mode so that the the server will reload itself on code changes  
+   export FLASK_DEBUG=1  
+   #  
    export FLASK_APP=simptext   
    python -m flask initdb  
+
    python -m flask run  
 
 - configure   

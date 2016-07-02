@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-# coding by wenlong 
+"""
+  main app
+  ~~~~~~~~~~
+# coding by wenlong
 #
+"""
 import os
 import sqlite3
 #from sqlite3 import dbapi2 as sqlite3
@@ -14,8 +18,11 @@ from wtforms import StringField, TextAreaField, SelectMultipleField, SubmitField
 from wtforms.validators import Required
 """
 
-# the dataset
+# load the dataset
 import utils.dt as dt
+
+# deal with the calculation
+import utils.cal as cal
 
 # the application
 app = Flask(__name__)
@@ -98,9 +105,9 @@ def show_entries():
     filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/wordlist.xlsx'
     words = dt.read_file(filename)
     # simplify the words in entries.input
-    outputs = dt.check_word(entries[0][0], words)
+    outputs = cal.check_word(entries[0][0], words)
     #outputs = {}
-    print "outputs: ", outputs
+    #print "output: ", outputs
     #, outputs=outputs
     return render_template('show_entries.html', entries=entries , outputs=outputs )
 
