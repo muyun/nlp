@@ -1,5 +1,6 @@
 #### proj
-This is for the project -
+  This project  
+  - a robot  
 
 
 ##### notes about NLP

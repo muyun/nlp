@@ -103,7 +103,7 @@ def show_entries():
 
     # the simplied words
     filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/wordlist.xlsx'
-    words = dt.read_file(filename)
+    words = dt.read_xlsx_file(filename)
     # simplify the words in entries.input
     outputs = cal.check_word(entries[0][0], words)
     #outputs = {}
