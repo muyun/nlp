@@ -31,6 +31,8 @@ from bs4 import BeautifulSoup
 
 import json
 
+import cal
+
 def read_xlsx_file(filename):
     """read the xlsx file and stored 1st column into words list"""
     # using the openpyxl lib here
@@ -65,7 +67,7 @@ def read_xml_file(filename, word):
 
 
 def get_stat_info(filename, store_filename):
-
+    """ read the filename and store the words with lemmas in store_filename"""
     num_sentence = 0
     num_words = 0
     num_words_syns = 0
@@ -89,41 +91,68 @@ def get_stat_info(filename, store_filename):
                 #
                 lemmas[tk['wordform']].append(st['lemma'])
 
-    print "#sentence: ", num_sentence
-    print "#words: ", num_words
-    print "#words_syns: ", num_words_syns
+    #print "#sentence: ", num_sentence
+    #print "#words: ", num_words
+    #print "#words_syns: ", num_words_syns
 
     # write the file
 
     #import pdb; pdb.set_trace()
-    json.dump(lemmas, open(store_filename, 'wb'))
+    json.dump(lemmas, open(store_filename, 'w'))
     
     return num_sentence, num_words, num_words_syns, lemmas            
 
 
 def get_simp_wordlist(datafile, wordlist):
     #
-    num_simp_words = 0
+    num_simp_words = 0  # number of words from datafile and can be found in wordlist
     num_not_simp_words = 0
 
+    num_feasible_words = 0
+    
     # the words with synonyms that are not in EDB list
-    not_simp_words = []
+    not_simp_wordlist = []
     
     # load the dict from coinco dataset
     data = json.load(open(datafile))
 
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     for k in data.keys():
         #print data[k] # the word
         if data[k][0] in wordlist:
             num_simp_words += 1
         else:
             num_not_simp_words += 1
-            not_simp_words.append(k)
-        
-    
-    return num_simp_words, num_not_simp_words, not_simp_words
 
+            not_simp_wordlist.append(k) # the words with synonyms not in EDB list
+
+            # check whether the synonyms is in the ones in WordNet
+            # the synonyms data[k]
+            # the synonyms in WordNet
+            k_wordnet_list = cal.get_wordnet_list(k)
+
+            #
+            feas = set(data[k]).intersection(k_wordnet_list)
+            if len(feas) >= 1: #
+                num_feasible_words += 1
+
+    #
+    print "#words with feasible: ", num_feasible_words
+    #import pdb; pdb.set_trace()
+    if num_feasible_words == 0:
+        ceiling = 0
+    else:
+        ceiling = num_feasible_words/float(num_not_simp_words)           
+
+    return num_simp_words, num_not_simp_words, ceiling
+
+
+def cal_ceiling(simp_wordlist):
+    """calculate the ceiling"""
+    #for word in simp_wordlist:
+        # the synonyms in the coinco
+        
+    return
 
 # Main test
 def main():
@@ -141,8 +170,10 @@ def main():
     info_ = get_simp_wordlist(store_filename, wordlist)
     print "#words in the EDB list: ", info_[0]
     print "#words not in the EDB list: ", info_[1]
+    print "The ceiling: ", info[2]
 
-    #
+    # the feasible words
+    
 
 if __name__ == '__main__':
     main()
