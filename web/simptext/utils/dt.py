@@ -29,6 +29,8 @@ for x in range(1, sheet.max_row+1):
 
 from bs4 import BeautifulSoup
 
+import json
+
 def read_xlsx_file(filename):
     """read the xlsx file and stored 1st column into words list"""
     # using the openpyxl lib here
@@ -62,6 +64,50 @@ def read_xml_file(filename, word):
     return tuple(lemmas)
 
 
-# Main test
-#def main():
+def get_stat_info(filename, store_filename):
+
+    num_sentence = 0
+    num_words = 0
+    num_words_syns = 0
+
+    lemmas = {}
     
+    soup = BeautifulSoup(open(filename))
+
+    sentence = soup.find_all("targetsentence")
+    num_sentence = len(sentence)
+
+    tokens = soup.find_all("token")
+    num_words = len(tokens)
+    for tk in tokens:
+        if tk['id'].isdigit():
+            num_words_syns += 1
+
+            lemmas[tk['wordform']] = []
+            lemmas[tk['wordform']].append(tk['lemma'])
+            for st in tk.find_all("subst"):
+                #
+                lemmas[tk['wordform']].append(st['lemma'])
+
+    print "#sentence: ", num_sentence
+    print "#words: ", num_words
+    print "#words_syns: ", num_words_syns
+
+    # write the file
+
+    import pdb; pdb.set_trace()
+    data = json.dump(lemmas, open(store_filename, 'wb'))
+    
+    return num_sentence, num_words, num_words_syns            
+
+
+def get_simp_wordlist():
+    return
+# Main test
+def main():
+    filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco.xml"
+    store_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/lemmas_.txt"
+    info = get_stat_info(filename, store_filename)
+
+if __name__ == '__main__':
+    main()
