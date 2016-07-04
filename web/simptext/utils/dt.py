@@ -92,18 +92,20 @@ def get_stat_info(filename, store_filename):
 
             #test_token[tk['id']]=tk['wordform']
             #_test_token.append(tk['wordform'])
-            #TODO: the same word are stored in the same slot in the lemmas dict
-            lemmas[tk['wordform']] = []
-            lemmas[tk['wordform']].append(tk['lemma'])
+            #TODO: the same word are stored in the same slot in the lemmas dict; A better data structure should be used
+            #lemmas[tk['wordform']] = []
+            lemmas[tk['id']] = []
+            lemmas[tk['id']].append(tk['wordform'])
+            lemmas[tk['id']].append(tk['lemma'])
             for st in tk.find_all("subst"):
                 #
-                lemmas[tk['wordform']].append(st['lemma'])
+                lemmas[tk['id']].append(st['lemma'])
 
     #print "#sentence: ", num_sentence
     #print "#words: ", num_words
-    print "#words_syns: ", num_words_syns
+    #print "#words_syns: ", num_words_syns
     #print "#_test_token: ", len(_test_token)
-    print "#lemmas: ", len(lemmas)
+    #print "#lemmas: ", len(lemmas)
 
     """
     for lst in _test_token:
@@ -124,7 +126,7 @@ def get_stat_info(filename, store_filename):
     #import pdb; pdb.set_trace()
     json.dump(lemmas, open(store_filename, 'w'))
     
-    return num_sentence, num_words, num_words_syns, len(lemmas)           
+    return num_sentence, num_words, num_words_syns           
 
 
 def get_simp_wordlist(datafile, wordlist):
@@ -140,12 +142,13 @@ def get_simp_wordlist(datafile, wordlist):
     # load the dict from coinco dataset
     data = json.load(open(datafile))
 
-    _num = 0
+    #_num = 0
     #import pdb; pdb.set_trace()
     for k in data.keys():
         #print data[k] # the word
-        _num += 1
-        if data[k][0] in wordlist:
+        #_num += 1
+        # TOUPDATE
+        if data[k][1] in wordlist:
             num_simp_words += 1
         else:
             num_not_simp_words += 1
@@ -163,10 +166,10 @@ def get_simp_wordlist(datafile, wordlist):
                 num_feasible_words += 1
 
     #
-    print "#num: ", _num
-    print "#num_simp_words: ", num_simp_words
-    print "#num_not_simp_words: ", num_not_simp_words
-    print "#words with feasible: ", num_feasible_words
+    #print "#num: ", _num
+    #print "#num_simp_words: ", num_simp_words
+    #print "#num_not_simp_words: ", num_not_simp_words
+    #print "#words with feasible: ", num_feasible_words
     #import pdb; pdb.set_trace()
     if num_feasible_words == 0:
         ceiling = 0
@@ -191,7 +194,7 @@ def main():
     print "#sentences: ", info[0]
     print "#words: ", info[1]
     print "#words marked with synonyms: ", info[2]
-    print "words with synonyms: ", info[3]
+    #print "words with synonyms: ", info[3]
 
     # 
     xlsx_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/wordlist.xlsx"
