@@ -170,7 +170,7 @@ def main():
     info_ = get_simp_wordlist(store_filename, wordlist)
     print "#words in the EDB list: ", info_[0]
     print "#words not in the EDB list: ", info_[1]
-    print "The ceiling: ", info[2]
+    print "The ceiling: ", info_[2]
 
     # the feasible words
     
