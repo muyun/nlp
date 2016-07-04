@@ -33,6 +33,8 @@ import json
 
 import cal
 
+from collections import OrderedDict
+
 def read_xlsx_file(filename):
     """read the xlsx file and stored 1st column into words list"""
     # using the openpyxl lib here
@@ -72,7 +74,7 @@ def get_stat_info(filename, store_filename):
     num_words = 0
     num_words_syns = 0
 
-    lemmas = {}
+    lemmas = OrderedDict()
     
     soup = BeautifulSoup(open(filename))
 
@@ -81,10 +83,16 @@ def get_stat_info(filename, store_filename):
 
     tokens = soup.find_all("token")
     num_words = len(tokens)
+
+    #test_token = {}
+    #_test_token = []
     for tk in tokens:
         if tk['id'].isdigit():
             num_words_syns += 1
 
+            #test_token[tk['id']]=tk['wordform']
+            #_test_token.append(tk['wordform'])
+            #TODO: the same word are stored in the same slot in the lemmas dict
             lemmas[tk['wordform']] = []
             lemmas[tk['wordform']].append(tk['lemma'])
             for st in tk.find_all("subst"):
@@ -93,14 +101,30 @@ def get_stat_info(filename, store_filename):
 
     #print "#sentence: ", num_sentence
     #print "#words: ", num_words
-    #print "#words_syns: ", num_words_syns
+    print "#words_syns: ", num_words_syns
+    #print "#_test_token: ", len(_test_token)
+    print "#lemmas: ", len(lemmas)
 
+    """
+    for lst in _test_token:
+        if lst in lemmas:
+            pass
+        else:
+            print "lst: ", lst
+    """
+
+    """
+    import pdb; pdb.set_trace()
+    k = lemmas.keys()      
+    k_feas = list(set(k) - set(_test_token))
+    print(k_feas)                   
+    """
     # write the file
 
     #import pdb; pdb.set_trace()
     json.dump(lemmas, open(store_filename, 'w'))
     
-    return num_sentence, num_words, num_words_syns, lemmas            
+    return num_sentence, num_words, num_words_syns, len(lemmas)           
 
 
 def get_simp_wordlist(datafile, wordlist):
@@ -116,9 +140,11 @@ def get_simp_wordlist(datafile, wordlist):
     # load the dict from coinco dataset
     data = json.load(open(datafile))
 
+    _num = 0
     #import pdb; pdb.set_trace()
     for k in data.keys():
         #print data[k] # the word
+        _num += 1
         if data[k][0] in wordlist:
             num_simp_words += 1
         else:
@@ -128,7 +154,7 @@ def get_simp_wordlist(datafile, wordlist):
 
             # check whether the synonyms is in the ones in WordNet
             # the synonyms data[k]
-            # the synonyms in WordNet
+            # the synonyms in mWordNet
             k_wordnet_list = cal.get_wordnet_list(k)
 
             #
@@ -137,6 +163,9 @@ def get_simp_wordlist(datafile, wordlist):
                 num_feasible_words += 1
 
     #
+    print "#num: ", _num
+    print "#num_simp_words: ", num_simp_words
+    print "#num_not_simp_words: ", num_not_simp_words
     print "#words with feasible: ", num_feasible_words
     #import pdb; pdb.set_trace()
     if num_feasible_words == 0:
@@ -156,13 +185,13 @@ def cal_ceiling(simp_wordlist):
 
 # Main test
 def main():
-    filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco.xml"
-    store_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/lemmas_.txt"
+    filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco_1000.xml"
+    store_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/lemmas_1000.txt"
     info = get_stat_info(filename, store_filename)
     print "#sentences: ", info[0]
     print "#words: ", info[1]
     print "#words marked with synonyms: ", info[2]
-    #print "words with synonyms: ", info[3]
+    print "words with synonyms: ", info[3]
 
     # 
     xlsx_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/wordlist.xlsx"
