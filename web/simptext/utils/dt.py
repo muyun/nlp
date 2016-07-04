@@ -144,24 +144,24 @@ def get_simp_wordlist(datafile, wordlist):
 
     #_num = 0
     #import pdb; pdb.set_trace()
-    for k in data.keys():
+    for id in data.keys():
         #print data[k] # the word
         #_num += 1
         # TOUPDATE
-        if data[k][1] in wordlist:
+        if data[id][1] in wordlist: # the lemma
             num_simp_words += 1
         else:
             num_not_simp_words += 1
 
-            not_simp_wordlist.append(k) # the words with synonyms not in EDB list
+            not_simp_wordlist.append(data[id][0]) # the words with synonyms not in EDB list
 
             # check whether the synonyms is in the ones in WordNet
             # the synonyms data[k]
             # the synonyms in mWordNet
-            k_wordnet_list = cal.get_wordnet_list(k)
+            k_wordnet_list = cal.get_wordnet_list(data[id][1])
 
             #
-            feas = set(data[k]).intersection(k_wordnet_list)
+            feas = set(data[id][1:]).intersection(k_wordnet_list)
             if len(feas) >= 1: #
                 num_feasible_words += 1
 
@@ -188,8 +188,8 @@ def cal_ceiling(simp_wordlist):
 
 # Main test
 def main():
-    filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco_1000.xml"
-    store_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/lemmas_1000.txt"
+    filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco.xml"
+    store_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/lemmas_.txt"
     info = get_stat_info(filename, store_filename)
     print "#sentences: ", info[0]
     print "#words: ", info[1]
