@@ -95,19 +95,54 @@ def get_stat_info(filename, store_filename):
 
     # write the file
 
-    import pdb; pdb.set_trace()
-    data = json.dump(lemmas, open(store_filename, 'wb'))
+    #import pdb; pdb.set_trace()
+    json.dump(lemmas, open(store_filename, 'wb'))
     
-    return num_sentence, num_words, num_words_syns            
+    return num_sentence, num_words, num_words_syns, lemmas            
 
 
-def get_simp_wordlist():
-    return
+def get_simp_wordlist(datafile, wordlist):
+    #
+    num_simp_words = 0
+    num_not_simp_words = 0
+
+    # the words with synonyms that are not in EDB list
+    not_simp_words = []
+    
+    # load the dict from coinco dataset
+    data = json.load(open(datafile))
+
+    import pdb; pdb.set_trace()
+    for k in data.keys():
+        #print data[k] # the word
+        if data[k][0] in wordlist:
+            num_simp_words += 1
+        else:
+            num_not_simp_words += 1
+            not_simp_words.append(k)
+        
+    
+    return num_simp_words, num_not_simp_words, not_simp_words
+
+
 # Main test
 def main():
     filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco.xml"
     store_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/lemmas_.txt"
     info = get_stat_info(filename, store_filename)
+    print "#sentences: ", info[0]
+    print "#words: ", info[1]
+    print "#words marked with synonyms: ", info[2]
+    #print "words with synonyms: ", info[3]
+
+    # 
+    xlsx_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/wordlist.xlsx"
+    wordlist = read_xlsx_file(xlsx_filename)
+    info_ = get_simp_wordlist(store_filename, wordlist)
+    print "#words in the EDB list: ", info_[0]
+    print "#words not in the EDB list: ", info_[1]
+
+    #
 
 if __name__ == '__main__':
     main()
