@@ -1,6 +1,6 @@
 #### proj
   This project  
-  - a robot  
+  - a Q&A robot?
 
 
 ##### notes about NLP
