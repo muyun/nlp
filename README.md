@@ -31,3 +31,4 @@
 * [celery](http://celery.readthedocs.io/en/latest/index.html)
 * 
 * [MITx: 6.041x Introduction to Probability - The Science of Uncertainty](https://courses.edx.org/courses/course-v1:MITx+6.041x_3+2T2016/info)
+* [Natural language understanding (almost) from scratch](https://blog.acolyer.org/2016/07/04/natural-language-understanding-almost-from-scratch/)
