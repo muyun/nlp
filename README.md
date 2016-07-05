@@ -11,6 +11,7 @@
 - running   
    To enable debug mode so that the the server will reload itself on code changes   
      >export FLASK_DEBUG=1  
+     
    cmd:   
      >export FLASK_APP=simptext   
      >python -m flask initdb  
