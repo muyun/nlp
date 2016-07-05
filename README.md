@@ -9,13 +9,13 @@
 ##### Flask web framework
 
 - running   
-   # To enable debug mode so that the the server will reload itself on code changes  
-   export FLASK_DEBUG=1  
-   #  
-   export FLASK_APP=simptext   
-   python -m flask initdb  
+   To enable debug mode so that the the server will reload itself on code changes   
+     >export FLASK_DEBUG=1  
+   cmd:   
+     >export FLASK_APP=simptext   
+     >python -m flask initdb  
 
-   python -m flask run  
+     >python -m flask run  
 
 - configure   
 
