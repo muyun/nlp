@@ -1,6 +1,5 @@
 #### proj
   This project  
-  - a robot
 
 
 ##### notes about NLP
