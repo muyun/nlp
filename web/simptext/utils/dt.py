@@ -88,7 +88,7 @@ def get_stat_info(filename, store_filename):
 
     lemmas = {}
     
-    soup = BeautifulSoup(open(filename))
+    soup = BeautifulSoup(open(filename), "lxml")
 
     sentence = soup.find_all("targetsentence")
     num_sentence = len(sentence)
@@ -146,8 +146,15 @@ def print_intermedia(datafile, wordlist):
     output = {}
     #import pdb; pdb.set_trace()
     for id in data.keys():
+        # remove the original word
+        w = data[id[1]]
         coincolist = data[id][1:]
-        wordlist = cal.get_wordnet_list(data[id][1])
+        if w in coincolist:
+            coincolist.remove(w)
+            
+        wordlist = cal.get_wordnet_list(w)
+        if w in wordlist:
+            wordlist.remove(w)
 
         feas = set(coincolist).intersection(wordlist)
         if len(feas) >= 1: #
@@ -184,7 +191,8 @@ def get_simp_wordlist(datafile, wordlist):
         #print data[k] # the word
         #_num += 1
         # TOUPDATE
-        if data[id][1] in wordlist: # the lemma
+        w = data[id][1]
+        if w in wordlist: # the lemma
             num_simp_words += 1
         else:
             num_not_simp_words += 1
@@ -194,10 +202,17 @@ def get_simp_wordlist(datafile, wordlist):
             # check whether the synonyms is in the ones in WordNet
             # the synonyms data[k]
             # the synonyms in mWordNet
-            k_wordnet_list = cal.get_wordnet_list(data[id][1])
+            k_wordnet_list = cal.get_wordnet_list(w)
 
             #
-            feas = set(data[id][1:]).intersection(k_wordnet_list)
+            coincolist = data[id][1:]
+            if w in coincolist:
+                coincolist.remove(w)
+            
+            if w in k_wordnet_list:
+                k_wordnet_list.remove(w)
+
+            feas = set(coincolist).intersection(k_wordnet_list)
             if len(feas) >= 1: #
                 num_feasible_words += 1
 
