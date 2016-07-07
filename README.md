@@ -1,6 +1,4 @@
 #### proj
-  This project  
-
 
 ##### notes about NLP
  - 
