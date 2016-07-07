@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 #  
-# deal with the dataset
-#
-# coding by wenlong 
-#
+"""
+   utils.dt
+   ~~~~~~~~~~
+   data processing
+
+@author wenlong
+"""
 
 import openpyxl
 """
@@ -35,19 +38,28 @@ import cal
 
 from collections import OrderedDict
 
-def read_xlsx_file(filename):
-    """read the xlsx file and stored 1st column into words list"""
+def read_xlsx_file(filename, sheetnums):
+    """read the xlsx file and stored first sheetnums into words list"""
     # using the openpyxl lib here
     wb = openpyxl.load_workbook(filename)
-    sheet = wb.get_sheet_by_name('level 1')
+
+    #import pdb; pdb.set_trace()
+    sheet_names = wb.get_sheet_names()[0:sheetnums]
+    #sheet1 = wb.get_sheet_by_name('level 1')
+    # sheet2 = wb.get_sheet_by_name('level 2')
+    #sheet = wb.get_sheet_by_name(sheets_names)
 
     # store the simplied words in the words list
     words = []
-    for x in range(1, sheet.max_row+1):
-        words.append(str(sheet.cell(row=x, column=1).value).lower())
+    for sheet_name in sheet_names:
+        worksheet=wb.get_sheet_by_name(sheet_name)
+        for x in range(1, worksheet.max_row+1):
+            words.append(str(worksheet.cell(row=x, column=1).value).lower())
 
     # now removing it
     # TODO- the replace function
+
+    #import pdb; pdb.set_trace()
     return tuple(words)
 
 
@@ -74,7 +86,7 @@ def get_stat_info(filename, store_filename):
     num_words = 0
     num_words_syns = 0
 
-    lemmas = OrderedDict()
+    lemmas = {}
     
     soup = BeautifulSoup(open(filename))
 
@@ -84,8 +96,6 @@ def get_stat_info(filename, store_filename):
     tokens = soup.find_all("token")
     num_words = len(tokens)
 
-    #test_token = {}
-    #_test_token = []
     for tk in tokens:
         if tk['id'].isdigit():
             num_words_syns += 1
@@ -128,6 +138,32 @@ def get_stat_info(filename, store_filename):
     
     return num_sentence, num_words, num_words_syns           
 
+
+def print_intermedia(datafile, wordlist):
+    """print the intermedia data for the check"""
+    data = json.load(open(datafile))
+
+    output = {}
+    #import pdb; pdb.set_trace()
+    for id in data.keys():
+        coincolist = data[id][1:]
+        wordlist = cal.get_wordnet_list(data[id][1])
+
+        feas = set(coincolist).intersection(wordlist)
+        if len(feas) >= 1: #
+            k = '*'+data[id][0]
+            output[k]=[coincolist, wordlist]
+        else:    
+            output[data[id][0]] = [coincolist, wordlist]
+
+
+    #import pdb; pdb.set_trace()
+    with open('intermedia_l1.json', 'w') as outfile:
+        json.dump(output, outfile, indent=2)
+        
+    #json.dump(output, open('intermedia.json', 'w'))
+
+        
 
 def get_simp_wordlist(datafile, wordlist):
     #
@@ -174,7 +210,7 @@ def get_simp_wordlist(datafile, wordlist):
     if num_feasible_words == 0:
         ceiling = 0
     else:
-        ceiling = num_feasible_words/float(num_not_simp_words)           
+        ceiling = num_feasible_words/float(num_not_simp_words)
 
     return num_simp_words, num_not_simp_words, ceiling
 
@@ -188,23 +224,42 @@ def cal_ceiling(simp_wordlist):
 
 # Main test
 def main():
-    filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco.xml"
-    store_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/lemmas_.txt"
-    info = get_stat_info(filename, store_filename)
-    print "#sentences: ", info[0]
-    print "#words: ", info[1]
-    print "#words marked with synonyms: ", info[2]
+    dirname="/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/"
+    filename = dirname + "/dataset/coinco/coinco.xml"
+    store_filename = dirname + "/dataset/coinco/lemmas_.txt"
+    #info = get_stat_info(filename, store_filename)
+    #print "#sentences: ", info[0]
+    #print "#words: ", info[1]
+    #print "#words marked with synonyms: ", info[2]
     #print "words with synonyms: ", info[3]
 
     # 
-    xlsx_filename = "/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/wordlist.xlsx"
-    wordlist = read_xlsx_file(xlsx_filename)
+    xlsx_filename = dirname + "/dataset/wordlist.xlsx"
+    wordlist = read_xlsx_file(xlsx_filename, 2)
     info_ = get_simp_wordlist(store_filename, wordlist)
-    print "#words in the EDB list: ", info_[0]
-    print "#words not in the EDB list: ", info_[1]
-    print "The ceiling: ", info_[2]
-
+    print "#words in the EDB list for level 1+2: ", info_[0]
+    print "#words not in the EDB list for level 1+2:: ", info_[1]
+    print "The ceiling for level 1+2:: ", info_[2]
     # the feasible words
+
+    """
+    wordlist = read_xlsx_file(xlsx_filename, 3)
+    info_3 = get_simp_wordlist(store_filename, wordlist)
+    print "#words in the EDB list for level 1+2+3: ", info_3[0]
+    print "#words not in the EDB list for level 1+2+3: ", info_3[1]
+    print "The ceiling for level 1+2+3:: ", info_3[2]
+
+    wordlist = read_xlsx_file(xlsx_filename, 4)
+    info_4 = get_simp_wordlist(store_filename, wordlist)
+    print "#words in the EDB list for level 1+2+3+4: ", info_4[0]
+    print "#words not in the EDB list for level 1+2+3+4: ", info_4[1]
+    print "The ceiling for level 1+2+3+4: ", info_4[2]
+    """
+
+    # print the intermeida data
+    #inter = print_intermedia(store_filename, wordlist)
+    
+
     
 if __name__ == '__main__':
     main()

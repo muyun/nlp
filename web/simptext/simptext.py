@@ -2,8 +2,9 @@
 """
   main app
   ~~~~~~~~~~
-# coding by wenlong
-#
+@author wenlong
+@update  TODO: module
+
 """
 import os
 import sqlite3
@@ -102,8 +103,8 @@ def show_entries():
     print "Intput: ", entries
 
     # the simplied words
-    filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/wordlist.xlsx'
-    words = dt.read_xlsx_file(filename)
+    filename = './dataset/wordlist.xlsx'
+    words = dt.read_xlsx_file(filename, 1)
     # simplify the words in entries.input
     outputs = cal.check_word(entries[0][0], words)
     #outputs = {}
