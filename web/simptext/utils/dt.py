@@ -82,34 +82,44 @@ def read_xml_file(filename, word):
 
 def get_stat_info(filename, store_filename):
     """ read the filename and store the words with lemmas in store_filename"""
-    num_sentence = 0
-    num_words = 0
+    num_sentences = 0
+    num_tokens = 0
     num_words_syns = 0
 
+    docs = {}
     lemmas = {}
     
     soup = BeautifulSoup(open(filename), "lxml")
 
-    sentence = soup.find_all("targetsentence")
-    num_sentence = len(sentence)
+    sentences = soup.find_all("sent")
+    num_sentences = len(sentences)
 
-    tokens = soup.find_all("token")
-    num_words = len(tokens)
+    num_tokens = len(soup.find_all("token"))
 
-    for tk in tokens:
-        if tk['id'].isdigit():
-            num_words_syns += 1
+    #import pdb; pdb.set_trace()
+    for sentence in sentences:
+        #print(sentence.targetsentence)
+        #print(sentence.tokens)
 
-            #test_token[tk['id']]=tk['wordform']
-            #_test_token.append(tk['wordform'])
-            #TODO: the same word are stored in the same slot in the lemmas dict; A better data structure should be used
-            #lemmas[tk['wordform']] = []
-            lemmas[tk['id']] = []
-            lemmas[tk['id']].append(tk['wordform'])
-            lemmas[tk['id']].append(tk['lemma'])
-            for st in tk.find_all("subst"):
-                #
-                lemmas[tk['id']].append(st['lemma'])
+        # the key in docs is the target sentence
+        target = str(sentence.targetsentence)
+        docs[target] = []
+        for tk in sentence.tokens.find_all("token"):
+            print(tk)
+            if tk['id'].isdigit():
+                num_words_syns += 1
+
+                docs[target].append(tk['id'])
+
+                #test_token[tk['id']]=tk['wordform']
+                #_test_token.append(tk['wordform'])
+                #TODO: the same word are stored in the same slot in the lemmas dict; A better data structure should be used
+                #lemmas[tk['wordform']] = []
+                lemmas[tk['id']] = []
+                lemmas[tk['id']].append(tk['wordform'])
+                lemmas[tk['id']].append(tk['lemma'])
+                for st in tk.find_all("subst"):
+                    lemmas[tk['id']].append(st['lemma'])
 
     #print "#sentence: ", num_sentence
     #print "#words: ", num_words
@@ -136,38 +146,49 @@ def get_stat_info(filename, store_filename):
     #import pdb; pdb.set_trace()
     json.dump(lemmas, open(store_filename, 'w'))
     
-    return num_sentence, num_words, num_words_syns           
+    return num_sentences, num_tokens, num_words_syns, docs          
 
 
-def print_intermedia(datafile, wordlist):
-    """print the intermedia data for the check"""
+def print_intermedia(datafile, docs, wordlist):
+    """print the intermedia data for the check
+     @datafile is the lemmas dict filename
+     @docs is the targetsentence
+     @wordlist is the edb wordlist
+
+    """
     data = json.load(open(datafile))
 
-    output = {}
-    #import pdb; pdb.set_trace()
-    for id in data.keys():
-        # remove the original word
-        w = data[id[1]]
-        coincolist = data[id][1:]
-        if w in coincolist:
-            coincolist.remove(w)
-            
-        wordlist = cal.get_wordnet_list(w)
-        if w in wordlist:
-            wordlist.remove(w)
-
-        feas = set(coincolist).intersection(wordlist)
-        if len(feas) >= 1: #
-            k = '*'+data[id][0]
-            output[k]=[coincolist, wordlist]
-        else:    
-            output[data[id][0]] = [coincolist, wordlist]
-
-
-    #import pdb; pdb.set_trace()
-    with open('intermedia_l1.json', 'w') as outfile:
-        json.dump(output, outfile, indent=2)
+    # import pdb; pdb.set_trace()
+    for sentence in docs.keys():
+        #print(sentence)
+        #print(docs[sentence])
         
+        output = OrderedDict()
+        for id in docs[sentence]:
+            w = data[id][1] # the lemma of the wordform
+            # remove the original word
+            coincolist = data[id][1:]
+            if w in coincolist:
+                coincolist.remove(w)
+            
+            wordlist = cal.get_wordnet_list(w)
+            if w in wordlist:
+                wordlist.remove(w)
+
+            feas = set(coincolist).intersection(wordlist)
+            if len(feas) >= 1:
+                k = '*'+data[id][0]
+                output[k] = [coincolist, wordlist]
+            else:
+                output[data[id][0]] = [coincolist, wordlist]
+
+        # write the sentence
+
+        #import pdb; pdb.set_trace()
+        with open('intermedia_l1.json', 'a') as outfile:
+            outfile.write('\n'+sentence+'\n')
+            json.dump(output, outfile, indent=2)
+
     #json.dump(output, open('intermedia.json', 'w'))
 
         
@@ -191,7 +212,7 @@ def get_simp_wordlist(datafile, wordlist):
         #print data[k] # the word
         #_num += 1
         # TOUPDATE
-        w = data[id][1]
+        w = data[id][1].lower()
         if w in wordlist: # the lemma
             num_simp_words += 1
         else:
@@ -242,10 +263,10 @@ def main():
     dirname="/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/"
     filename = dirname + "/dataset/coinco/coinco.xml"
     store_filename = dirname + "/dataset/coinco/lemmas_.txt"
-    #info = get_stat_info(filename, store_filename)
-    #print "#sentences: ", info[0]
-    #print "#words: ", info[1]
-    #print "#words marked with synonyms: ", info[2]
+    info = get_stat_info(filename, store_filename)
+    print "#sentences: ", info[0]
+    print "#words: ", info[1]
+    print "#words marked with synonyms: ", info[2]
     #print "words with synonyms: ", info[3]
 
     # 
@@ -272,9 +293,9 @@ def main():
     """
 
     # print the intermeida data
-    #inter = print_intermedia(store_filename, wordlist)
+    inter = print_intermedia(store_filename, info[3], wordlist)
     
 
-    
 if __name__ == '__main__':
+
     main()
