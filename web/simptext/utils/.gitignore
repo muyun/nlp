@@ -1,2 +1,4 @@
 *pyc
 *xlsx
+.gitignore
+*.json
