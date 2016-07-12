@@ -12,6 +12,8 @@
      >python -m flask initdb  
      >python -m flask run  
 
+* Configuation 
+
 
 #### reference
 * [The Hitchhiker’s Guide to Python](http://docs.python-guide.org/en/latest/)
