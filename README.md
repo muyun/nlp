@@ -2,7 +2,6 @@
  - 
 
 ##### About Flask
-* notes about Flask
 
 * running   
    To enable debug mode so that the the server will reload itself on code changes   
@@ -13,15 +12,6 @@
      >python -m flask initdb  
      >python -m flask run  
 
-* using virtual Environments to separate the development and maintance 
-    >virtualenv --no-site-packages venv 
-    > . venv/bin/activate 
-    >deactivate 
-    
-    “freeze” the current state of the environment packages  
-    > pip freeze > requirements.txt 
-    > pip install -r requirements.txt 
-   
 
 * TODO:
   * being module for the flexible and scalable
