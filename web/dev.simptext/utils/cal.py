@@ -19,6 +19,8 @@ from nltk.stem import WordNetLemmatizer
 wnl = WordNetLemmatizer()
 
 import string
+
+import dt
 #from dt import get_stat_info
 
 def check_word(strs, words):
@@ -65,14 +67,14 @@ def get_wordnet_list(w):
             #print lemma.name()
             wordnet.append(lemma.name())
 
-    return list(set(wordnet))
+    return list(set(wordnet)) 
 
 
 def cal_stat_info(filename):
     #filename="/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco_172.xml"
 
     lemmas = {}
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     [num_sentences, num_words, num_words_syn, lemmas] = get_stat_info(filename)
 
     return
