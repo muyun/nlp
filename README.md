@@ -1,9 +1,10 @@
 ##### notes about NLP
  - 
 
-##### Flask web framework
+##### About Flask
+* notes about Flask
 
-- running   
+* running   
    To enable debug mode so that the the server will reload itself on code changes   
      >export FLASK_DEBUG=1  
      
@@ -13,7 +14,21 @@
 
      >python -m flask run  
 
-- configure   
+* using virtual Environments to separate the development and maintance 
+    >virtualenv --no-site-packages venv 
+    > . venv/bin/activate 
+
+    >deactivate 
+    
+    “freeze” the current state of the environment packages  
+    > pip freeze > requirements.txt 
+
+    > pip install -r requirements.txt 
+   
+
+* TODO:
+  * being module for the flexible and scalable
+
 
 #### reference
 * [The Hitchhiker’s Guide to Python](http://docs.python-guide.org/en/latest/)
