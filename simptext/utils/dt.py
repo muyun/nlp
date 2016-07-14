@@ -27,6 +27,7 @@ for x in range(1, sheet.max_row+1):
     simp_words.append(str(sheet.cell(row=x,column=1).value))
 
 # now removing it
+
 #TODO- the replace function
 """
 
@@ -88,25 +89,24 @@ def read_xml_file(filename, word):
 
 def get_stat_info(filename, store_filename):
     """ read the filename and store the words with lemmas in store_filename"""
-    num_sentences = 0
-    num_tokens = 0
+
     num_words_syns = 0
 
-    docs = OrderedDict()
-    lemmas = {}
+    docs = OrderedDict() # store the info - docs[sentence] = [id,...]
+    
+    lemmas = {}  # store the word info - lemmas[id] = {word: synsets, ...}
     
     soup = BeautifulSoup(open(filename), "lxml")
 
+    # number of sentences, based on the 'sent' tag
     sentences = soup.find_all("sent")
     num_sentences = len(sentences)
 
+    # number of tokens, based on the 'token' tag
     num_tokens = len(soup.find_all("token"))
 
     #import pdb; pdb.set_trace()
     for sentence in sentences:
-        #print(sentence.targetsentence)
-        #print(sentence.tokens)
-
         # the key in docs is the target sentence
         target = str(sentence.targetsentence)
         docs[target] = []
@@ -119,8 +119,8 @@ def get_stat_info(filename, store_filename):
 
                 #test_token[tk['id']]=tk['wordform']
                 #_test_token.append(tk['wordform'])
-                #TODO: the same word are stored in the same slot in the lemmas dict; A better data structure should be used
-                #lemmas[tk['wordform']] = []
+                # the same word are stored in the same slot in the lemmas dict; A better data structure should be used
+                
                 lemmas[tk['id']] = []
                 lemmas[tk['id']].append(tk['wordform'])
                 lemmas[tk['id']].append(tk['lemma'])
@@ -149,7 +149,7 @@ def get_stat_info(filename, store_filename):
     """
     # write the file
 
-    #import pdb; pdb.set_trace()
+    #write the fiel
     json.dump(lemmas, open(store_filename, 'w'))
     
     return num_sentences, num_tokens, num_words_syns, docs          
@@ -199,7 +199,7 @@ def print_intermedia(datafile, docs, wordlist):
 
         
 
-def get_simp_wordlist(datafile, wordlist):
+def get_coinco_wordlist(datafile, wordlist):
     #
     num_simp_words = 0  # number of words from datafile and can be found in wordlist
     num_not_simp_words = 0
@@ -446,11 +446,11 @@ def cal_ceiling(simp_wordlist):
 
 # Main test
 def main():
-    dirname="/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/utils/"
+    dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/dataset/"
     
-    filename = dirname + "/data/coinco/coinco.xml"
-    store_filename = dirname + "/data/coinco/lemmas_.txt"
-    """
+    filename = dir + "/coinco/coinco.xml"
+    store_filename = dir + "/coinco/coinco_lemmas.txt"
+
     info = get_stat_info(filename, store_filename)
     print "#sentences: ", info[0]
     print "#words: ", info[1]
@@ -458,28 +458,30 @@ def main():
     #print "words with synonyms: ", info[3]
 
     # 
-    xlsx_filename = dirname + "/data/wordlist.xlsx"
+    xlsx_filename = dir + "/data/wordlist.xlsx"
     wordlist = read_xlsx_file(xlsx_filename, 1)
-    info_ = get_simp_wordlist(store_filename, wordlist)
+    
+    info_ = get_coinco_wordlist(store_filename, wordlist)
     print "#words in the EDB list for level 1: ", info_[0]
     print "#words not in the EDB list for level 1:: ", info_[1]
     print "The ceiling for level 1: ", info_[2]
 
+    """
     wordlist = read_xlsx_file(xlsx_filename, 2)
-    info_ = get_simp_wordlist(store_filename, wordlist)
+    info_ = get_coinco_wordlist(store_filename, wordlist)
     print "#words in the EDB list for level 1+2: ", info_[0]
     print "#words not in the EDB list for level 1+2:: ", info_[1]
     print "The ceiling for level 1+2:: ", info_[2]
     # the feasible words
     
     wordlist = read_xlsx_file(xlsx_filename, 3)
-    info_3 = get_simp_wordlist(store_filename, wordlist)
+    info_3 = get_coinco_wordlist(store_filename, wordlist)
     print "#words in the EDB list for level 1+2+3: ", info_3[0]
     print "#words not in the EDB list for level 1+2+3: ", info_3[1]
     print "The ceiling for level 1+2+3:: ", info_3[2]
 
     wordlist = read_xlsx_file(xlsx_filename, 4)
-    info_4 = get_simp_wordlist(store_filename, wordlist)
+    info_4 = get_coinco_wordlist(store_filename, wordlist)
     print "#words in the EDB list for level 1+2+3+4: ", info_4[0]
     print "#words not in the EDB list for level 1+2+3+4: ", info_4[1]
     print "The ceiling for level 1+2+3+4: ", info_4[2]
@@ -544,6 +546,7 @@ def main():
     #filename = dirname + "/data/roget"
     
     #
+    """
     xlsx_filename = dirname + "/data/wordlist.xlsx"
    
     wordlist = read_xlsx_file(xlsx_filename, 1)
@@ -571,6 +574,7 @@ def main():
     print "The ceiling for level 1+2+3+4: ", info_[2]
     
     
+    """
     """
     lemmas = []
     wd ='mission'

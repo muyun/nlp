@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+ Logical Model
+
+ @author wenlong
+"""
 import os
 
 from flask import Flask, request, render_template, session, g, redirect, url_for, abort, \
@@ -19,15 +24,13 @@ import utils.dt, utils.cal
 
 @app.route('/')
 def show_entries():
-
+    # the the latest text from database
     m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
-    The_id = m.max_id
-
-    the_text = db.session.query(models.Entry).get(m.max_id)
-    entries = str(the_text.text)
+    txt = db.session.query(models.Entry).get(m.max_id)
+    entries = str(txt.text)
     #print "entries: ", entries
 
-    # simplify the words
+    # simplify the words in this text
     words = utils.dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
     outputs = utils.cal.check_word(entries, words)
     #print "output: ", outputs
@@ -36,8 +39,8 @@ def show_entries():
 
 
 # this view let the user add new entries if they are logged in
-@app.route('/add', methods=['POST'])  # URL with a variable
-def add_entry():                      # The function shall take the URL variable as parameter
+@app.route('/add', methods=['POST'])
+def add_entry():
     if not session.get('logged_in'):
         abort(401)
 
