@@ -447,6 +447,7 @@ def cal_ceiling(simp_wordlist):
 # Main test
 def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/dataset/"
+    xlsx_filename = dir + "/wordlist.xlsx"
     
     filename = dir + "/coinco/coinco.xml"
     store_filename = dir + "/coinco/coinco_lemmas.txt"
@@ -458,7 +459,6 @@ def main():
     #print "words with synonyms: ", info[3]
 
     # 
-    xlsx_filename = dir + "/data/wordlist.xlsx"
     wordlist = read_xlsx_file(xlsx_filename, 1)
     
     info_ = get_coinco_wordlist(store_filename, wordlist)
@@ -492,11 +492,11 @@ def main():
 
     """
     # SemEval 2007
-    #filename = dirname + "/data/semeval/trial/lexsub_trial.xml"
-    filename = dirname + "/data/semeval/trial/BLoutof10.out"
-    store_filename = dirname + "/data/semeval/trial/semeval_lemmas_.txt"
+    #filename = dirname + "/semeval/trial/lexsub_trial.xml"
+    filename = dirname + "/semeval/trial/BLoutof10.out"
+    store_filename = dirname + "/semeval/trial/semeval_lemmas_.txt"
     
-    xlsx_filename = dirname + "/data/wordlist.xlsx"
+    xlsx_filename = dirname + "/wordlist.xlsx"
     wordlist = read_xlsx_file(xlsx_filename, 1)
     info_ = get_semeval_info(filename, wordlist)
     print "#sentences: ", info_[0]
@@ -547,7 +547,7 @@ def main():
     
     #
     """
-    xlsx_filename = dirname + "/data/wordlist.xlsx"
+    xlsx_filename = dirname + "/wordlist.xlsx"
    
     wordlist = read_xlsx_file(xlsx_filename, 1)
     info_ = get_roget_info(store_filename, wordlist)

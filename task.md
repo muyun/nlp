@@ -185,11 +185,13 @@ the sentence are nodes in the graph and grammatical relations are edge labels.
    - reconstruct the system
    - 
 
-#####
+##### 07/14/2016
 
 ##### 07/15/2016
    - the stanford parser dir:
-   /Users/zhaowenlong/workspace/lib/nltk_data/jars   
+   /Users/zhaowenlong/workspace/lib/nltk_data/jars  
+
+   - using the Stanford lib in NLTK or the third python wrapper? 
 
 ##### reference
  - Natural Language Processing With Python

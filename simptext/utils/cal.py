@@ -12,9 +12,12 @@ from collections import OrderedDict
 #import nltk
 from nltk.corpus import wordnet as wn
 
-from nltk.tokenize import wordpunct_tokenize
+#Use StanfordTokenizer
+from nltk.tokenize import StanfordTokenizer
+#from nltk.tokenize import wordpunct_tokenize
 
 # lemma
+
 from nltk.stem import WordNetLemmatizer
 wnl = WordNetLemmatizer()
 
@@ -30,7 +33,7 @@ def check_word(strs, words):
 
     #import pdb; pdb.set_trace()
     #for w in str(strs).split():
-    for token in wordpunct_tokenize(strs):
+    for token in StanfordTokenizer().tokenize(strs):
         #print 'token: ', token
         if token in string.punctuation:
             #print "stro :", token
@@ -38,8 +41,10 @@ def check_word(strs, words):
         else:
             #_w = w.lower()
             # so slow here
+            _token_ = StanfordTokenizer().lemmatize()
             _token = wnl.lemmatize(token.lower(), pos='v')
-            #print "token: ", token
+            
+            print "token: ", token
 
             if _token in words:
                  output[token] = token
