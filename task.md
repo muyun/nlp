@@ -183,9 +183,28 @@ the sentence are nodes in the graph and grammatical relations are edge labels.
 
 ##### 07/13/2016
    - reconstruct the system
-   - 
+
 
 ##### 07/14/2016
+   - Stanford parser
+     dependency_tag(governor, dependent) 
+
+     >tokens
+       StanfordSegmenter -> for chinese
+       StanfordTokenizer -> for english
+
+     > Named Entity Recognizer
+     StanfordNERTagger
+
+     > 词性标注
+     StanfordPOSTagger
+
+     > Syntactic analysis
+     StanfordParser
+
+     StanfordDependencyParser
+
+     StanfordNeuralDependencyParser  
 
 ##### 07/15/2016
    - the stanford parser dir:

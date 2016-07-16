@@ -41,7 +41,7 @@ def check_word(strs, words):
         else:
             #_w = w.lower()
             # so slow here
-            _token_ = StanfordTokenizer().lemmatize()
+            #_token_ = StanfordTokenizer().lemmatize(token.lower())
             _token = wnl.lemmatize(token.lower(), pos='v')
             
             print "token: ", token
