@@ -11,9 +11,9 @@
   * learning
 
 ##### About Flask and Python
-  * Use virtual Environments to separate the development from the maintance 
+  * Use virtual Environments 
 
-  * Structure
+  * Structure the project
     - module
 
 #### reference
