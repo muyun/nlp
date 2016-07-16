@@ -1,10 +1,10 @@
 ##### Project
 
 ##### About NLP
-  * Part-of-speech (POS) tagging 
-    Chunking -> labels phrases or segments with tags
-    Named-entity recognition (NER) -> labels recognised entities
-    Semantic-role labeling (SRL)
+  * Part-of-speech (POS) tagging  
+    Chunking -> labels phrases or segments with tags  
+    Named-entity recognition (NER) -> labels recognised entities  
+    Semantic-role labeling (SRL)  
 
   * hand-engineered features -> assign label to words 
 
