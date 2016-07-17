@@ -19,7 +19,7 @@ db = SQLAlchemy(app)
 
 import models
 
-import utils.dt, utils.cal
+import utils.dt, utils.cal, utils.alg
 
 
 @app.route('/')
@@ -28,11 +28,15 @@ def show_entries():
     m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
     txt = db.session.query(models.Entry).get(m.max_id)
     entries = str(txt.text)
-    #print "entries: ", entries
+    print "entries: ", entries
+
+    #Syntactic simplification
+    simp_sent = utils.alg.simp_and_sent(entries)
+    print "simp_sent: ", simp_sent
 
     # simplify the words in this text
     words = utils.dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
-    outputs = utils.cal.check_word(entries, words)
+    outputs = utils.cal.check_word(simp_sent, words)
     #print "output: ", outputs
 
     return render_template('show_entries.html', entries=entries , outputs=outputs )
