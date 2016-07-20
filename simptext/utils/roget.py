@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+"""
 import glob, lxml, re
 from lxml import etree
-
-import json
+from bs4 import BeautifulSoup
 
 # clean the input
 def clean(l):
@@ -22,6 +22,7 @@ def pos(pos_element):
     return re.sub('[.#]','',pos_element.find("b").text)
 
 def words(paragraph_element):
+    #import pdb; pdb.set_trace()
     return set([word.strip() for i in paragraph_element 
            if not i.text is None 
            for word in i.text.split(',') 
@@ -29,7 +30,7 @@ def words(paragraph_element):
            ])
 
 def index(fn,root):
-    return re.sub('[/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/utils/data/roget/heads.txt]','',fn + ' ') + headword(root)
+    return re.sub('[/heads.txt]','',fn + ' ') + headword(root)
 
 # helper generator:
 def pospargen(c):
@@ -42,16 +43,15 @@ def pos_words(c):
     return dict([[pos(a),words(b)] for a,b in pospargen(c)])
 
 roget = {}
-
-for fn in glob.glob("/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/utils/data/roget/heads/head*.txt"):
-    #import pdb; pdb.set_trace()
+for fn in glob.glob("./heads/head*.txt"):
+    #print(fn)
     with open(fn,'rb') as f:
         xml = ['<class>']+[clean(l) for l in f.readlines()]+['</class>']
         root = etree.fromstring(''.join(xml), parser=etree.XMLParser(encoding="windows-1252"))
 
-        #import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
         roget[index(fn,root)] = pos_words(root.getchildren())
-
+                         
 parts_of_speech = ['INT', 'VB', 'ADJ', 'N']
 
 
@@ -60,15 +60,13 @@ from collections import defaultdict
 
 reverse_roget = defaultdict(set)
 
-#lemmas = {} # for the file store
-
 for category in roget: #head_file, like '_1 Existence'
     for pos in parts_of_speech:  #in prts_of_speech
         if pos in roget[category]:  # {'_1 Existence' : {'ADV' : set (['in point of fact', 'indeed'])}}
             for word in roget[category][pos]:
                 reverse_roget[word + '_' + pos].add(category)
 
-                
+
 #import pdb; pdb.set_trace()
 # INTERFACE COMMANDS
 def categories(word,pos):  # entries means the filename
@@ -91,49 +89,62 @@ def shared_categories(l,pos):
     "If you want to know which categories are shared by a list of words with a given part of speech"
     return set.intersection(*[categories(w,pos) for w in l])
 
+"""
 
-def store_file(filename):
-    #
-    #reverse_roget
-    lemmas = {}
-    #for the file store
+import glob, re
+from bs4 import BeautifulSoup
+
+# sg - Semicolon Group like synset in wordNet
+
+headgroup = {}
+
+#from path import path
+
+for fn in glob.glob("./heads/head*.txt"):
+    #print(fn)
 
     #import pdb; pdb.set_trace()
-    for k in reverse_roget: #word_pos
-        #print(k)
-        word_pos = k.split("_")
-        lemmas_lst = []
-        for st in reverse_roget[k]: # set(['900 Courage', '744 Defiance'])
-            #print(roget[st][word_pos[1]])
-            wd_lst= list(roget[st][word_pos[-1]])
-            lemmas_lst = lemmas_lst + wd_lst
-    
-        lemmas[word_pos[0]] = lemmas_lst
+    soup = BeautifulSoup(open(fn), "lxml")
 
-        #print(lemmas)
+    headword = soup.headword.b.text.split(' ')
+    #root = soup.find_all("headword")
+    root = headword[1]+headword[2]
+    sgs = soup.find_all("sg")
 
-    json.dump(lemmas, open(filename, 'w'))
+    #import pdb; pdb.set_trace()
+    #sg_lst = []
+    headgroup[root] = []
+    #Semicolon Group
+    for syn in sgs:
+        #print(syn)
+        #import pdb; pdb.set_trace()
+        synset = []
+        for word in syn.text.split(','):
+            synset.append((re.sub(r"(\d+)", "", word).lstrip()))
+            
+        #print(synset)
+        headgroup[root].append(synset)
 
-"""
-def main():
+
+def get_roget_synset(word):
     lemmas = []
-    wd = 'end'
-    for pos in parts_of_speech:
-        import pdb; pdb.set_trace()
-        words = all_entries(wd, pos)
-        #print(all_entries('existing', pos))
+    #word = "see"
+    for head in headgroup:
+        #import pdb; pdb.set_trace()
+        for sg in headgroup[head]: # each sg
+            if word in sg:
+                #print(sg)
+                lemmas = lemmas + sg
 
-        for w in words:
-            lemmas = lemmas + list(w)
+    
+    #import pdb; pdb.set_trace()
+    return list(set(lemmas))
 
- 
-    print lemmas
 
-    #filename="/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/utils/data/roget/roget.json"
-    #store_file(filename)        
+def main():
+    word = "see"
 
-    #TODO: store the wordlist -> word
+    print(list(get_roget_synset(word)))
     
 if __name__ == '__main__':
     main()
-"""

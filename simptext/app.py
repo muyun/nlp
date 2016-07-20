@@ -21,6 +21,7 @@ import models
 
 import utils.dt, utils.cal, utils.alg
 
+words = utils.dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
 
 @app.route('/')
 def show_entries():
@@ -31,12 +32,15 @@ def show_entries():
     print "entries: ", entries
 
     #Syntactic simplification
-    simp_sent = utils.alg.simp_and_sent(entries)
+    simp_sent = utils.alg.simp_conj_sent(entries)
     print "simp_sent: ", simp_sent
 
-    # simplify the words in this text
-    words = utils.dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
-    outputs = utils.cal.check_word(simp_sent, words)
+    # simplify the words in this text  
+    if len(simp_sent) > 0:
+        outputs = utils.cal.check_word(simp_sent, words)
+    else:
+        outputs = utils.cal.check_word(entries, words)
+            
     #print "output: ", outputs
 
     return render_template('show_entries.html', entries=entries , outputs=outputs )

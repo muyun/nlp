@@ -6,6 +6,14 @@
 
 * TODO
 
+
+* corouts  
+ - Coinco
+ - SemEval-2007
+ - Mechanical Turk Lexical Simplification dataset
+ -
+ - 1911 Roget’s Thesaurus
+
 #### reference
 * [The Hitchhiker’s Guide to Python](http://docs.python-guide.org/en/latest/)
 * [thinkpython2](http://www.greenteapress.com/thinkpython2/html/index.html)

@@ -8,7 +8,6 @@
 
   * hand-engineered features -> assign label to words 
 
-  * learning
 
 ##### About Flask and Python
   * Use virtual Environments 

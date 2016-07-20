@@ -73,7 +73,7 @@ def get_wordnet_list(w):
 
     return list(set(wordnet)) 
 
-
+"""
 def cal_stat_info(filename):
     #filename="/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco_172.xml"
 
@@ -82,3 +82,4 @@ def cal_stat_info(filename):
     [num_sentences, num_words, num_words_syn, lemmas] = get_stat_info(filename)
 
     return
+"""
