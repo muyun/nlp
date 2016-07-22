@@ -6,51 +6,23 @@
    data processing
 
 @author wenlong
-"""
 
-import openpyxl
-"""
-from collections import OrderedDict
-
-import string
-"""
-# Read the dataset
-# filename = '/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/wordlist.xlsx'
+@TODO: update the software construction
 
 """
-Wb = openpyxl.load_workbook(filename)
-sheet = wb.get_sheet_by_name('level 1')
 
-#store the simplied words in the simp_words list
-simp_words=[]
-for x in range(1, sheet.max_row+1):
-    simp_words.append(str(sheet.cell(row=x,column=1).value))
-
-# now removing it
-
-#TODO- the replace function
-"""
+import sys, re, codecs
 
 from bs4 import BeautifulSoup
 
-import json, csv, codecs
-
-#import alg, cal
-
-import sys, re
-
 from collections import OrderedDict
-
-#TODO: update the software construction
-
-import  alg, roget, cal, tool
+import openpyxl, json, csv
 
 # for Roget's Thesaurus (1911)
+import  alg, roget, cal, tool
 
-#from data.roget import roget
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 def read_xlsx_file(filename, sheetnums):
     """read the xlsx file and stored first sheetnums into words list"""
@@ -66,7 +38,7 @@ def read_xlsx_file(filename, sheetnums):
     # store the simplied words in the words list
     words = []
     for sheet_name in sheet_names:
-        worksheet=wb.get_sheet_by_name(sheet_name)
+        worksheet = wb.get_sheet_by_name(sheet_name)
         for x in range(1, worksheet.max_row+1):
             words.append(str(worksheet.cell(row=x, column=1).value).lower())
 
@@ -224,7 +196,7 @@ def print_coinco_sent(filename):
     #import pdb; pdb.set_trace()
     output = OrderedDict()
     for sentence in sentences:
-        print(sentence)
+        #print(sentence)
         sent = str(p.sub('', str(sentence)))
         #sent = str(BeautifulSoup(sentence).text)
         print(sent)

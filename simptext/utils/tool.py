@@ -15,3 +15,5 @@ def read_file(filename):
        lines.append(line)
 
    f.close()
+
+   return line
