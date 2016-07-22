@@ -100,7 +100,7 @@ headgroup = {}
 
 #from path import path
 
-for fn in glob.glob("./heads/head*.txt"):
+for fn in glob.glob("./roget/head*.txt"):
     #print(fn)
 
     #import pdb; pdb.set_trace()
@@ -142,7 +142,7 @@ def get_roget_synset(word):
 
 
 def main():
-    word = "see"
+    word = "mad"
 
     print(list(get_roget_synset(word)))
     

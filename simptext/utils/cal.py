@@ -25,6 +25,9 @@ import string
 
 import dt
 
+def get_lemma(word):
+    return wnl.lemmatize(word.lower(), pos='v')
+
 def check_word(strs, words):
     """ check the word is words list, and return the string"""
     #output={}
@@ -42,7 +45,8 @@ def check_word(strs, words):
             #_w = w.lower()
             # so slow here
             #_token_ = StanfordTokenizer().lemmatize(token.lower())
-            _token = wnl.lemmatize(token.lower(), pos='v')
+            #_token = wnl.lemmatize(token.lower(), pos='v')
+            _token = get_lemma(token)
             
             print "token: ", token
 

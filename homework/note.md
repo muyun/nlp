@@ -13,6 +13,23 @@
 * Structuring
  - module
 
+* unicode 
+   - text is encoded (An encoding is a set of rules that assign numeric values to each text character) 
+   - UTF-8 is an extension of ASCII
+
+   - s.decode(encoding) -> str-> unicode
+     u.encode(encoding) -> unicode -> str
+
+   - unique is a way to represent text without bytes
+    unicode is a concept, to save unicode to disk you have to encode it
+
+   - The default python2 encoding is ASCII
+      sys.setdefaultencoding('utf-8')
+
+    - python2 unicode incompatibility - csv module   
+
+    - decode early, unicode everywhere, encode late
+
 
    
 ##### note about NLP

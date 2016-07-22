@@ -33,11 +33,11 @@ for x in range(1, sheet.max_row+1):
 
 from bs4 import BeautifulSoup
 
-import json, codecs
+import json, csv, codecs
 
 #import alg, cal
 
-import re
+import sys, re
 
 from collections import OrderedDict
 
@@ -48,6 +48,9 @@ import  alg, roget, cal, tool
 # for Roget's Thesaurus (1911)
 
 #from data.roget import roget
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 def read_xlsx_file(filename, sheetnums):
     """read the xlsx file and stored first sheetnums into words list"""
@@ -195,6 +198,7 @@ def print_intermedia(datafile, docs, wordlist):
         # write the sentence
 
         #import pdb; pdb.set_trace()
+
         with open('coinco_l1.json', 'a') as outfile:
             outfile.write('\n'+sentence+'\n')
             json.dump(output, outfile, indent=2)
@@ -357,9 +361,12 @@ def get_semeval_stat_info(filename, synset_filename, store_filename):
                 #print(synsets[key])
                 semeval[key].append(synsets[key])
 
-        with open(store_filename, "w") as outfile:
-            json.dump(semeval, outfile)
+    json.dump(semeval, open(store_filename, 'w'))            
 
+    """
+    with open(store_filename, "w") as outfile:
+        json.dump(semeval, outfile)
+    """
     return num_sentences, num_words_syns        
 
 
@@ -404,7 +411,8 @@ def get_semeval_info(datafile, wordlist):
         else:
             tokens[w] = 0
         """
-        
+
+        #import pdb; pdb.set_trace()
         _w = w.lower()
         if _w in wordlist: # the lemma
             #num_simp_words += 1
@@ -424,10 +432,10 @@ def get_semeval_info(datafile, wordlist):
             k_wordnet_list = cal.get_wordnet_list(_w)
             k_roget_list = roget.get_roget_synset(_w)
 
-            wordlist = k_wordnet_list + k_roget_list
+            lst = k_wordnet_list + k_roget_list
             
-            k_simp_wordnet=[]
-            for wd in (k_wordnet_list + k_roget_list):
+            k_simp_wordnet = []
+            for wd in k_wordnet_list:
                 if wd in wordlist:
                     k_simp_wordnet.append(wd)
 
@@ -454,9 +462,9 @@ def get_semeval_info(datafile, wordlist):
     num_feasible_words = len(set(feasible_words))
     #
     #print "#num: ", _num
-    #print "#num_simp_words: ", num_simp_words
-    #print "#num_not_simp_words: ", num_not_simp_words
-    #print "#words with feasible: ", num_feasible_words
+    print "#num_simp_words: ", num_simp_words
+    print "#num_not_simp_words: ", num_not_simp_words
+    print "#words with feasible: ", num_feasible_words
     #import pdb; pdb.set_trace()
     if num_feasible_words == 0:
         ceiling = 0
@@ -481,15 +489,17 @@ def print_semeval_interdata(datafile, wordlist):
 
         k_wordnet_list = cal.get_wordnet_list(w)
         k_roget_list = roget.get_roget_synset(w)
+        lst = k_wordnet_list+k_roget_list
 
         #wordlist = k_wordnet_list + k_roget_list
         
         k_simp_wordnet=[]
-        for wd in (k_wordnet_list + k_roget_list):
+        for wd in k_wordnet_list:
             if wd in wordlist:
                 k_simp_wordnet.append(wd)
 
-            #
+
+        #import pdb; pdb.set_trace()#
         if len(data[id]) > 1:
             semevallist = data[id][1]
         if w in semevallist:
@@ -498,13 +508,43 @@ def print_semeval_interdata(datafile, wordlist):
         if w in k_simp_wordnet:
             k_simp_wordnet.remove(w)
 
+        if w in k_wordnet_list:
+            k_wordnet_list.remove(w)
+
+        if w in k_roget_list:
+            k_roget_list.remove(w)
+
         output = OrderedDict()    
         feas = set(semevallist).intersection(k_simp_wordnet)
+
+        wordnet_feas = set(semevallist).intersection(k_wordnet_list)
+        roget_feas = set(semevallist).intersection(k_roget_list)
+
         if len(feas) >= 1:
             k = '*'+w
-            output[k] = [semevallist, k_simp_wordnet]
+            if len(wordnet_feas) >= 1: # at least one in wordnet
+                wf = ['Y']
+            else:
+                wf = ['N']
+
+            if len(roget_feas) >= 1:
+                rf = ['Y']
+            else:
+                rf = ['N']
+                
+            output[k] = [data[id][0], k, semevallist, k_wordnet_list, wf, k_roget_list, rf]
         else:
-            output[w] = [semevallist, k_simp_wordnet]
+            if len(wordnet_feas) >= 1: # at least one in wordnet
+                wf = ['Y']
+            else:
+                wf = ['N']
+
+            if len(roget_feas) >= 1:
+                rf = ['Y']
+            else:
+                rf = ['N']
+            
+            output[w] = [data[id][0], w, semevallist, k_wordnet_list, wf, k_roget_list, rf]
 
         # write the sentence
 
@@ -512,19 +552,250 @@ def print_semeval_interdata(datafile, wordlist):
         #import pdb; pdb.set_trace()
         #print(data[id][0])
         #import pdb; pdb.set_trace()
-        with codecs.open('semeval_l1.json', 'a', encoding='utf-8') as outfile:
-            outfile.write('\nSentence:'+data[id][0]+'\n')
-            json.dump(output, outfile, indent=2)
+        # wirte the file in CSV format
+        with codecs.open('semeval_l1.csv', 'a', encoding='utf-8') as outfile:
+            wr = csv.writer(outfile, delimiter =',', quoting=csv.QUOTE_ALL)
+            for row in output:
+                wr.writerow(output[row])
 
+        """
+        with codecs.open('semeval_l1_.json', 'w', encoding='utf-8') as outfile:
+            #outfile.write('\nSentence:'+data[id][0]+'\n')
+            json.dump(output, outfile)
+        """
     #json.dump(output, open('intermedia.json', 'w'))
 
 
-def cal_ceiling(simp_wordlist):
-    """calculate the ceiling"""
-    #for word in simp_wordlist:
-        # the synonyms in the coinco
+def get_mturk_stat_info(filename, store_filename):
+    """ store the stat info in store_filename
+    """
+    num_sentences = 0
+    num_words_syns = 0
+    
+    # store read the synset file
+    mturk = OrderedDict() # synsets -> { word : [sent], [synsets]}
+
+    f = open(filename, 'rU')
+    for line in f: # for each line
+        line = line.strip('\n')
+        #import pdb; pdb.set_trace()
+        if line:
+            #import pdb; pdb.set_trace()
+            obj = line.split("\t")
+            sent = obj[0]
+            word = obj[1]
+            synsets = obj[2:]
+            
+            mturk[word] = []
+            mturk[word].append(sent)
+            mturk[word].append(synsets)
+
+            num_sentences = num_sentences + 1
+            num_words_syns = num_words_syns + 1
         
-    return
+    f.close()
+
+    """
+    blob = open('unknown-file').read()
+    m = magic.Magic(mime_encoding=True)
+    encode = m.from_buffer(blob)
+    """
+    #import pdb; pdb.set_trace()
+    json.dump(mturk, open(store_filename, 'w'))   
+
+    return num_sentences, num_words_syns
+
+
+def get_mturk_info(datafile, wordlist):
+    num_sentences = 0
+    num_tokens = 0
+    num_words_syns = 0
+    tokens = {}
+    #
+    num_simp_words = 0  # number of words from datafile and can be found in wordlist
+    simp_words = []
+    num_not_simp_words = 0
+    _num_not_simp_words = 0
+    #not_simp_words = []
+
+    num_feasible_words = 0
+    feasible_words = []
+    
+    # the words with synonyms that are not in EDB list
+    not_simp_wordlist = []
+    _not_simp_wordlist = []
+    
+    # load the dict from semeval dataset
+    #data = json.load(open(datafile))
+    data = json.load(open(datafile))
+
+    #_num = 0
+    for id in data:
+        #print data[id] # 
+        #import pdb; pdb.set_trace()
+        #_num += 1
+        # TOUPDATE
+        w = cal.get_lemma(id)
+        if w in wordlist: # the lemma
+            #num_simp_words += 1
+            simp_words.append(w)
+        else:
+            #num_not_simp_words += 1
+            #not_simp_words.append(w)
+
+            not_simp_wordlist.append(w) # the words with synonyms not in EDB list
+
+            # check whether the synonyms is in the ones in WordNet
+            # the synonyms data[k]
+            # the synonyms in mWordNet
+
+            #import pdb; pdb.set_trace()
+            #TODO: should check each word in k_wordnet_list is in EDB list
+            k_wordnet_list = cal.get_wordnet_list(w)
+            k_roget_list = roget.get_roget_synset(w)
+
+
+            #import pdb; pdb.set_trace()
+            lst = k_wordnet_list + k_roget_list
+            
+            k_simp_wordnet=[]
+            for wd in lst:
+                if wd in lst:
+                    k_simp_wordnet.append(wd)
+
+            #
+            #import pdb; pdb.set_trace()
+            mturklist = data[id][1]
+            if id in mturklist:
+                mturklist.remove(id)
+
+            # do the lemma
+            _mturklist = []
+            for wd in mturklist:
+                 _mturklist.append(cal.get_lemma(wd))
+                 
+            
+            if w in k_simp_wordnet:
+                k_simp_wordnet.remove(w)
+
+            if len(k_simp_wordnet) >= 1:
+                _not_simp_wordlist.append(w)
+                
+
+            #import pdb; pdb.set_trace()
+            feas = set(_mturklist).intersection(k_simp_wordnet)
+            if len(feas) >= 1: #
+                feasible_words.append(w)
+                #num_feasible_words += 1
+
+    num_tokens = len(tokens)
+    num_not_simp_words = len(set(not_simp_wordlist))
+    _num_not_simp_words = len(set(_not_simp_wordlist))
+    num_feasible_words = len(set(feasible_words))
+    #
+    #print "#num: ", _num
+    #print "#num_simp_words: ", num_simp_words
+    #print "#num_not_simp_words: ", num_not_simp_words
+    #print "#words with feasible: ", num_feasible_words
+    #import pdb; pdb.set_trace()
+    if num_feasible_words == 0:
+        ceiling = 0
+    else:
+        ceiling = num_feasible_words/float(num_not_simp_words)
+
+    return num_tokens, num_not_simp_words, _num_not_simp_words, ceiling
+
+
+
+def print_mturk_interdata(datafile, wordlist):
+    """print the intermedia data for the check
+     @datafile is the lemmas dict filename
+     @wordlist is the edb wordlist
+
+    """
+    data = json.load(open(datafile))
+
+    # import pdb; pdb.set_trace()
+    for id in data:
+        w = cal.get_lemma(id)
+
+        k_wordnet_list = cal.get_wordnet_list(w)
+        k_roget_list = roget.get_roget_synset(w)
+        lst = k_wordnet_list+k_roget_list
+
+        #wordlist = k_wordnet_list + k_roget_list
+        
+        k_simp_wordnet=[]
+        for wd in k_wordnet_list:
+            if wd in wordlist:
+                k_simp_wordnet.append(wd)
+
+
+        #import pdb; pdb.set_trace()#
+        if len(data[id]) > 1:
+            mturklist = data[id][1]
+        if w in mturklist:
+            mturklist.remove(w)
+            
+        if w in k_simp_wordnet:
+            k_simp_wordnet.remove(w)
+
+        if w in k_wordnet_list:
+            k_wordnet_list.remove(w)
+
+        if w in k_roget_list:
+            k_roget_list.remove(w)
+
+        output = OrderedDict()    
+        feas = set(mturklist).intersection(k_simp_wordnet)
+
+        wordnet_feas = set(mturklist).intersection(k_wordnet_list)
+        roget_feas = set(mturklist).intersection(k_roget_list)
+
+        if len(feas) >= 1:
+            k = '*'+w
+            if len(wordnet_feas) >= 1: # at least one in wordnet
+                wf = ['Y']
+            else:
+                wf = ['N']
+
+            if len(roget_feas) >= 1:
+                rf = ['Y']
+            else:
+                rf = ['N']
+                
+            output[k] = [data[id][0], k, mturklist, k_wordnet_list, wf, k_roget_list, rf]
+        else:
+            if len(wordnet_feas) >= 1: # at least one in wordnet
+                wf = ['Y']
+            else:
+                wf = ['N']
+
+            if len(roget_feas) >= 1:
+                rf = ['Y']
+            else:
+                rf = ['N']
+            
+            output[w] = [data[id][0], w, mturklist, k_wordnet_list, wf, k_roget_list, rf]
+
+        # write the sentence
+
+
+        #import pdb; pdb.set_trace()
+        #print(data[id][0])
+        #import pdb; pdb.set_trace()
+        # wirte the file in CSV format
+        with codecs.open('mturk_l1.csv', 'a') as outfile:
+            wr = csv.writer(outfile, delimiter =',', quoting=csv.QUOTE_ALL)
+            for row in output:
+                wr.writerow(output[row])
+
+        """
+        with codecs.open('semeval_l1_.json', 'w', encoding='utf-8') as outfile:
+            #outfile.write('\nSentence:'+data[id][0]+'\n')
+            json.dump(output, outfile)
+        """
+    #json.dump(output, open('intermedia.json', 'w'))
 
 # Main test
 def main():
@@ -542,7 +813,7 @@ def main():
     #print "words with synonyms: ", info[3]
 
     #
-    xlsx_filename = dir + "/wordlist.xlsx"
+    xlsx_filename = dir + "dataset/wordlist.xlsx"
 
     wordlist = read_xlsx_file(xlsx_filename, 1)
  
@@ -572,16 +843,17 @@ def main():
     print "The ceiling for level 1+2+3+4: ", info_4[2]
 
     # print the intermeida data
-    #inter = print_intermedia(store_filename, info[3], wordlist)
+    inter = print_intermedia(store_filename, info[3], wordlist)
     
     # print the inter data in the syntactic simplification
     #print_coinco_sent(filename)
     
     """
+    """
     # SemEval 2007 - the lexsub_test.xml + key/gold
     filename = dir + "utils/semeval/test/lexsub_test.xml"
     synset_filename = dir + "utils/semeval/key/gold"
-    store_filename = dir + "utils/semeval/semeval_synsets_.json"
+    store_filename = dir + "utils/semeval/semeval_synsets.json"
     
     xlsx_filename = dir + "dataset/wordlist.xlsx"
     wordlist = read_xlsx_file(xlsx_filename, 1)
@@ -595,27 +867,31 @@ def main():
     #print "words with synonyms: ", info[3]
 
     xlsx_filename = dir + "dataset/wordlist.xlsx"
+
+    
     wordlist1 = read_xlsx_file(xlsx_filename, 1)
 
-    info_ = get_semeval_info(store_filename, wordlist1)
-    print "#difficult words with substitutions for level 1: ", info_[1]
-    print "#difficult words with simple substitutions for level 1:: ", info_[2]
-    print "The ceiling for level 1: ", info_[3]
+    info1 = get_semeval_info(store_filename, wordlist1)
+    print "#difficult words with substitutions for level 1: ", info1[1]
+    print "#difficult words with simple substitutions for level 1:: ", info1[2]
+    print "The ceiling for level 1: ", info1[3]
+    
     
     wordlist = read_xlsx_file(xlsx_filename, 2)
-    info_ = get_semeval_info(store_filename, wordlist)
+    info2 = get_semeval_info(store_filename, wordlist)
  
     #print "words with synonyms: ", info[3]
-    print "#difficult words with substitutions for level 1+2: ", info_[1]
-    print "#difficult words with simple substitutions for level 1+2: ", info_[2]
-    print "The ceiling for level 1+2: ", info_[3]
+    print "#difficult words with substitutions for level 1+2: ", info2[1]
+    print "#difficult words with simple substitutions for level 1+2: ", info2[2]
+    print "The ceiling for level 1+2: ", info2[3]
 
+    
     wordlist = read_xlsx_file(xlsx_filename, 3)
-    info_ = get_semeval_info(store_filename, wordlist)
+    info3 = get_semeval_info(store_filename, wordlist)
     #print "words with synonyms: ", info[3]
-    print "#difficult words with substitutions for level 1+2+3: ", info_[1]
-    print "#difficult words with simple substitutions for level 1+2+3: ", info_[2]
-    print "The ceiling for level 1+2+3: ", info_[3]
+    print "#difficult words with substitutions for level 1+2+3: ", info3[1]
+    print "#difficult words with simple substitutions for level 1+2+3: ", info3[2]
+    print "The ceiling for level 1+2+3: ", info3[3]
 
     wordlist = read_xlsx_file(xlsx_filename, 4)
     info_ = get_semeval_info(store_filename, wordlist)
@@ -626,41 +902,47 @@ def main():
 
 
     print_semeval_interdata(store_filename, wordlist1)
-    # Mechanical Turk
-
-    # roget
-    #filename = dirname + "/data/roget"
     
-    #
+    
     """
-    xlsx_filename = dirname + "/wordlist.xlsx"
-   
-    wordlist = read_xlsx_file(xlsx_filename, 1)
-    info_ = get_roget_info(store_filename, wordlist)
-    print "#words in the EDB list for level 1: ", info_[0]
-    print "#words not in the EDB list for level 1:: ", info_[1]
-    print "The ceiling for level 1: ", info_[2]
 
+    # Mechanical Turk
+    filename = dir + "utils/mturk/lex.mturk.txt"
+    store_filename = dir + "utils/mturk/mturk_synsets.json"
+    xlsx_filename = dir + "dataset/wordlist.xlsx"
+
+    info = get_mturk_stat_info(filename, store_filename)
+    print "#sentences: ", info[0]
+    print "#words: ", info[1]
+    print "#words marked with synonyms: ", info[1]
+    
+    wordlist1 = read_xlsx_file(xlsx_filename, 1)
+    info_ = get_mturk_info(store_filename, wordlist1)
+    print "#difficult words with substitutions for level 1: ", info_[1]
+    print "#difficult words with simple substitutions for level 1: ", info_[2]
+    print "The ceiling for level 1: ", info_[3]
+  
     wordlist = read_xlsx_file(xlsx_filename, 2)
-    info_ = get_roget_info(store_filename, wordlist)
-    print "#words in the EDB list for level 1+2: ", info_[0]
-    print "#words not in the EDB list for level 1+2: ", info_[1]
-    print "The ceiling for level 1+2: ", info_[2]
+    info_ = get_mturk_info(store_filename, wordlist)
+    print "#difficult words with substitutions for level 1+2: ", info_[1]
+    print "#difficult words with simple substitutions for level 1+2: ", info_[2]
+    print "The ceiling for level 1: ", info_[3]
 
     wordlist = read_xlsx_file(xlsx_filename, 3)
-    info_ = get_roget_info(store_filename, wordlist)
-    print "#words in the EDB list for level 1+2+3: ", info_[0]
-    print "#words not in the EDB list for level 1+2+3: ", info_[1]
-    print "The ceiling for level 1+2+3: ", info_[2]
+    info_ = get_mturk_info(store_filename, wordlist)
+    print "#difficult words with substitutions for level 1+2+3: ", info_[1]
+    print "#difficult words with simple substitutions for level 1+2+3: ", info_[2]
+    print "The ceiling for level 1: ", info_[3]
 
     wordlist = read_xlsx_file(xlsx_filename, 4)
-    info_ = get_roget_info(store_filename, wordlist)
-    print "#words in the EDB list for level 1+2+3+4: ", info_[0]
-    print "#words not in the EDB list for level 1+2+3+4: ", info_[1]
-    print "The ceiling for level 1+2+3+4: ", info_[2]
+    info_ = get_mturk_info(store_filename, wordlist)
+    print "#difficult words with substitutions for level 1+2+3: ", info_[1]
+    print "#difficult words with simple substitutions for level 1+2+3: ", info_[2]
+    print "The ceiling for level 1+2+3: ", info_[3]
+
+    # print inter data
+    print_mturk_interdata(store_filename, wordlist1)
     
-    
-    """
     """
     lemmas = []
     wd ='mission'
