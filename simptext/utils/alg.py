@@ -290,14 +290,18 @@ def simp_subordi_sent(sent):
             advcl_ind = nd[4]['advcl'][0]
 
             for _nd in node_list:
-                if (advcl_ind == _nd[0]) and ('mark' in _nd[4].keys()):
+                if (advcl_ind == _nd[0]) and ('mark' in _nd[4].keys()) and (_nd[4]['mark'][0] == 1):
                     mark_ind = _nd[4]['mark'][0]
                     # get the marker
+                    #if mark_ind != 1: # manual trick, if the mark word is the 1st word
+                    #    break
 
                     #import pdb; pdb.set_trace()
                     for __nd in node_list[1:]: #skip the 1st one
                         if (__nd[1].lower() in dict1.keys()) or (__nd[1].lower() in dict2.keys()):
                             #import pdb; pdb.set_trace()
+
+
                             # mark word, so,
                             #how to know the 2rd sentence?, now we use he advcl_ind to check it
                             # Remove the 1st word like 'since/because'
@@ -305,15 +309,19 @@ def simp_subordi_sent(sent):
 
                             tokens[mark_ind+1] = tokens[mark_ind+1][0].upper() + tokens[mark_ind+1][1:]
 
-                             # add the test trick here
-
                              #import pdb; pdb.set_trace()
                             #[Notice]:NOW we use ',' to break the sentences
                             #the 2nd setence? now we use the advcl_ind to test
                             punct = ','
+                            # add the manual trick here
+
                             if punct in tokens:
                                 split_ind = tokens.index(punct)
                                 tokens[split_ind] = ''
+
+                                #if __nd[1] in tokens:
+                                #    _ind = tokens.index(__nd[1])
+
                                 #if mark_id > split_ind: #
 
                                 #import pdb; pdb.set_trace()
@@ -332,8 +340,10 @@ def simp_subordi_sent(sent):
                                     str2 = w  + ' '.join(_str2)
                                     print "2nd sent: ", str2
 
-                                    if mark_ind < split_ind:
-                                        strs = str1 + ' . ' + str2
+                                    #if mark_ind < split_ind:
+                                    strs = str1 + ' . ' + str2
+
+                                    return strs
 
                                 # if dict2, the subordinated clause goes second
                                 if (__nd[1].lower() in dict2.keys()):
@@ -346,8 +356,9 @@ def simp_subordi_sent(sent):
                                     str2 = w  + ' '.join(_str2)
                                     print "2nd sent: ", str2
 
-                                    if mark_ind < split_ind:
-                                        strs = str1 + ' . ' + str2
+                                    #if mark_ind < split_ind:
+                                    strs = str1 + ' . ' + str2
+                                    return strs
 
                                 #strs = str1 + ' . ' +  str2
                             #
@@ -355,7 +366,11 @@ def simp_subordi_sent(sent):
                         else:
                             pass # the 3rd loop
 
-                else:
+                else: # if no mark word
+                    # nsubj
+                    print "hello, world"
+
+
                     pass# the 2nd loop
 
             #split_ind = advcl_ind # in the
@@ -392,6 +407,17 @@ def main():
     #sent = "Because he took the head, the question is asked?"
     #sent = "A mission to end a war"
     sent = "Before he came, I left."
+    sent = "If IBM has miscalculated the demand, it will suffer badly as both the high operating costs and depreciation on the huge capital investment for the East Fishkill factory drag down earnings."
+    sent = "The black door opened as we came up to it, and a pale man opened the door."
+    sent = "If we only had a human on our staff, we could have done so ages ago and sold it off, but we have no such luck."
+    sent = "Tokhtakhounov's action apparently came soon after he said he received a phone call from the mother of the female ice dancer, presumably Anissina."
+    sent = "As reinstalled in Washington, the kitchen should be as we all remember it from countless TV shows, \"right down to the toothpicks.\""
+    sent = "he version endorsed by the APA would license doctoral-level psychologists to independently prescribe psychotropic drugs after completing 300 hours of classroom instruction in neuroscience, physiology and pharmacology, followed by four months' supervised treatment of 100 patients."
+
+    sent = "The black door opened as we came up to it, and a pale man opened the door."
+    sent = "\“As if I wanted it,\” interrupted the woman."
+    sent = "If we only had a human on our staff, we could have done so ages ago and sold it off, but we have no such luck."
+    sent = "If IBM has miscalculated the demand, it will suffer badly as both the high operating costs and depreciation on the huge capital investment for the East Fishkill factory drag down earnings."
     print(simp_subordi_sent(sent))
 
 

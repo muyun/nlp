@@ -203,10 +203,10 @@ def print_coinco_sent(filename):
         # write the sentence
         #res = ""
         #res = alg.simp_conj_sent(se)
-        #if not res:
         res = alg.simp_subordi_sent(se)
         if not res: # the
             num_splitted_sentences = num_splitted_sentences + 1
+            
         
         output[sentence] = res
         #import pdb; pdb.set_trace()
@@ -297,7 +297,7 @@ def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/"
 
    
-    filename = dir + "dataset/coinco/coinco.xml"
+    filename = dir + "dataset/coinco/coinco_test.xml"
     store_filename = dir + "dataset/coinco/coinco_lemmas.txt"
 
     """
@@ -345,7 +345,7 @@ def main():
     """
     # print the inter data in the syntactic simplification
     _info = print_coinco_sent(filename)
-    print "type:"
+    print "type: Subordinated Clauses:"
     print "#sentence in coinco: ", _info[0]
     print "#sentence with simplification: ", _info[1]
     
