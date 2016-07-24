@@ -53,7 +53,16 @@ def check_word(strs, words):
             if _token in words:
                  output[token] = token
             else:
-                 output[token] = get_wordnet_list(_token)
+                 _output = []
+                 wordnet = get_wordnet_list(_token)
+                 for _w in wordnet:
+                     if _w in words: # w in EDB list?
+                         _output.append(_w)
+
+                 if len(_output) >= 1:
+                     output[token] = _output
+                 else: # TOCHECK: if all synonym from wordnet are all difficult words, don't change it NOW.
+                     output[token] = token
 
     #import pdb; pdb.set_trace()
     #return ' '.join(str(w) for w in output)
