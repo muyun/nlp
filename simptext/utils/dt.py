@@ -177,8 +177,7 @@ def print_intermedia(datafile, docs, wordlist):
 
     #json.dump(output, open('intermedia.json', 'w'))
 
-
-def print_coinco_sent(filename):
+def print_simpsynt_sent(filename):
     num_sentences = 0
     num_splitted_sentences = 0
     #data = json.load(open(datafile))
@@ -199,19 +198,19 @@ def print_coinco_sent(filename):
         sent = str(p.sub('', str(sentence)))
         se = re.sub(r'^”|”$', '', sent)
         #sent = str(BeautifulSoup(sentence).text)
-        print(se)
+        #print(se)
         # write the sentence
         #res = ""
-        #res = alg.simp_conj_sent(se)
-        res = alg.simp_subordi_sent(se)
-        if not res: # the
+        res = alg.simp_coordi_sent(se)
+        #res = alg.simp_subordi_sent(se)
+        if res: # the
             num_splitted_sentences = num_splitted_sentences + 1
             
         
         output[sentence] = res
         #import pdb; pdb.set_trace()
         
-        with open('coinco_subordi_sent_l1.json', 'a') as outfile:
+        with open('coinco_coordi_sent_l1.json', 'a') as outfile:
            outfile.write(str(sentence)+'\n')
            outfile.write("OUTPUT: " + res + '\n')
            outfile.write('-----------------------\n')
@@ -297,7 +296,7 @@ def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/"
 
    
-    filename = dir + "dataset/coinco/coinco_test.xml"
+    filename = dir + "dataset/coinco/coinco_test1.xml"
     store_filename = dir + "dataset/coinco/coinco_lemmas.txt"
 
     """
@@ -344,10 +343,10 @@ def main():
 
     """
     # print the inter data in the syntactic simplification
-    _info = print_coinco_sent(filename)
-    print "type: Subordinated Clauses:"
+    _info = print_simpsynt_sent(filename)
+    print "Type: coordinating Clauses:"
     print "#sentence in coinco: ", _info[0]
-    print "#sentence with simplification: ", _info[1]
+    print "#sentence with Syntactic simplification: ", _info[1]
     
     """
     lemmas = []
