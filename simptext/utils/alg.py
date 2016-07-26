@@ -16,133 +16,136 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+#from  nltk.parse.stanford import StanfordParser
+#eng_parser = StanfordParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
+
 import base
+
+PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
 def traverse(t):
     try:
-        t.labels()
+        t.label()
     except AttributeError:
-        print t,
+        print(t + " ")
     else:
         # Now we know that t.node is defined
 
         #import pdb; pdb.set_trace()
-        print "(", t.label(),
+        print('(', t.label())
         for child in t:
             traverse(child)
-        print ")",
+        print(')')
 
-def simp_conj_sent(sent):
+def upper_first_char(w):
+    return w[0].upper() + w[1:]
+
+def simp_coordi_sent(sent):
     tokens = StanfordTokenizer().tokenize(sent)
+    tokens.insert(0, '')
 
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
-    #print "root: ", root
 
-    """
-    words = []
-    #import pdb; pdb.set_trace()
-    for node in result.nodes.items():
-        #print(node)
-        #print(node[1]['word'])
-        words.append(node[1]['word'])
-    """
-
-    #w = result.tree()
-    #print "parse_tree:", w
-
-    #TODO: use the tree, check again
-    """
-    _tree = {} # store the _tree-> {node: children}
-    #import pdb; pdb.set_trace()
-    for postn in w.treepositions():
-        if w.label() and len(postn) > 0:
-            parent = postn[:-1]
-
-            nd = w[parent].label() #node
-            if nd in _tree:
-                _tree[nd].append(w[postn])
-            else:
-                _tree[nd] = []
-                _tree[nd].append(w[postn])
-
-    """
 
     node_list = [] #(4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     for node in result.nodes.items():
         #print(node)
         node_list.append(base.get_triples(node))
 
-    # construct the tree
-    #partial = Tree(w[parent].label(), )
     """
+    # construct the tree
+    #w = result.tree()
+    #partial = Tree(w[parent].label(), )
     _subtree = {}
     for subtree in w.subtrees():
-
         #import pdb; pdb.set_trace()
-        traverse(subtree)
+        #traverse(subtree)
         _subtree[subtree.label()] = subtree
 
-    """
-    """
-     # store the subtree in the
-    for nd in _subtree:
-        childs = []
-        for v in _subtree[nd]:
-            if not isinstance(v, Tree):
-                childs.append(v)
-            #else:
-            #    childs.append(v.label())
-        _subtree[nd] = childs
     """
 
     # Universal dependencies -- And relations
     """ depes format, based on dependency graph in NLTK
     ((head word, head tag), rel, (dep word, dep tag))
     e.g.  ((u'ate', u'VBD'), u'nsubj', (u'I', u'PRP'))
+    ##### node_list
+    e.g. #(4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     """
-
     strs = ""
-    """
-    for nd in node_list:
-        if 'root' in nd[4]:
-            rind = nd[4]['root'] # the index of root
-    """
-    for nd in node_list:
-        #import pdb; pdb.set_trace()
+    for nd in node_list[1:]:
         #print(nd)
-        if (root in nd) and ('conj' in nd[4].keys()):
-            #print "conj: ", nd
-            #print "conj node: ", nd[4]['conj']
-            pass
+        #depes.append(row)
 
-        if (root in nd) and ('cc' in nd[4].keys()):
-            #print "cc: ", nd
-            ind = nd[4]['cc'][0]
-            #print "cc_node: ", ind
+        #import pdb; pdb.set_trace()
+        # look for the root word, and check the root word has a modifier
+        """
+        #if (root in nd) and ('conj' in nd[4].keys()):
+            # if "conj" relation, it is modified by row[2]
+            #import pdb; pdb.set_trace()
+            #print "conj_node: ", nd[4]['conj']
+        #    pass
+            #
 
-            # if the last one in the _str is ',', replace ',' with '.'
+            lst = []
+            lst.append(row[2][0])
+            if row[2][0] in _subtree:
+                #print "conj_node: ", _subtree[row[2][0]]
+                for k in _subtree[row[2][0]]:
+                    lst.append(k)
+            #lst.append(row[2][0])
+
+            lst_ = sorted(lst, key=lambda x: tokens.index(x))
+            #print "conj_lst_: ", lst_
+            ret.append(lst_)
+        """
+        if (root in nd) and ('cc' in nd[4].keys()) and ('conj' in nd[4].keys()):
+              # coordination
+            # Note: remove the conjunction word, and
+            #       if there is words before the conjunction, we consider it as a sent,
+            #       or,
+            #import pdb; pdb.set_trace()
+            #print "cc_node: ", nd[4]['cc']
+            cc_ind = nd[4]['cc'][0]
+
+            # remove the conjunction word
 
             #import pdb; pdb.set_trace()
-            # some trick for the dataset
-            if tokens[ind-2] == ',':
-                tokens[ind-2] = ''
-            if (ind-1) == 0:
+            tokens[cc_ind] = ''
+            if tokens[cc_ind - 1] == '':# no word before the conjunction word
                 pass
-            else:
-                _str = tokens[:(ind-1)]
+            elif tokens[cc_ind - 1] in PUNCTUATION:
+                tokens[cc_ind - 1] = ''
+                tokens[cc_ind] = '.'
+            else:# we can add ' . ' as the end of the 1st sentence
+                tokens[cc_ind] = '. '
 
-                strs = ' '.join(_str)
-                strs = strs + " . "
-            #print(strs)
+            #NOTE: We can consider the next word after the conjunction as the first word of 2nd sentence
+            word = tokens[cc_ind + 1]
+            tokens[cc_ind + 1] = upper_first_char(word)
 
-            #import pdb; pdb.set_trace()
-            # upper the first char in tokens[ind]
-            _str1 = tokens[ind][0].upper() + tokens[ind][1:] + ' '
-            _str2 = _str1 + ' '.join(tokens[(ind+1):])
-            #print(_str2)
+            """
+            lst = []
+            lst.append(row[0][0])
+            if row[0][0] in _subtree:
+                #print "cc_node: ", _subtree[row[0][0]]
+                for k in _subtree[row[0][0]]:
+                    # remove the 'cc' modifier
+                    if k == row[2][0]:
+                        pass
+                    else:
+                        lst.append(k)
+            #lst.append(row[0][0])
 
-            strs = strs + _str2
+            lst_ = sorted(lst, key=lambda x: tokens.index(x))
+            print "cc_lst_: ", lst_
+            #ret.append(lst_)
+            """
+            strs = ' '.join(tokens)
+            return strs
+        else:
+            #print "Hello, World"
+            pass
 
     """
     ret = []
@@ -195,22 +198,14 @@ def simp_conj_sent(sent):
             pass
 
     """
-    # based on the splitting alg
 
     #import pdb; pdb.set_trace()
-    #print
 
-    #import pdb; pdb.set_trace()
-    """
-    strs =""
-    for str in ret:
-        _strs = ' '.join(str)
-        _strs = _strs + ' . '
-        strs = strs + _strs
-    """
     return strs
 
+
 def simp_subordi_sent(sent):
+    PUNCT = ','
     # the subordinating conjunction
     dict1 = {   'after': 'Then',
                 'although': 'But',
@@ -224,12 +219,12 @@ def simp_subordi_sent(sent):
              'before': 'Then'
             }
 
+    # the original tokens in the sent
     tokens = StanfordTokenizer().tokenize(sent)
     tokens.insert(0, '')
 
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
-    #print "root: ", root
 
     #w = result.tree()
     #print "parse_tree:", w
@@ -251,10 +246,16 @@ def simp_subordi_sent(sent):
 
     """
 
-    node_list = [] #(4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
+    # Universal dependencies --
+    """ depes format, based on dependency graph in NLTK
+    ((head word, head tag), rel, (dep word, dep tag))
+    e.g.  ((u'ate', u'VBD'), u'nsubj', (u'I', u'PRP'))
+    """
+    node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     for node in result.nodes.items():
         #print(node)
         node_list.append(base.get_triples(node))
+        #node_list[base.get_triples[0]] = base.get_triples(node)
 
     # construct the tree
     #partial = Tree(w[parent].label(), )
@@ -270,16 +271,11 @@ def simp_subordi_sent(sent):
         _subtree[nd] = childs
     """
 
-    # Universal dependencies --
-    """ depes format, based on dependency graph in NLTK
-    ((head word, head tag), rel, (dep word, dep tag))
-    e.g.  ((u'ate', u'VBD'), u'nsubj', (u'I', u'PRP'))
-    """
-
     strs = ""
     split_ind = 0
-    for nd in node_list:
-        #import pdb; pdb.set_trace()
+    mark_ind = 0
+    for nd in node_list[1:]:
+        import pdb; pdb.set_trace()
         #print(nd)
         if (root in nd) and ('advcl' in nd[4].keys()):
             #print "conj: ", nd
@@ -288,98 +284,62 @@ def simp_subordi_sent(sent):
 
         if (root in nd) and ('advcl' in nd[4].keys()):
             advcl_ind = nd[4]['advcl'][0]
+            advcl_dic = node_list[advcl_ind][4]
 
-            for _nd in node_list:
-                if (advcl_ind == _nd[0]) and ('mark' in _nd[4].keys()) and (_nd[4]['mark'][0] == 1):
-                    mark_ind = _nd[4]['mark'][0]
-                    # get the marker
-                    #if mark_ind != 1: # manual trick, if the mark word is the 1st word
-                    #    break
+            if ('mark' in advcl_dic.keys()):
+                import pdb; pdb.set_trace()
+                mark_ind = node_list[advcl_ind]['mark'][0]
 
-                    #import pdb; pdb.set_trace()
-                    for __nd in node_list[1:]: #skip the 1st one
-                        if (__nd[1].lower() in dict1.keys()) or (__nd[1].lower() in dict2.keys()):
-                            #import pdb; pdb.set_trace()
+                # get the marker,  delete the conjunction
+                tokens[mark_ind] = ''
+                tokens[mark_ind+1] = upper_first_char(tokens[mark_ind+1])
+                # if the marker is in the dict1
+                # [NOTICE]: we use the punctuation to check the sentence
+                if (tokens[mark_ind].lower() in dict1.keys()): # if dict1, subordinated clause goes first
+                    # delete the conjunction,
+                    #tokens[mark_ind] = ''
+                    #tokens[mark_ind+1] = upper_first_char(tokens[mark_ind+1])
 
+                    #[NOTICE]: we consider 1st ',' to split the sentence, and get the 2nd sentence
+                    if PUNCT in tokens:
+                        split_ind = tokens.index(PUNCT)
+                        tokens[split_ind] = ''
+                         #import pdb; pdb.set_trace()
+                        #print "tokens: ", tokens[split_ind+1]
+                        #= tokens[split_ind+1][0].upper() + tokens[split_ind+1][1:]
+                        _str1 = tokens[:(split_ind)]
+                        str1 = ' '.join(_str1)
+                        #print "1st sent: ", str1
 
-                            # mark word, so,
-                            #how to know the 2rd sentence?, now we use he advcl_ind to check it
-                            # Remove the 1st word like 'since/because'
-                            tokens[mark_ind] = ''
+                        _str2 = tokens[(split_ind+1):]
+                        w = dict1[tokens[mark_ind].lower()] + ' '
+                        str2 = w  + ' '.join(_str2)
+                        #print "2nd sent: ", str2
 
-                            tokens[mark_ind+1] = tokens[mark_ind+1][0].upper() + tokens[mark_ind+1][1:]
+                        strs = str1 + ' . ' + str2
 
-                             #import pdb; pdb.set_trace()
-                            #[Notice]:NOW we use ',' to break the sentences
-                            #the 2nd setence? now we use the advcl_ind to test
-                            punct = ','
-                            # add the manual trick here
+                        return strs
 
-                            if punct in tokens:
-                                split_ind = tokens.index(punct)
-                                tokens[split_ind] = ''
+                # if dict2, the subordinated clause goes second
+                if (tokens[mark_ind].lower() in dict2.keys()):
+                    if PUNCT in tokens:
+                        split_ind = tokens.index(PUNCT)
+                        _str1 = tokens[:(split_ind)]
+                        str1 = ' '.join(_str1)
+                        #print "1st sent: ", str1
 
-                                #if __nd[1] in tokens:
-                                #    _ind = tokens.index(__nd[1])
+                        _str2 = tokens[(split_ind+1):]
+                        w = dict2[tokens[mark_ind].lower()] + ' '
+                        str2 = w  + ' '.join(_str2)
+                        #print "2nd sent: ", str2
 
-                                #if mark_id > split_ind: #
-
-                                #import pdb; pdb.set_trace()
-                                #print "tokens: ", tokens[split_ind+1]
-                                #= tokens[split_ind+1][0].upper() + tokens[split_ind+1][1:]
-
-                                # if dict1, subordinated clause goes first
-                                if (__nd[1].lower() in dict1.keys()):
-
-                                    _str1 = tokens[:(split_ind)]
-                                    str1 = ' '.join(_str1)
-                                    print "1st sent: ", str1
-
-                                    _str2 = tokens[(split_ind+1):]
-                                    w = dict1[__nd[1].lower()] + ' '
-                                    str2 = w  + ' '.join(_str2)
-                                    print "2nd sent: ", str2
-
-                                    #if mark_ind < split_ind:
-                                    strs = str1 + ' . ' + str2
-
-                                    return strs
-
-                                # if dict2, the subordinated clause goes second
-                                if (__nd[1].lower() in dict2.keys()):
-                                    _str1 = tokens[:(split_ind)]
-                                    str1 = ' '.join(_str1)
-                                    print "1st sent: ", str1
-
-                                    _str2 = tokens[(split_ind+1):]
-                                    w = dict2[__nd[1].lower()] + ' '
-                                    str2 = w  + ' '.join(_str2)
-                                    print "2nd sent: ", str2
-
-                                    #if mark_ind < split_ind:
-                                    strs = str1 + ' . ' + str2
-                                    return strs
-
-                                #strs = str1 + ' . ' +  str2
-                            #
-
-                        else:
-                            pass # the 3rd loop
-
-                else: # if no mark word
-                    # nsubj
-                    print "hello, world"
+                        strs = str1 + ' . ' + str2
+                        return strs
 
 
-                    pass# the 2nd loop
+        #if mark_ind == 0:  # if no mark word
+        # adverbial clauses [NOTICE]: consider ',' to split the sentence
 
-            #split_ind = advcl_ind # in the
-
-    # Universal dependencies -- And relations
-    """ depes format, based on dependency graph in NLTK
-    ((head word, head tag), rel, (dep word, dep tag))
-    e.g.  ((u'ate', u'VBD'), u'nsubj', (u'I', u'PRP'))
-    """
 
     return strs
 
@@ -387,18 +347,21 @@ def simp_subordi_sent(sent):
 #main
 def main():
     # coordinated clauses
-    #sent = "I ate fish and he drank wine."
+
     sent = "He likes swimming and I like football."
     #sent = "I like swimming and he love running and she likes badminton"
 
     #sent = "Integra-A Hotel  Co. said its planned rights offering to raise about $9 million was declared effective and the company will begin mailing materials to shareholders at the end of this week."
-    #sent = "We haven't totally forgotten about it, but we're looking forward to this upcoming season."
+
     sent = "He held it out, and with a delighted \"Oh!\""
     sent = "and this is factory is critical to meeting that growing demand."
     sent = "He looked me and at last said, \"Very well.\""
     sent = "For information on COPIA events open to the public, sign on to www.copia.org"
-    #res = simp_coordi_sent(sent)
-    #print(res)
+    sent = "I ate fish and he drank wine"
+    #sent = "I ate fish and he drank wine."
+    sent = "We haven't totally forgotten about it, but we're looking forward to this upcoming season."
+    sent = "By contrast, European firms will spend $150 million this year on electronic security, and are expected to spend $1 billion by 1992."
+    #print(simp_coordi_sent(sent))
 
 
     # Subordinated Clauses and Adverbial Clauses
@@ -418,10 +381,13 @@ def main():
     sent = "\“As if I wanted it,\” interrupted the woman."
     sent = "If we only had a human on our staff, we could have done so ages ago and sold it off, but we have no such luck."
     sent = "If IBM has miscalculated the demand, it will suffer badly as both the high operating costs and depreciation on the huge capital investment for the East Fishkill factory drag down earnings."
+    sent= "Since he came, I left."
     print(simp_subordi_sent(sent))
 
 
     # Adverbial Clauses
+    #sent = "Needing money, I begged my parents."
+    #print(simp_advcl_sent(sent))
 
     # Appositive phrase
 
