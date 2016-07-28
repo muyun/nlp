@@ -559,7 +559,9 @@ def get_mturk_stat_info(filename, store_filename):
     
     # store read the synset file
     mturk = OrderedDict() # Synsets -> { word : [sent], [synsets]}
-    #docs = []
+
+    # this docs is used for print in order
+    docs = []
 
     f = open(filename, 'rU')
     for line in f: # for each line
@@ -582,6 +584,8 @@ def get_mturk_stat_info(filename, store_filename):
             mturk[w].append(sent)
             mturk[w].append(synsets)
 
+            docs.append(w)
+            
             num_sentences = num_sentences + 1
             
         
@@ -596,7 +600,7 @@ def get_mturk_stat_info(filename, store_filename):
     json.dump(mturk, open(store_filename, 'w'))
     #json.dump(docs, open('docs.txt', 'w'))
 
-    return num_sentences,num_words, num_words_syns
+    return num_sentences,num_words, num_words_syns, docs
 
 
 def get_mturk_info(datafile, wordlist):
@@ -706,7 +710,7 @@ def get_mturk_info(datafile, wordlist):
 
 
 
-def print_mturk_interdata(datafile, wordlist):
+def print_mturk_interdata(datafile, wordlist, docs):
     """print the intermedia data for the check
      @datafile is the lemmas dict filename
      @wordlist is the edb wordlist
@@ -715,7 +719,10 @@ def print_mturk_interdata(datafile, wordlist):
     data = json.load(open(datafile))
 
     # import pdb; pdb.set_trace()
-    for id in data:
+    for wd in docs:
+
+        #import pdb; pdb.set_trace()
+        id = wd.split('_')[1]
         w = cal.get_lemma(id)
 
         k_wordnet_list = cal.get_wordnet_list(w)
@@ -725,14 +732,14 @@ def print_mturk_interdata(datafile, wordlist):
         #wordlist = k_wordnet_list + k_roget_list
         
         k_simp_wordnet=[]
-        for wd in k_wordnet_list:
-            if wd in wordlist:
-                k_simp_wordnet.append(wd)
+        for _wd in k_wordnet_list:
+            if _wd in wordlist:
+                k_simp_wordnet.append(_wd)
 
 
         #import pdb; pdb.set_trace()#
-        if len(data[id]) > 1:
-            mturklist = data[id][1]
+        if len(data[wd][1]) > 1:
+            mturklist = data[wd][1]
         if w in mturklist:
             mturklist.remove(w)
             
@@ -763,7 +770,7 @@ def print_mturk_interdata(datafile, wordlist):
             else:
                 rf = ['N']
                 
-            output[k] = [data[id][0], k, mturklist, k_wordnet_list, wf, k_roget_list, rf]
+            output[k] = [data[wd][0], k, mturklist, k_wordnet_list, wf, k_roget_list, rf]
         else:
             if len(wordnet_feas) >= 1: # at least one in wordnet
                 wf = ['Y']
@@ -775,7 +782,7 @@ def print_mturk_interdata(datafile, wordlist):
             else:
                 rf = ['N']
             
-            output[w] = [data[id][0], w, mturklist, k_wordnet_list, wf, k_roget_list, rf]
+            output[w] = [data[wd][0], w, mturklist, k_wordnet_list, wf, k_roget_list, rf]
 
         # write the sentence
 
@@ -784,7 +791,7 @@ def print_mturk_interdata(datafile, wordlist):
         #print(data[id][0])
         #import pdb; pdb.set_trace()
         # wirte the file in CSV format
-        with codecs.open('mturk_l1.csv', 'a') as outfile:
+        with codecs.open('mturk_l1_.csv', 'a') as outfile:
             wr = csv.writer(outfile, delimiter =',', quoting=csv.QUOTE_ALL)
             for row in output:
                 wr.writerow(output[row])
@@ -912,6 +919,7 @@ def main():
     print "#sentences: ", info[0]
     print "#words: ", info[1]
     print "#words marked with synonyms: ", info[2]
+    #print "#docs[]", info[3]
     
     wordlist1 = read_xlsx_file(xlsx_filename, 1)
     info_ = get_mturk_info(store_filename, wordlist1)
@@ -937,8 +945,8 @@ def main():
     print "#difficult words with simple substitutions for level 1+2+3: ", info_[2]
     print "The ceiling for level 1+2+3: ", info_[3]
 
-    # print inter data
-    #print_mturk_interdata(store_filename, wordlist1)
+    # print inter data - info[3] is docs[]
+    print_mturk_interdata(store_filename, wordlist1, info[3])
     
     """
     lemmas = []

@@ -177,7 +177,7 @@ def print_intermedia(datafile, docs, wordlist):
 
     #json.dump(output, open('intermedia.json', 'w'))
 
-def print_simpsynt_sent(filename):
+def print_syn_sent(filename, sent_file):
     num_sentences = 0
     num_splitted_sentences = 0
     #data = json.load(open(datafile))
@@ -198,11 +198,13 @@ def print_simpsynt_sent(filename):
         sent = str(p.sub('', str(sentence)))
         se = re.sub(r'^”|”$', '', sent)
         #sent = str(BeautifulSoup(sentence).text)
-        #print(se)
+        print(se)
         # write the sentence
         #res = ""
-        res = alg.simp_coordi_sent(se)
+        #res = alg.simp_coordi_sent(se)
         #res = alg.simp_subordi_sent(se)
+        #res = alg.simp_advcl_sent(se)
+        res = alg.simp_parti_sent(se)
         if res: # the
             num_splitted_sentences = num_splitted_sentences + 1
             
@@ -210,14 +212,120 @@ def print_simpsynt_sent(filename):
         output[sentence] = res
         #import pdb; pdb.set_trace()
         
-        with open('coinco_coordi_sent_l1.json', 'a') as outfile:
+        with open(sent_file, 'a') as outfile:
            outfile.write(str(sentence)+'\n')
            outfile.write("OUTPUT: " + res + '\n')
            outfile.write('-----------------------\n')
            #json.dump(output, outfile, indent=2)
 
     return num_sentences, num_splitted_sentences       
+
+def print_semeval_sent(filename, sent_file):
+    num_sentences = 0
+    num_splitted_sentences = 0
+    #data = json.load(open(datafile))
+    docs = OrderedDict() # store the info - docs[sentence] = [id,...]
+    
+    soup = BeautifulSoup(open(filename), "lxml")
+
+    # number of sentences, based on the 'sent' tag
+    sentences = soup.find_all("instance")
+    #num_sentences = len(sentences)
+
+    p = re.compile(r'<.*?>')
+    #import pdb; pdb.set_trace()
+    output = OrderedDict()
+    for sentence in sentences:
+
+        #import pdb; pdb.set_trace()
+        num_sentences = num_sentences + 1
+        #print(sentence)
+        #sent = str(p.sub('', str(sentence)))
+        #se = re.sub(r'^”|”$', '', sent)
+        se = sentence.context.get_text()
+        #sent = str(BeautifulSoup(sentence).text)
+        #print(se)
+        # write the sentence
+        #res = ""
+        res = alg.simp_coordi_sent(se)
+        #res = alg.simp_subordi_sent(se)
+        #res = alg.simp_advcl_sent(se)
+        #res = alg.simp_parti_sent(se)
+        if res: # the
+            num_splitted_sentences = num_splitted_sentences + 1
+            
+        output[sentence] = res
+        #import pdb; pdb.set_trace()
         
+        with open(sent_file, 'a') as outfile:
+           outfile.write(str(sentence)+'\n')
+           outfile.write("OUTPUT: " + res + '\n')
+           outfile.write('-----------------------\n')
+           #json.dump(output, outfile, indent=2)
+
+    return num_sentences, num_splitted_sentences
+
+def print_mturk_sent(filename, sent_file):
+    num_sentences = 0
+    num_splitted_sentences = 0
+    #data = json.load(open(datafile))
+    docs = OrderedDict() # store the info - docs[sentence] = [id,...]
+    
+    #soup = BeautifulSoup(open(filename), "lxml")
+
+    # number of sentences, based on the 'sent' tag
+    #sentences = soup.find_all("instance")
+    #num_sentences = len(sentences)
+
+    #p = re.compile(r'<.*?>')
+    #import pdb; pdb.set_trace()
+    output = OrderedDict()
+    f = open(filename, 'rU')
+    num = 0
+    for line in f:
+        line = line.strip('\n')
+        if line:
+            #import pdb; pdb.set_trace()
+            num_sentences = num_sentences + 1
+            #print(sentence)
+            #sent = str(p.sub('', str(sentence)))
+            #se = re.sub(r'^”|”$', '', sent)
+            #se = sentence.context.get_text()
+            #sent = str(BeautifulSoup(sentence).text)
+            obj = line.split("\t")
+            se = re.sub(r'^"|"$', '', obj[0])
+            #print(se)
+            # write the sentence
+            #res = ""
+            #res = alg.simp_coordi_sent(str(se))
+            #res = alg.simp_subordi_sent(str(se))
+            #res = alg.simp_advcl_sent(str(se))
+            #res = alg.simp_parti_sent(str(se))
+            #res = alg.simp_adjec_sent(str(se))
+            #res = alg.simp_appos_sent(str(se))
+            res = alg.simp_passive_sent(str(re))
+            #import pdb; pdb.set_trace()
+            #print "re: ", re
+            if res: # the
+                num_splitted_sentences = num_splitted_sentences + 1
+
+
+            #import pdb; pdb.set_trace()
+            output[se] = res
+            #import pdb; pdb.set_trace()
+        
+            with open(sent_file, 'a') as outfile:
+                outfile.write(str(se)+'\n')
+                outfile.write("OUTPUT: " + res + '\n')
+                outfile.write('-----------------------\n')
+                #json.dump(output, outfile, indent=2)
+                
+            num = num + 1
+            if num == 200:
+                break
+
+    return num_sentences, num_splitted_sentences
+
 
 def get_coinco_wordlist(datafile, wordlist):
     #
@@ -261,8 +369,7 @@ def get_coinco_wordlist(datafile, wordlist):
             for wd in (k_wordnet_list):
                 if wd in wordlist:
                       k_simp_wordnet.append(wd)
-                      
-            
+                        
             #
             coincolist = data[id][1:]
             if w in coincolist:
@@ -291,13 +398,58 @@ def get_coinco_wordlist(datafile, wordlist):
 
     return num_simp_words, _num_not_simp_words, ceiling
 
+def cal_mturk_sent(filename):
+    f = open(filename, 'rU')
+    _num_wrong_output = 0
+    num_false = 0
+    num_false_positive = 0
+    num_false_negative = 0
+    num_true = 0
+    for line in f:
+        line = line.strip('\n')
+        if "OUTPUT" in line:
+            #import pdb; pdb.set_trace()
+            #num_output = num_output + 1
+            #print(sentence)
+            #sent = str(p.sub('', str(sentence)))
+            #se = re.sub(r'^”|”$', '', sent)
+            #se = sentence.context.get_text()
+            #sent = str(BeautifulSoup(sentence).text)
+            ot_flag = line.split(':')[0]
+            ot = line.split(':')[1].strip() # having output or not
+
+            #import pdb; pdb.set_trace()
+            if ot_flag == "#OUTPUT":  # the wrong classifier
+                _num_wrong_output = _num_wrong_output + 1
+
+            if not ot: #don't have the output,consider it as false positive
+                num_false = num_false + 1
+                if ot_flag == "#OUTPUT":
+                    num_false_positive = num_false_positive + 1
+            else: # having the output
+                num_true = num_true + 1
+                if ot_flag == "#OUTPUT": #False Negative
+                    num_false_negative = num_false_negative + 1
+                    
+
+    #import pdb; pdb.set_trace()
+            #match = re.search(r'(^(#OUTPUT):(\w*))', line)
+    print "#num_flase: ", num_false
+    print "#num_false_positive: ", num_false_positive
+    print "#num_false_negative: ", num_false_negative
+    print "#num_true: ", num_true
+    print "#_num_wrong_output: ", _num_wrong_output
+    
+    return num_false, num_false_positive, num_false_negative, num_true       
+
+
 # Main test
 def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/"
 
    
-    filename = dir + "dataset/coinco/coinco_test1.xml"
-    store_filename = dir + "dataset/coinco/coinco_lemmas.txt"
+    filename = dir + "dataset/coinco/coinco.xml"
+    #store_filename = dir + "dataset/coinco/coinco_lemmas.txt"
 
     """
     info = get_stat_info(filename, store_filename)
@@ -343,10 +495,23 @@ def main():
 
     """
     # print the inter data in the syntactic simplification
-    _info = print_simpsynt_sent(filename)
-    print "Type: coordinating Clauses:"
-    print "#sentence in coinco: ", _info[0]
-    print "#sentence with Syntactic simplification: ", _info[1]
+    #filename = dir + "utils/semeval/test/lexsub_test.xml"
+    filename = dir + "utils/mturk/lex.mturk_200.txt"
+    sent_file = dir + "utils/passive_mturk_l2_.json"
+    
+    #_info = print_mturk_sent(filename, sent_file)
+    #print "Type:  Passive Clauses:"
+    #print "#sentence in mturk: ", _info[0]
+    #print "#sentence with Syntactic simplification: ", _info[1]
+    
+
+    # recall and precision
+    #filename = dir + "utils/testset_groundtruth.md"
+    #filename = dir + "utils/coordi_mturk_l1_.json"
+    filename = dir + "utils/testset_gt_adverb.md"
+    filename = dir + "utils/testset_gt_appos.md"
+
+    _info = cal_mturk_sent(filename)
     
     """
     lemmas = []
