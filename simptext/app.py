@@ -22,6 +22,7 @@ import models
 import utils.dt, utils.cal, utils.alg
 
 words = utils.dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
+#from nltk.tokenize import StanfordTokenizer
 
 @app.route('/')
 def show_entries():
@@ -31,54 +32,15 @@ def show_entries():
     entries = str(txt.text)
     print "entries: ", entries
 
-    #Syntactic simplification
-    coordi = utils.alg.simp_coordi_sent(entries)
-    print "simp_sent: ", coordi
-
     #outputs = entries
-    outputs = utils.cal.check_word(coordi, words)
-    # simplify the words in this text  
-    if len(coordi) > 0:
-        outputs = utils.cal.check_word(coordi, words)
-        #outputs = coordi
-        #break
-    else:
-        # subordi
-        subordi = utils.alg.simp_subordi_sent(entries)
-        if len(subordi) > 0:
-            outputs = utils.cal.check_word(subordi, words)
-            #outputs = coordi
-            #break
-        else: #advcl
-            advcl = utils.alg.simp_advcl_sent(entries)
-            if len(advcl) > 0:
-                outputs = utils.cal.check_word(advcl, words)
-
-                #break
-            else: #parti 
-                      
-                parti = utils.alg.simp_parti_sent(str(entries))
-                if len(parti) > 0:
-                    outputs = utils.cal.check_word(parti, words)
-                    #break
-                else: #adjec   
-                    adjec = utils.alg.simp_adjec_sent(str(entries)) 
-                    if len(adjec) > 0:
-                        outputs = utils.cal.check_word(adjec, words)
-                        #break
-                    else: #appos
-                        appos = utils.alg.simp_appos_sent(str(entries)) 
-                        if len(appos) > 0:
-                            outputs = utils.cal.check_word(appos, words) 
-                            #break
-                        else: #passive
-                            passive = utils.alg.simp_passive_sent(str(entries)) 
-                            if len(passive) > 0:
-                                outputs = utils.cal.check_word(passive, words) 
-                                #break
-                            else: # just simplify the word
-                                #outputs = utils.cal.check_word(entries, words)
-                                pass
+    outputs = {}
+     
+    if len(entries) > 0: #Syntactic simplification firstly
+        #tokens = StanfordTokenizer().tokenize(entries)
+        syn_ret = utils.alg.simp_syn_sent(entries)
+        #print "Syntactic result: ", syn_ret
+        if len(syn_ret) > 0: # next simplify the word
+            outputs = utils.cal.check_word(syn_ret, words)
                   
     print "output: ", outputs
 
@@ -126,3 +88,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+    #app.run(host='144.214.20.231',debug=True)

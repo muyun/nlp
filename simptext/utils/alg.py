@@ -41,7 +41,8 @@ def traverse(t):
 def upper_first_char(w):
     return w[0].upper() + w[1:]
 
-def simp_coordi_sent(sent):
+def simp_coordi_sent(tokens, node_list):
+    """
     tokens = StanfordTokenizer().tokenize(sent)
     tokens.insert(0, '')
 
@@ -54,7 +55,6 @@ def simp_coordi_sent(sent):
         #print(node)
         node_list.append(base.get_triples(node))
 
-    """
     # construct the tree
     #w = result.tree()
     #partial = Tree(w[parent].label(), )
@@ -73,6 +73,14 @@ def simp_coordi_sent(sent):
     ##### node_list
     e.g. #(4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     """
+    root = ""
+    root_ind = node_list[0][4]['root'][0]
+    for nd in node_list:
+        if root_ind == nd[0]:
+            root=nd[1]
+
+    #import pdb; pdb.set_trace()
+
     strs = ""
     for nd in node_list[1:]:
         #print(nd)
@@ -105,10 +113,36 @@ def simp_coordi_sent(sent):
             # Note: remove the conjunction word, and
             #       if there is words before the conjunction, we consider it as a sent,
             #       or,
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
+
+            nsubj = " "
+            nsubj_ind = 0
+            FLAG = 0
+            #Assume the nsubj is the before word of the conj_ind
+            conj_ind = nd[4]['conj'][0]
+            for _nd in node_list[1:]:
+                if conj_ind == _nd[0]:
+                    if ('nsubj' in _nd[4].keys()) or ('nsubjpass' in _nd[4].keys()):
+                        # another subj :THE ASSUME
+                        nsubj_ind = conj_ind - 1
+                        conj_nsubj = upper_first_char(tokens[nsubj_ind]) + nsubj
+                        FLAG = 1 # use the subj
+
+            # get nsubj
+            #nsubj = " "
+            if ('nsubj' in nd[4].keys()):
+                nsubj_ind = nd[4]['nsubj'][0]
+                nsubj =  upper_first_char(tokens[nsubj_ind]) + nsubj
+
+
+            if ('nsubjpass' in nd[4].keys()):
+                nsubj_ind = nd[4]['nsubjpass'][0]
+                nsubj = upper_first_char(tokens[nsubj_ind]) + nsubj
+
             #print "cc_node: ", nd[4]['cc']
             cc_ind = nd[4]['cc'][0]
 
+            # 1st str1
             # remove the conjunction word
 
             #import pdb; pdb.set_trace()
@@ -118,12 +152,20 @@ def simp_coordi_sent(sent):
             elif tokens[cc_ind - 1] in PUNCTUATION:
                 tokens[cc_ind - 1] = ''
                 tokens[cc_ind] = '.'
+            elif tokens[cc_ind + 1] in PUNCTUATION:
+                tokens[cc_ind + 1] = ''
             else:# we can add ' . ' as the end of the 1st sentence
-                tokens[cc_ind] = '. '
+                tokens[cc_ind] = '.'
+
+            str1 = nsubj + " ".join(tokens[(nsubj_ind+1):(cc_ind+1)])
 
             #NOTE: We can consider the next word after the conjunction as the first word of 2nd sentence
-            word = tokens[cc_ind + 1]
-            tokens[cc_ind + 1] = upper_first_char(word)
+            # str2
+            if not FLAG:
+                str2 = nsubj + " ".join(tokens[(cc_ind + 1):])
+            else:
+                str2 = conj_nsubj + " ".join(tokens[conj_ind:])
+
 
             """
             lst = []
@@ -142,7 +184,8 @@ def simp_coordi_sent(sent):
             print "cc_lst_: ", lst_
             #ret.append(lst_)
             """
-            strs = ' '.join(tokens)
+            strs = str1 + " " + str2
+
             return strs
         else:
             #print "Hello, World"
@@ -205,7 +248,8 @@ def simp_coordi_sent(sent):
     return strs
 
 
-def simp_subordi_sent(sent):
+def simp_subordi_sent(tokens, node_list):
+    # C1 and C2  must have the own subject
     #PUNCT = ','
     # the subordinating conjunction
     dict1 = {   'after': 'Then',
@@ -220,13 +264,14 @@ def simp_subordi_sent(sent):
              'before': 'Then'
             }
 
+    """
     # the original tokens in the sent
     tokens = StanfordTokenizer().tokenize(sent)
     tokens.insert(0, '')
 
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
-
+    """
     #w = result.tree()
     #print "parse_tree:", w
 
@@ -252,11 +297,14 @@ def simp_subordi_sent(sent):
     ((head word, head tag), rel, (dep word, dep tag))
     e.g.  ((u'ate', u'VBD'), u'nsubj', (u'I', u'PRP'))
     """
+
+    """
     node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     for node in result.nodes.items():
         #print(node)
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
+    """
 
     # construct the tree
     #partial = Tree(w[parent].label(), )
@@ -272,8 +320,14 @@ def simp_subordi_sent(sent):
         _subtree[nd] = childs
     """
 
+    root = ""
+    root_ind = node_list[0][4]['root'][0]
+    for nd in node_list:
+        if root_ind == nd[0]:
+            root=nd[1]
+
     strs = ""
-    split_ind = 0
+    #split_ind = 0
     mark_ind = 0
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
@@ -411,9 +465,10 @@ def simp_subordi_sent(sent):
 
     return strs
 
-def simp_advcl_sent(sent):
+def simp_advcl_sent(tokens, node_list):
     strs = ""
 
+    """
     # the original tokens in the sent
     tokens = StanfordTokenizer().tokenize(sent)
     tokens.insert(0, '')
@@ -429,9 +484,14 @@ def simp_advcl_sent(sent):
     for node in result.nodes.items():
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
+    """
+    root = ""
+    root_ind = node_list[0][4]['root'][0]
+    for nd in node_list:
+        if root_ind == nd[0]:
+            root=nd[1]
 
-
-    split_ind = 0
+    #split_ind = 0
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
         #print(nd)
@@ -491,8 +551,9 @@ def simp_advcl_sent(sent):
 
     return strs
 
-def simp_parti_sent(sent):
-    strs = ""
+def simp_parti_sent(tokens, node_list):
+
+    """
     # the original tokens in the sent
     tokens = StanfordTokenizer().tokenize(sent)
     tokens.insert(0, '')
@@ -509,6 +570,15 @@ def simp_parti_sent(sent):
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
 
+    """
+
+    root = ""
+    root_ind = node_list[0][4]['root'][0]
+    for nd in node_list:
+        if root_ind == nd[0]:
+            root=nd[1]
+
+    strs = ""
     #split_ind = 0
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
@@ -564,7 +634,8 @@ def simp_parti_sent(sent):
 
     return strs
 
-def simp_adjec_sent(sent):
+def simp_adjec_sent(tokens, node_list):
+    """
     strs = ""
     # the original tokens in the sent
     tokens = StanfordTokenizer().tokenize(sent)
@@ -582,6 +653,14 @@ def simp_adjec_sent(sent):
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
 
+    """
+    root = ""
+    root_ind = node_list[0][4]['root'][0]
+    for nd in node_list:
+        if root_ind == nd[0]:
+            root=nd[1]
+
+    strs = ""
     #split_ind = 0
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
@@ -630,7 +709,8 @@ def simp_adjec_sent(sent):
     return strs
 
 
-def simp_appos_sent(sent):
+def simp_appos_sent(tokens, node_list):
+    """
     strs = ""
     # the original tokens in the sent
     tokens = StanfordTokenizer().tokenize(sent)
@@ -647,6 +727,15 @@ def simp_appos_sent(sent):
     for node in result.nodes.items():
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
+
+    """
+    root = ""
+    root_ind = node_list[0][4]['root'][0]
+    for nd in node_list:
+        if root_ind == nd[0]:
+            root=nd[1]
+
+    strs = ""
 
     #split_ind = 0
     for nd in node_list[1:]:
@@ -703,7 +792,8 @@ def simp_appos_sent(sent):
 
     return strs
 
-def simp_passive_sent(sent):
+def simp_passive_sent(tokens, node_list):
+    """
     strs = ""
     # the original tokens in the sent
 
@@ -725,7 +815,14 @@ def simp_passive_sent(sent):
     for node in result.nodes.items():
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
+    """
+    root = ""
+    root_ind = node_list[0][4]['root'][0]
+    for nd in node_list:
+        if root_ind == nd[0]:
+            root=nd[1]
 
+    strs = ""
     #split_ind = 0
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
@@ -757,7 +854,8 @@ def simp_passive_sent(sent):
             #if ('case' in nmod_dict.keys()): # 'by'
                 #[NOTICE]: connect the nsubj + acl as 1st
                 #import pdb; pdb.set_trace()
-                det_ind = nmod_dict['det'][0]
+                if ('det' in nmod_dict):
+                    det_ind = nmod_dict['det'][0]
 
                 if det_ind:
                     subj = upper_first_char(tokens[det_ind]) + " " + tokens[nmod_ind]
@@ -792,74 +890,146 @@ def simp_passive_sent(sent):
 
     return strs
 
+def simp_syn_sent_(sent):
+    strs = ""
+    # the original tokens in the sent
+
+
+    #import pdb; pdb.set_trace()
+    #print(sent)
+    #import pdb; pdb.set_trace()
+    tokens = StanfordTokenizer().tokenize(str(sent))
+    tokens.insert(0, '')
+
+    result = list(eng_parser.raw_parse(sent))[0]
+    root = result.root['word']
+
+    #w = result.tree()
+    #print "parse_tree:", w
+    #for row in result.triples():
+    #    print(row)
+
+
+    #import pdb; pdb.set_trace()
+    #TODO: use the tree structure, check again
+    node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
+    for node in result.nodes.items():
+        node_list.append(base.get_triples(node))
+        #node_list[base.get_triples[0]] = base.get_triples(node)
+
+
+    #import pdb; pdb.set_trace()
+    strs = simp_coordi_sent(tokens, node_list)
+    #strs = simp_subordi_sent(tokens, node_list)
+    #strs = simp_advcl_sent(tokens, node_list)
+    #strs = simp_parti_sent(tokens, node_list)
+    #strs = simp_adjec_sent(tokens, node_list)
+    #strs = simp_appos_sent(tokens, node_list)
+    #strs = simp_passive_sent(tokens, node_list)
+
+    return strs
+
+def simp_syn_sent(sent):
+    strs = ""
+    # the original tokens in the sent
+
+
+    #import pdb; pdb.set_trace()
+    #print "syn sent: ", sent
+    #import pdb; pdb.set_trace()
+    tokens = StanfordTokenizer().tokenize(sent)
+    tokens.insert(0, '')
+
+    result = list(eng_parser.raw_parse(sent))[0]
+    root = result.root['word']
+
+    #w = result.tree()
+    #print "parse_tree:", w
+
+    #TODO: use the tree structure, check again
+    node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
+    for node in result.nodes.items():
+        node_list.append(base.get_triples(node))
+        #node_list[base.get_triples[0]] = base.get_triples(node)
+
+
+    #import pdb; pdb.set_trace()
+    if len(sent) > 0:
+        strs = simp_coordi_sent(tokens, node_list)
+        if len(strs) > 0:
+            return strs
+        else:
+            strs = simp_subordi_sent(tokens, node_list)
+            if len(strs) > 0:
+                return strs
+            else:
+                strs = simp_advcl_sent(tokens, node_list)
+                if len(strs) > 0:
+                    return strs
+                else:
+                    strs = simp_parti_sent(tokens, node_list)
+                    if len(strs) > 0:
+                        return strs
+                    else:
+                        strs = simp_adjec_sent(tokens, node_list)
+                        if len(strs) > 0:
+                            return strs
+                        else:
+                            strs = simp_appos_sent(tokens, node_list)
+                            if len(strs) > 0:
+                                return strs
+                            else:
+                                strs = simp_passive_sent(tokens, node_list)
+                                if len(strs) > 0:
+                                    return strs
+
+
+    return strs
+
 #main
 def main():
     # coordinated clauses
-
-    sent = "He likes swimming and I like football."
-    #sent = "I like swimming and he love running and she likes badminton"
-
-    #sent = "Integra-A Hotel  Co. said its planned rights offering to raise about $9 million was declared effective and the company will begin mailing materials to shareholders at the end of this week."
-
     sent = "He held it out, and with a delighted \"Oh!\""
-    sent = "and this is factory is critical to meeting that growing demand."
-    sent = "He looked me and at last said, \"Very well.\""
-    sent = "For information on COPIA events open to the public, sign on to www.copia.org"
-    sent = "I ate fish and he drank wine"
     #sent = "I ate fish and he drank wine."
     sent = "We haven't totally forgotten about it, but we're looking forward to this upcoming season."
-    sent = "By contrast, European firms will spend $150 million this year on electronic security, and are expected to spend $1 billion by 1992."
     sent = "I ate fish or he drank wine."
-    sent = "I ate fish or he drank wine"
-    #sent ="The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
-    print(simp_coordi_sent(sent))
 
+    sent = "I ate an apple and an orange."
+    #print(simp_coordi_sent(sent))
+    print(simp_syn_sent_(sent))
 
     # Subordinated Clauses and Adverbial Clauses
     sent= "Since he came, I left."
-    #sent = " Since he took the head coaching job at bottom-dwelling Vanderbilt, the question Bobby Johnson is asked most often is not, &quot;Why will things be different under you?"
-    #sent = "Because he took the head, the question is asked?"
-    #sent = "A mission to end a war"
     sent = "Before he came, I left."
-    sent = "If IBM has miscalculated the demand, it will suffer badly as both the high operating costs and depreciation on the huge capital investment for the East Fishkill factory drag down earnings."
-    sent = "The black door opened as we came up to it, and a pale man opened the door."
-    sent = "If we only had a human on our staff, we could have done so ages ago and sold it off, but we have no such luck."
-    sent = "Tokhtakhounov's action apparently came soon after he said he received a phone call from the mother of the female ice dancer, presumably Anissina."
-    sent = "As reinstalled in Washington, the kitchen should be as we all remember it from countless TV shows, \"right down to the toothpicks.\""
-    sent = "he version endorsed by the APA would license doctoral-level psychologists to independently prescribe psychotropic drugs after completing 300 hours of classroom instruction in neuroscience, physiology and pharmacology, followed by four months' supervised treatment of 100 patients."
-
-    sent = "The black door opened as we came up to it, and a pale man opened the door."
-    sent = "\“As if I wanted it,\” interrupted the woman."
-    sent = "If we only had a human on our staff, we could have done so ages ago and sold it off, but we have no such luck."
-    sent = "If IBM has miscalculated the demand, it will suffer badly as both the high operating costs and depreciation on the huge capital investment for the East Fishkill factory drag down earnings."
-    sent= "Since he came, I left."
-    #sent = "Before he came, I left."
-    #sent = "Ochoa's new teammates were generally pleased with the move, even if it wasn't a blockbuster."
-    sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
     #print(simp_subordi_sent(sent))
+    #print(simp_syn_sent_(sent))
 
     # Adverbial Clauses
     sent = "Needing money, I begged my parents."
     #sent = "Ochoa's new teammates were generally pleased with the move, even if it wasn't a blockbuster."
-    #sent = "Ralston Purina Co. reported a 47% decline in fourth-quarter earnings, reflecting restructuring costs as well as a more difficult pet food market."
     #sent = "I blinked when I opened the door."
     #print(simp_advcl_sent(sent))
+    #print(simp_syn_sent(sent))
 
     # participial phrases
     sent = "Alicia, running down the street, tripped."
     #sent = "The MTR was immediately popular with residents of Hong Kong ; as a result , subsequent lines have been built to cover more territory . There are continual debates regarding how and where to expand the MTR network ."
     #print(simp_parti_sent(sent))
+    #print(simp_syn_sent(sent))
 
     #Adjectival Clauses and Appositive phrases
     sent = "Peter, who liked fruits, ate an apple."
     #print(simp_adjec_sent(sent))
+    #print(simp_syn_sent(sent))
 
     sent = "Peter, my son, ate an apple."
     #print(simp_appos_sent(sent))
+    #print(simp_syn_sent(sent))
 
     sent = "Peter was hit by a bus."
-    #sent = "In March 1992 , Linux version 0.95 was the first to be capable of running X. This large version number jump was due to a feeling that a version 1.0 with no major missing pieces was imminent ."
     #print(simp_passive_sent(sent))
+    sent = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
+    #print(simp_syn_sent_(sent))
 
 
 if __name__ == '__main__':

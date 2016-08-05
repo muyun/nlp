@@ -30,20 +30,24 @@
   <li><h2>Output:<h2>
  
    <li>
-   {% for key, value in outputs.iteritems() %} 
-       {% if key is equalto value %}
-         {{ key }}
-         
-       {% else %} {# not change #}
+   {% for item in outputs %}   
+       {% if item is mapping %} {# not change #}
+   
+        {% for key, value in item.iteritems() %}
          <select>
-            {% for v in value %}
-            <option value={{ v }} >{{ v }} </option>
-            {% endfor %}
+           {% for v in value %}
+             <option value={{ v }} >{{ v }} </option>
+           {% endfor %}
          </select>
+         
+         {% endfor %}
+
+         {% else %}
+            {{ item }}
          
        {% endif %}
 
-      {% endfor %}  
+     {% endfor %}  
   
 </ul>
   <!--

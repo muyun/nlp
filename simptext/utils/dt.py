@@ -19,7 +19,9 @@ from collections import OrderedDict
 import openpyxl, json, csv
 
 # for Roget's Thesaurus (1911)
-import  alg, roget, cal, tool
+import  cal, tool
+
+from app import alg
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -294,18 +296,19 @@ def print_mturk_sent(filename, sent_file):
             #sent = str(BeautifulSoup(sentence).text)
             obj = line.split("\t")
             se = re.sub(r'^"|"$', '', obj[0])
-            #print(se)
+            print(se)
             # write the sentence
             #res = ""
-            #res = alg.simp_coordi_sent(str(se))
-            #res = alg.simp_subordi_sent(str(se))
+            res = alg.punct.simp_syn_sent_(se)
+            #res = alg.simp_syn_sent_(str(se))
+            #res = alg.simp_syn_sent_(str(se))
             #res = alg.simp_advcl_sent(str(se))
             #res = alg.simp_parti_sent(str(se))
             #res = alg.simp_adjec_sent(str(se))
             #res = alg.simp_appos_sent(str(se))
-            res = alg.simp_passive_sent(str(re))
+            #res = alg.simp_passive_sent(str(re))
             #import pdb; pdb.set_trace()
-            #print "re: ", re
+            print "re: ", re
             if res: # the
                 num_splitted_sentences = num_splitted_sentences + 1
 
@@ -319,10 +322,12 @@ def print_mturk_sent(filename, sent_file):
                 outfile.write("OUTPUT: " + res + '\n')
                 outfile.write('-----------------------\n')
                 #json.dump(output, outfile, indent=2)
-                
+
+            """  
             num = num + 1
             if num == 200:
                 break
+            """
 
     return num_sentences, num_splitted_sentences
 
@@ -496,22 +501,22 @@ def main():
     """
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
-    filename = dir + "utils/mturk/lex.mturk_200.txt"
-    sent_file = dir + "utils/passive_mturk_l2_.json"
+    filename = dir + "utils/mturk/lex.mturk.txt"
+    sent_file = dir + "utils/testset/punct_mturk_l1_.md"
     
-    #_info = print_mturk_sent(filename, sent_file)
-    #print "Type:  Passive Clauses:"
-    #print "#sentence in mturk: ", _info[0]
-    #print "#sentence with Syntactic simplification: ", _info[1]
+    _info = print_mturk_sent(filename, sent_file)
+    print "Type: Punct Clauses:"
+    print "#sentence in mturk: ", _info[0]
+    print "#sentence with Syntactic simplification: ", _info[1]
     
 
     # recall and precision
     #filename = dir + "utils/testset_groundtruth.md"
     #filename = dir + "utils/coordi_mturk_l1_.json"
-    filename = dir + "utils/testset_gt_adverb.md"
-    filename = dir + "utils/testset_gt_appos.md"
+    #filename = dir + "utils/testset_gt_adverb.md"
+    #filename = dir + "utils/testset_gt_appos.md"
 
-    _info = cal_mturk_sent(filename)
+    #_info = cal_mturk_sent(filename)
     
     """
     lemmas = []
