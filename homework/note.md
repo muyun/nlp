@@ -5,7 +5,7 @@
         $ source /usr/local/bin/virtualenvwrapper.sh   
         $     
         $ mkvirtualenv venv2  ## create   
-        $ workon venv2 
+        $ workon venv2   #working    
         $ (Emacs) M-x pyvenv-workon venv2   
         $    
         $ deactivate  
