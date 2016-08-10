@@ -1,14 +1,20 @@
 ##### note about Flask
 * Use virtual Environments to separate the development from the maintance 
-    >virtualenv --no-site-packages venv  
-    > . venv/bin/activate  
+    - virtualenvwrapper is used for the virtual env management
+      > $ export WORKON_HOME = $HOME/.virtualenvs
+        $ source /usr/local/bin/virtualenvwrapper.sh
 
-    >deactivate 
-    
-    “freeze” the current state of the environment packages  
-    > pip freeze > requirements.txt   
+      > $ mkvirtualenv venv2
+        $ workon venv2
+   
+        $ M-x pyvenv-workon venv2
 
-    > pip install -r requirements.txt 
+        $ deactivate
+        $ rmvirtualenv venv2
+
+    - “freeze” the current state of the environment packages  
+      > pip freeze > requirements.txt   
+      > pip install -r requirements.txt 
 
 * Structuring
  - module
