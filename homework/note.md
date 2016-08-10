@@ -4,12 +4,12 @@
       > $ export WORKON_HOME = $HOME/.virtualenvs
         $ source /usr/local/bin/virtualenvwrapper.sh
 
-      > $ mkvirtualenv venv2
-        $ workon venv2
+        $ mkvirtualenv venv2 
+        $ workon venv2 
    
-        $ M-x pyvenv-workon venv2
+        $ M-x pyvenv-workon venv2  
 
-        $ deactivate
+        $ deactivate  
         $ rmvirtualenv venv2
 
     - “freeze” the current state of the environment packages  
