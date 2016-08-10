@@ -2,13 +2,12 @@
 * Use virtual Environments to separate the development from the maintance 
     - virtualenvwrapper is used for the virtual env management
       > $ export WORKON_HOME = $HOME/.virtualenvs  
-        $ source /usr/local/bin/virtualenvwrapper.sh  
-
-        $ mkvirtualenv venv2 
+        $ source /usr/local/bin/virtualenvwrapper.sh
+        $     
+        $ mkvirtualenv venv2  ## create   
         $ workon venv2 
-   
-        $ (Emacs) M-x pyvenv-workon venv2  
-
+        $ (Emacs) M-x pyvenv-workon venv2 
+        $   
         $ deactivate  
         $ rmvirtualenv venv2
 
