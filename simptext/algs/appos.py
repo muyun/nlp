@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-   utils.base
+   algs.appos
    ~~~~~~~~~~
-   base common function
+   appos function
 """
 #from itertools import chain
 from collections import defaultdict
@@ -12,20 +12,15 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from alg import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
-def simp_passive_sent(tokens, node_list):
+def simp_appos_sent(tokens, node_list):
     """
     strs = ""
     # the original tokens in the sent
-
-
-    #import pdb; pdb.set_trace()
-    print(sent)
-    #import pdb; pdb.set_trace()
-    tokens = StanfordTokenizer().tokenize(str(sent))
+    tokens = StanfordTokenizer().tokenize(sent)
     tokens.insert(0, '')
 
     result = list(eng_parser.raw_parse(sent))[0]
@@ -39,6 +34,7 @@ def simp_passive_sent(tokens, node_list):
     for node in result.nodes.items():
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
+
     """
     root = ""
     root_ind = node_list[0][4]['root'][0]
@@ -47,57 +43,47 @@ def simp_passive_sent(tokens, node_list):
             root=nd[1]
 
     strs = ""
+
     #split_ind = 0
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
         #print(nd)
-        # A passive nominal subjec
-        if (root in nd) and ('nsubjpass' in nd[4].keys()):
+        if (root in nd) and ('nsubj' in nd[4].keys()):
             pass
 
-        if (root in nd) and ('nsubjpass' in nd[4].keys()):
+        if (root in nd) and ('nsubj' in nd[4].keys()):
             #print "conj: ", nd
             #print "conj node: ", nd[4]['conj']
 
             #import pdb; pdb.set_trace()
-            nsubjpass_ind = nd[4]['nsubjpass'][0]
-
-            det_ind = 0
-            subj = ""
-            if ('nmod' in nd[4].keys()):
-                nmod_ind = nd[4]['nmod'][0]
-
-                nmod_dict = {}
-                for _nd in node_list: #BUG
-                    if nmod_ind == _nd[0]:
-                         nmod_dict = _nd[4]
-                         break
+            nsubj_ind = nd[4]['nsubj'][0]
+            nsubj_dict = {}
+            for _nd in node_list: #BUG
+                if nsubj_ind == _nd[0]:
+                     nsubj_dict = _nd[4]
+                     break
 
 
-                #import pdb; pdb.set_trace()
-            #if ('case' in nmod_dict.keys()): # 'by'
+            #import pdb; pdb.set_trace()
+            if ('appos' in nsubj_dict.keys()):
                 #[NOTICE]: connect the nsubj + acl as 1st
                 #import pdb; pdb.set_trace()
-                if ('det' in nmod_dict):
-                    det_ind = nmod_dict['det'][0]
+                appos_ind = nsubj_dict['appos'][0]
 
-                if det_ind:
-                    subj = base.upper_first_char(tokens[det_ind]) + " " + tokens[nmod_ind]
-                else:
-                    subj = tokens[nmod_ind]
+                verb = "be"
 
-            strs = subj + " " + root + " " + tokens[nsubjpass_ind]
-            """
+                subj = base.upper_first_char(tokens[nsubj_ind])
+
                 #[NOTICE]: remove the ',' after the nsubj
                 if tokens[nsubj_ind + 1] in PUNCTUATION:
                     tokens[nsubj_ind + 1] = ''
 
                 tokens.insert(nsubj_ind + 1, verb)
 
-                #root_ind = tokens.index(root)
-                #_str1 = tokens[nsubj_ind:root_ind]
+                root_ind = tokens.index(root)
+                _str1 = tokens[nsubj_ind:root_ind]
 
-                if _str1[-1] in PUNCTUATION:
+                if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
                 str1 =  ' '.join(_str1)
                 #print "1st sent: ", str1
@@ -105,14 +91,14 @@ def simp_passive_sent(tokens, node_list):
                 # upper the 1st char in 2nd sent
                 _str2 = tokens[root_ind:]
                 #w = _w + ' '
-                str2 = upper_first_char(subj) + " " + ' '.join(_str2)
+                str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
-            """
-                #strs = str1 + ' . ' + str2
-            return strs
 
+                strs = str1 + ' . ' + str2
+                return strs
 
     return strs
+
 
 def simp_syn_sent_(sent):
     strs = ""
@@ -148,23 +134,18 @@ def simp_syn_sent_(sent):
     #strs = simp_advcl_sent(tokens, node_list)
     #strs = simp_parti_sent(tokens, node_list)
     #strs = simp_adjec_sent(tokens, node_list)
-    #strs = simp_appos_sent(tokens, node_list)
-    strs = simp_passive_sent(tokens, node_list)
+    strs = simp_appos_sent(tokens, node_list)
+    #strs = simp_passive_sent(tokens, node_list)
 
     return strs
 
 def main():
-    # coordinated clauses
-    sent = "He held it out, and with a delighted \"Oh!\""
-    #sent = "I ate fish and he drank wine."
-    sent = "We haven't totally forgotten about it, but we're looking forward to this upcoming season."
-    sent = "I ate fish or he drank wine."
+    # Appositive clauses
 
     #sent = "I ate an apple and an orange."
     sent = "I ate an apple and an orange."
-    sent = "Peter was hit by a bus."
+    sent = "Peter, my son, ate an apple."
     #TODO: the tense of the output
-    #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 
 

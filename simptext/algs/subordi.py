@@ -25,12 +25,22 @@ def simp_subordi_sent(tokens, node_list):
                 'though': 'But',
                 'since': 'Therefore',
                 'because': 'Therefore',
-                'as': 'Therefore'
+                'as': 'Therefore',
+                'even though': 'Even so',
+                'while': 'But',
+                'if': 'Suppose',
+                'when': 'At the time'
             }
 
-    dict2 = {'so': 'So',
-             'before': 'Then'
-            }
+    dict2 = {
+                'since': 'This is because',
+                'because': 'This is because',
+                'as': 'This is because',
+                'so': 'So',
+                'before': 'Then',
+                'while': 'But',
+                'where': 'There'
+    }
 
     root = ""
     root_ind = node_list[0][4]['root'][0]

@@ -161,23 +161,37 @@ def simp_coordi_sent(tokens, node_list):
             strs = str1 + " " + str2
             return strs
         
-        elif (root in nd) and ('dobj' in nd[4].keys()):
+        elif (root in nd) and ('dobj' in nd[4].keys() or 'nsubj' in nd[4].keys()):
             #
-            dobj_ind = nd[4]['dobj'][0]
-            cc_ind = 0
-            for _nd in node_list[1:]:
-                if (dobj_ind == _nd[0]) and ('conj' in _nd[4].keys()) and ('cc' in _nd[4].keys()):
-                    cc_ind = _nd[4]['cc'][0]
 
-                    #import pdb; pdb.set_trace()
-                    break
-            #
+            #import pdb; pdb.set_trace()
+            cc_ind = 0
+            dobj_ind = 0
+            if ('dobj' in nd[4].keys()):
+                dobj_ind = nd[4]['dobj'][0]
+                for _nd in node_list[1:]:
+                    if (dobj_ind == _nd[0]) and ('conj' in _nd[4].keys()) and ('cc' in _nd[4].keys()):
+                        cc_ind = _nd[4]['cc'][0]
+                        break
+
+            nsubj_ind = 0
+            if ('nsubj' in nd[4].keys()): # there is BUG here
+                nsubj_ind = nd[4]['nsubj'][0]
+                for _nd in node_list[1:]:
+                    if (nsubj_ind == _nd[0]) and ('conj' in _nd[4].keys()) and ('cc' in _nd[4].keys()):
+                        cc_ind = _nd[4]['cc'][0]
+                        break
 
             #import pdb; pdb.set_trace()
             str1 = " ".join(tokens[:(dobj_ind+1)])
             str2 = " ".join(tokens[:(root_ind+1)] + tokens[cc_ind+1:])
 
-            strs = str1 + " . " + str2
+            if str1:
+                return strs
+            if str2:
+                return strs 
+            else:  
+                strs = str1 + " . " + str2
 
             return strs
 

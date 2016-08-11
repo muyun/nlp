@@ -237,6 +237,7 @@ def print_semeval_sent(filename, sent_file):
     p = re.compile(r'<.*?>')
     #import pdb; pdb.set_trace()
     output = OrderedDict()
+    _output = OrderedDict()
     for sentence in sentences:
 
         #import pdb; pdb.set_trace()
@@ -258,12 +259,17 @@ def print_semeval_sent(filename, sent_file):
             
         output[sentence] = res
         #import pdb; pdb.set_trace()
-        
+
         with open(sent_file, 'a') as outfile:
            outfile.write(str(sentence)+'\n')
            outfile.write("OUTPUT: " + res + '\n')
            outfile.write('-----------------------\n')
            #json.dump(output, outfile, indent=2)
+
+        _output[sentence] = [sentence, res]
+        with codecs.open('mturk_sent.csv', 'a') as _outfile:
+            wr = csv.writer(_outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
+            wr.writerow(_output[sentence])
 
     return num_sentences, num_splitted_sentences
 
@@ -365,8 +371,8 @@ def get_coinco_wordlist(datafile, wordlist):
             # the synonyms in mWordNet
 
             #import pdb; pdb.set_trace()
-            k_wordnet_list = cal.get_wordnet_list(w)
-            k_roget_list = roget.get_roget_synset(w)
+            k_wordnet_list = utils.wordcal.get_wordnet_list(w)
+            #k_roget_list = roget.get_roget_synset(w)
 
             # we should remove the words not in EDB list
 

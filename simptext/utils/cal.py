@@ -23,7 +23,6 @@ wnl = WordNetLemmatizer()
 
 import string
 
-import dt
 
 def get_lemma(word):
     return wnl.lemmatize(word.lower(), pos='v')

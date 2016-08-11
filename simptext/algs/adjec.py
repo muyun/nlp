@@ -69,6 +69,7 @@ def simp_adjec_sent(tokens, node_list):
 
             #import pdb; pdb.set_trace()
             nsubj_ind = nd[4]['nsubj'][0]
+
             subj = tokens[nsubj_ind]
             nsubj_dict = {}
             for _nd in node_list[1:]: #BUG
@@ -76,16 +77,21 @@ def simp_adjec_sent(tokens, node_list):
                      nsubj_dict = _nd[4]
                      break
 
+            # are
+            cop_ind = 0
+            if ('cop' in nd[4].keys()):
+                cop_ind = nd[4]['cop'][0]
 
             #import pdb; pdb.set_trace()
             if ('acl:relcl' in nsubj_dict.keys()):
                 #[NOTICE]: connect the nsubj + acl as 1st
-                import pdb; pdb.set_trace()
+                #import pdb; pdb.set_trace()
                 relcl_ind = nsubj_dict['acl:relcl'][0]
 
                 # is there the 'dobj'
                 dobj_ind = 0
                 rel_nsubj_ind = 0
+                nmod_ind = 0
                 for _nd in node_list[1:]:
                     if relcl_ind == _nd[0]:
                         if ('dobj' in _nd[4].keys()):
@@ -94,10 +100,12 @@ def simp_adjec_sent(tokens, node_list):
                             rel_nsubj_ind = _nd[4]['nsubj'][0]
                         if ('nmod' in _nd[4].keys()):
                             nmod_ind = _nd[4]['nmod'][0]
-                        break
+                        #break
 
 
-                #import pdb; pdb.set_trace()
+                """
+                TODO: The code cannot recognize the 'dobj' and 'nsubj'
+                import pdb; pdb.set_trace()
                 if dobj_ind != 0: # the verb is modified by "dobj"
 
                     #import pdb; pdb.set_trace()
@@ -120,13 +128,15 @@ def simp_adjec_sent(tokens, node_list):
                     strs = str1 + ' . ' + str2
 
                     return strs
+                """
 
-                elif nmod_ind != 0: # nmod
+                #import pdb; pdb.set_trace()
+                if nmod_ind != 0: # nmod
                     #import pdb; pdb.set_trace()
                     rel_nsubj = base.upper_first_char(tokens[rel_nsubj_ind])
                     _str1 =  tokens[relcl_ind:(root_ind-1)]
 
-                    if _str1[-1] in PUNCTUATION:
+                    if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                        _str1[-1] = ''
                     str1 = rel_nsubj + " " + ' '.join(_str1) + " " + tokens[nsubj_ind]
 
@@ -147,16 +157,24 @@ def simp_adjec_sent(tokens, node_list):
                 #subj = tokens[nsubj_ind]
                 #tokens.insert(1, upper_first_char(subj))
 
-                    import pdb; pdb.set_trace()
+                    #TODO- cannot recognize the nsubj and dobj
+                    #import pdb; pdb.set_trace()
                     root_ind = tokens.index(root)
-                    _str1 = tokens[relcl_ind:root_ind]
-                    if _str1[-1] in PUNCTUATION:
+
+                    if cop_ind:
+                        _str1 = tokens[relcl_ind:cop_ind]
+                    else:
+                        _str1 = tokens[relcl_ind:root_ind]
+                    if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                         _str1[-1] = ''
                     str1 = base.upper_first_char(subj) + " " + ' '.join(_str1)
                 #print "1st sent: ", str1
 
                 # upper the 1st char in 2nd sent
-                    _str2 = tokens[root_ind:]
+                    if cop_ind:
+                        _str2 = tokens[cop_ind:]
+                    else:
+                        _str2 = tokens[root_ind:]
                 #w = _w + ' '
                     str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
@@ -210,10 +228,10 @@ def main():
     #sent = "Peter, who liked fruits, ate an apple."
     #sent = "I ate fish and he drank wine."
     sent = "The apple, which Peter ate, was red."
-    #sent = "Peter, whom I know, came."
+    sent = "Peter, whom I know, came."
 
     #sent = "Peter, to whom I talked, came."
-    #sent = "The books, most of which I read, are interesting."
+    sent = "The books, most of which I read, are interesting."
 
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))

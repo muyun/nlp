@@ -1,3 +1,12 @@
+##### note about NLP
+  * Part-of-speech (POS) tagging  
+    Chunking -> labels phrases or segments with tags  
+    Named-entity recognition (NER) -> labels recognised entities  
+    Semantic-role labeling (SRL)  
+
+  * hand-engineered features -> assign label to words 
+
+
 ##### note about Flask
 * Use virtual Environments to separate the development from the maintance 
     - virtualenvwrapper is used for the virtual env management
@@ -37,10 +46,4 @@
 
 
    
-##### note about NLP
-  * Part-of-speech (POS) tagging  
-    Chunking -> labels phrases or segments with tags  
-    Named-entity recognition (NER) -> labels recognised entities  
-    Semantic-role labeling (SRL)  
-
-  * hand-engineered features -> assign label to words  
+ 

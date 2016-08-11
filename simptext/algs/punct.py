@@ -142,7 +142,7 @@ def main():
     sent = "I ate fish; he drank wine; we liked swimming"
     #sent = "I have two brothers: they both live in China."
     #sent = "I have two brothers: Peter and Sam."
-    sent = "In March 1992 , Linux version 0.95 was the first to be capable of running X. This large version number jump was due to a feeling that a version 1.0 with no major missing pieces was imminent ."
+    #sent = "In March 1992 , Linux version 0.95 was the first to be capable of running X. This large version number jump was due to a feeling that a version 1.0 with no major missing pieces was imminent ."
     print(simp_syn_sent_(sent))    
 
         

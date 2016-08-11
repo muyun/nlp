@@ -19,7 +19,7 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #from  nltk.parse.stanford import StanfordParser
 #eng_parser = StanfordParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from alg import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -95,7 +95,7 @@ def simp_parti_sent(tokens, node_list):
                 verb = "be"
                 root_ind = tokens.index(root)
                 _str1 = tokens[acl_ind:root_ind]
-                if _str1[-1] in PUNCTUATION:
+                if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
                 str1 = base.upper_first_char(subj) + " " + verb + " "
                 str1 =  str1 + ' '.join(_str1)
@@ -157,6 +157,8 @@ def main():
     sent = "Alicia, running down the street, tripped."
 
     sent = "Peter, also called Pete, came."
+
+    sent = "The MTR was immediately popular with residents of Hong Kong ; as a result , subsequent lines have been built to cover more territory . There are continual debates regarding how and where to expand the MTR network ."
 
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))

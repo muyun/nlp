@@ -19,9 +19,10 @@ db = SQLAlchemy(app)
 
 import models
 
-import utils.dt, utils.cal, utils.alg
+#from algs import simp
+import dt, utils.cal, utils.algs
 
-words = utils.dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
+words = dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
 #from nltk.tokenize import StanfordTokenizer
 
 @app.route('/')
@@ -37,7 +38,7 @@ def show_entries():
      
     if len(entries) > 0: #Syntactic simplification firstly
         #tokens = StanfordTokenizer().tokenize(entries)
-        syn_ret = utils.alg.simp_syn_sent(entries)
+        syn_ret = algs.simp.simp_syn_sent_(entries)
         #print "Syntactic result: ", syn_ret
         if len(syn_ret) > 0: # next simplify the word
             outputs = utils.cal.check_word(syn_ret, words)

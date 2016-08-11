@@ -12,7 +12,7 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from alg import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -44,11 +44,11 @@ def simp_paratax_sent(tokens, node_list):
             str1 = " ".join(_str1)
 
             subj = base.upper_first_char(tokens[inds[0]+1])
-            _str2 = tokens[inds[0]+1:inds[1]]
+            _str2 = tokens[inds[0]+2:inds[1]]
             str2 = subj + " " + " ".join(_str2)
 
 
-        strs = str1  + " " + str2
+            strs = str1  + " " + str2
 
     return strs
 

@@ -25,7 +25,12 @@ root = None
 """
 
 def upper_first_char(w):
-    return w[0].upper() + w[1:]        
+    if len(w) > 1:
+        return w[0].upper() + w[1:] 
+    elif len(w) == 1:
+        return w[0].upper() 
+    else:
+        return ""              
 
 
 def get_triples(node):

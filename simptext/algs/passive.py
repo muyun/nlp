@@ -12,7 +12,7 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from alg import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -156,15 +156,8 @@ def simp_syn_sent_(sent):
     return strs
 
 def main():
-    # coordinated clauses
-    sent = "He held it out, and with a delighted \"Oh!\""
-    #sent = "I ate fish and he drank wine."
-    sent = "We haven't totally forgotten about it, but we're looking forward to this upcoming season."
-    sent = "I ate fish or he drank wine."
 
-    #sent = "I ate an apple and an orange."
-    sent = "I ate an apple and an orange."
-    sent = "He is an actor and a musician."
+    sent = "Peter was hit by a bus."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

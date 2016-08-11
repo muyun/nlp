@@ -38,8 +38,10 @@ def traverse(t):
             traverse(child)
         print(')')
 
+"""
 def upper_first_char(w):
     return w[0].upper() + w[1:]
+"""
 
 def simp_coordi_sent(tokens, node_list):
     """
@@ -125,19 +127,19 @@ def simp_coordi_sent(tokens, node_list):
                     if ('nsubj' in _nd[4].keys()) or ('nsubjpass' in _nd[4].keys()):
                         # another subj :THE ASSUME
                         nsubj_ind = conj_ind - 1
-                        conj_nsubj = upper_first_char(tokens[nsubj_ind]) + nsubj
+                        conj_nsubj = base.upper_first_char(tokens[nsubj_ind]) + nsubj
                         FLAG = 1 # use the subj
 
             # get nsubj
             #nsubj = " "
             if ('nsubj' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubj'][0]
-                nsubj =  upper_first_char(tokens[nsubj_ind]) + nsubj
+                nsubj =  base.upper_first_char(tokens[nsubj_ind]) + nsubj
 
 
             if ('nsubjpass' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubjpass'][0]
-                nsubj = upper_first_char(tokens[nsubj_ind]) + nsubj
+                nsubj = base.upper_first_char(tokens[nsubj_ind]) + nsubj
 
             #print "cc_node: ", nd[4]['cc']
             cc_ind = nd[4]['cc'][0]
@@ -185,7 +187,6 @@ def simp_coordi_sent(tokens, node_list):
             #ret.append(lst_)
             """
             strs = str1 + " " + str2
-
             return strs
         else:
             #print "Hello, World"
@@ -370,7 +371,7 @@ def simp_subordi_sent(tokens, node_list):
                     # delete the conjunction,
                     _w = dict1[marker]
                     tokens[mark_ind] = ''
-                    tokens[mark_ind+1] = upper_first_char(tokens[mark_ind+1])
+                    tokens[mark_ind+1] = base.upper_first_char(tokens[mark_ind+1])
 
                     #[NOTICE]: we consider 1st ',' to split the sentence, and get the 2nd sentence
 
@@ -420,7 +421,7 @@ def simp_subordi_sent(tokens, node_list):
                 if (marker in dict2.keys()):
                     _w = dict2[marker]
                     tokens[mark_ind] = ''
-                    tokens[mark_ind+1] = upper_first_char(tokens[mark_ind+1])
+                    tokens[mark_ind+1] = base.upper_first_char(tokens[mark_ind+1])
 
 
                     #import pdb; pdb.set_trace()
@@ -530,7 +531,7 @@ def simp_advcl_sent(tokens, node_list):
                     nsubj_ind = nd[4]['nsubj'][0]
                     #if (advcl_ind < split_ind):
                     subj = tokens[nsubj_ind]
-                    tokens.insert(1, upper_first_char(subj))
+                    tokens.insert(1, base.upper_first_char(subj))
 
                     _str1 = tokens[:(nsubj_ind)]
                     if _str1[-1] in PUNCTUATION:
@@ -539,7 +540,7 @@ def simp_advcl_sent(tokens, node_list):
                         #print "1st sent: ", str1
 
                         # upper the 1st char in 2nd sent
-                    tokens[nsubj_ind] = upper_first_char(tokens[nsubj_ind])
+                    tokens[nsubj_ind] = base.upper_first_char(tokens[nsubj_ind])
                     _str2 = tokens[nsubj_ind:]
                         #w = _w + ' '
                     str2 =  ' '.join(_str2)
@@ -620,13 +621,13 @@ def simp_parti_sent(tokens, node_list):
                 _str1 = tokens[acl_ind:(split_ind+acl_ind)]
                 if _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
-                str1 = upper_first_char(subj) + " " + ' '.join(_str1)
+                str1 = base.upper_first_char(subj) + " " + ' '.join(_str1)
                 #print "1st sent: ", str1
 
                 # upper the 1st char in 2nd sent
                 _str2 = tokens[root_ind:]
                 #w = _w + ' '
-                str2 = upper_first_char(subj) + " " + ' '.join(_str2)
+                str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
 
                 strs = str1 + ' . ' + str2
@@ -694,13 +695,13 @@ def simp_adjec_sent(tokens, node_list):
                 _str1 = tokens[relcl_ind:root_ind]
                 if _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
-                str1 = upper_first_char(subj) + " " + ' '.join(_str1)
+                str1 = base.upper_first_char(subj) + " " + ' '.join(_str1)
                 #print "1st sent: ", str1
 
                 # upper the 1st char in 2nd sent
                 _str2 = tokens[root_ind:]
                 #w = _w + ' '
-                str2 = upper_first_char(subj) + " " + ' '.join(_str2)
+                str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
 
                 strs = str1 + ' . ' + str2
@@ -765,7 +766,7 @@ def simp_appos_sent(tokens, node_list):
 
                 verb = "be"
 
-                subj = upper_first_char(tokens[nsubj_ind])
+                subj = base.upper_first_char(tokens[nsubj_ind])
 
                 #[NOTICE]: remove the ',' after the nsubj
                 if tokens[nsubj_ind + 1] in PUNCTUATION:
@@ -858,7 +859,7 @@ def simp_passive_sent(tokens, node_list):
                     det_ind = nmod_dict['det'][0]
 
                 if det_ind:
-                    subj = upper_first_char(tokens[det_ind]) + " " + tokens[nmod_ind]
+                    subj = base.upper_first_char(tokens[det_ind]) + " " + tokens[nmod_ind]
                 else:
                     subj = tokens[nmod_ind]
 

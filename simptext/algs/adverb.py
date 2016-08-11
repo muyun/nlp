@@ -12,13 +12,16 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from algs import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 COMMA = ','
 
 def simp_adverb_sent(tokens, node_list):
     strs = ""
+
+    if COMMA not in tokens:
+        return strs
 
     root = ""
     root_ind = node_list[0][4]['root'][0]
@@ -124,10 +127,11 @@ def simp_adverb_sent(tokens, node_list):
                 #_str2 = tokens[root_ind:]
                 _str2 = tokens[split_ind+1:]
                         #w = _w + ' '
-                str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
+                #str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
+                str2 = "That" + " " + ' '.join(_str2)
                         #print "2nd sent: ", str2
 
-                strs = str1 + ' . ' + str2
+                strs = str1 + ' . ' + str2 + ' .'
 
                 return strs
  
@@ -176,8 +180,8 @@ def simp_syn_sent_(sent):
 
 def main():
     #  clauses
-    #sent = "Needing money, I begged my parents."
-    sent = "suprising everyone, peter came."
+    sent = "Needing money, I begged my parents."
+    sent = "Peter came suprising everyone"
     
     #sent = "Refreshed, Peter stood up."
 
