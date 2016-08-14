@@ -12,7 +12,7 @@
 ##### About Flask and Python
   * Use virtual Environments 
 
-  * Structure the project
+  * Structure is the key
     - module
 
 #### reference
