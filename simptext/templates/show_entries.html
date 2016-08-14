@@ -1,5 +1,13 @@
 {% extends "layout.html" %}
 {% block body %}
+<script type=text/javascript>
+$(function() {
+  $('#editBtn').click(function(){
+    $('li').attr('contenteditable','true');
+  });
+
+});
+</script>
   {% if session.logged_in %}
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
       <dl>
@@ -27,28 +35,31 @@
      <li><em>No output here so far</em>
   {% endif %}
 
-  <li><h2>Output:<h2>
- 
-   <li>
+  <li><h2>Output:<h2></li>
+  <li>
    {% for item in outputs %}   
        {% if item is mapping %} {# not change #}
    
         {% for key, value in item.iteritems() %}
          <select>
            {% for v in value %}
-             <option value={{ v }} >{{ v }} </option>
+             <option value={{ v }} >{{ v |safe}} </option>
            {% endfor %}
          </select>
          
          {% endfor %}
 
          {% else %}
-            {{ item }}
+            {{ item |safe }}
          
        {% endif %}
 
-     {% endfor %}  
-  
+   {% endfor %}  
+
+  </li>
+
+  <dd><input type=submit id="editBtn" value=edit>
+
 </ul>
   <!--
   <script type="text/javascript">

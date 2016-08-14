@@ -2,6 +2,14 @@
 <html lang="en-US">
 <!--
     Jinja
+
+<script type="text/javascript">
+$(function(){
+$('button').click(function(){
+    $('div').attr('contenteditable','true');
+});
+});
+</script>
 -->
 <title>SimpText</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css')}}">
@@ -30,6 +38,19 @@
     $SCRIPT_ROOT= {{request.script_root|tojson|safe}};
   </script>
   -->
+
+
+<script type="text/javascript"
+  src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js">
+</script>
+
+<!--
+<script src="/static/js/app.js"</script>
+-->
+<script type="text/javascript">
+  var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+
   {% block body %}
   {% endblock %}
 </div>
