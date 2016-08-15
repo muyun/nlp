@@ -9,7 +9,7 @@ class Entry(db.Model):
         __tablename = 'entries'
         
         id = db.Column(db.Integer, primary_key=True)
-        text = db.Column(db.String(480))
+        text = db.Column(db.String(960))
 
         def __init__(self, text):
             self.text = text

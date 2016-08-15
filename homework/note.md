@@ -25,7 +25,7 @@
       > pip install -r requirements.txt 
 
 * Structuring
- - module
+    - module
 
 * unicode 
    - text is encoded (An encoding is a set of rules that assign numeric values to each text character)  

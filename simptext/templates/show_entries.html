@@ -1,12 +1,35 @@
 {% extends "layout.html" %}
 {% block body %}
 <script type=text/javascript>
+
 $(function() {
-  $('#editBtn').click(function(){
-    $('li').attr('contenteditable','true');
+  $('#edit-1').click(function(){
+    document.getElementById("reverse-1").contentEditable = true;
+  });
+
+  $('#edit-2').click(function(){
+    document.getElementById("reverse-2").contentEditable = true;
+  });
+
+  $('#edit-3').click(function(){
+    document.getElementById("reverse-2").contentEditable = true;
+  });
+
+  var lastInput = {{ entries | tojson }};
+  $('#undo-1').click(function(){
+    document.getElementById("reverse-1").innerHTML = lastInput;
+  });
+
+  $('#undo-2').click(function(){
+    document.getElementById("reverse-2").innerHTML = lastInput;
+  });
+
+  $('#undo-3').click(function(){
+    document.getElementById("reverse-3").innerHTML = lastInput;
   });
 
 });
+
 </script>
   {% if session.logged_in %}
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
@@ -17,7 +40,7 @@ $(function() {
         <dt>Output:
         <dd><textarea name=output rows=5 cols=60></textarea>
         #}
-        <dd><input type=submit value=simplify>
+        <dd><input type='button' value=Simplify>
       </dl>
 
 
@@ -29,36 +52,49 @@ $(function() {
   {% if entries %}
      <li><h2>Input:</h2>
      <li>
-     {{ entries|safe }}
-
+     {{ entries }}
+     </li>
   {% else %}
      <li><em>No output here so far</em>
   {% endif %}
 
   <li><h2>Output:<h2></li>
-  <li>
-   {% for item in outputs %}   
-       {% if item is mapping %} {# not change #}
+  {% set counter = ['1'] %}
+  <li id="reverse-{{counter|length}}">
+   {% for item in outputs %} 
+        {% if item is mapping %} {# not change #}
    
-        {% for key, value in item.iteritems() %}
-         <select>
-           {% for v in value %}
-             <option value={{ v }} >{{ v |safe}} </option>
-           {% endfor %}
-         </select>
+          {% for key, value in item.iteritems() %}
+            <select>
+              {% for v in value %}
+                 <option value={{ v }} >{{ v |safe}} </option>
+              {% endfor %}
+            </select>
          
-         {% endfor %}
+          {% endfor %}
 
-         {% else %}
-            {{ item |safe }}
-         
-       {% endif %}
+        {% else %}
+           {{ item |safe }}
+
+           {% if item == "." %}  {# is a sentence? #} 
+               <input type='button' id="edit-{{counter|length}}" value='Edit'/>
+               <input type='button' id="undo-{{counter|length}}" value='Undo'/>
+               {% if counter.append('1') %}
+               {% endif %}
+     
+               <br></li><li id="reverse-{{counter|length}}">
+               
+           {% endif %}
+              
+        {% endif %}
 
    {% endfor %}  
-
-  </li>
-
-  <dd><input type=submit id="editBtn" value=edit>
+   </li>
+   {#
+   <dd><input type='button' id="edit" value='Edit'/>
+   <input type='button' id="undo1" value='Undo-S1'/>
+   <input type='button' id="undo-2" value='Undo-S2'/>
+   #}
 
 </ul>
   <!--

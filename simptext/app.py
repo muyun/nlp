@@ -20,7 +20,7 @@ db = SQLAlchemy(app)
 import models
 
 #from algs import simp
-import dt, utils.cal, utils.algs
+import dt, utils.wordcal
 
 words = dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
 #from nltk.tokenize import StanfordTokenizer
@@ -38,10 +38,10 @@ def show_entries():
      
     if len(entries) > 0: #Syntactic simplification firstly
         #tokens = StanfordTokenizer().tokenize(entries)
-        syn_ret = algs.simp.simp_syn_sent_(entries)
+        syn_ret = dt.simp_syn_sent(entries)
         #print "Syntactic result: ", syn_ret
         if len(syn_ret) > 0: # next simplify the word
-            outputs = utils.cal.check_word(syn_ret, words)
+            outputs = utils.wordcal.check_word(syn_ret, words)
                   
     print "output: ", outputs
 

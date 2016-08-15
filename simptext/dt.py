@@ -32,7 +32,6 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #import utils.base
 #import algs
 from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, passive, paratax
-#from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, passive, paratax
 #import utils.base, utils.algs
 #from utils import algs
 #from utils import algs, base
@@ -467,6 +466,279 @@ def simp_mturk_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences        
 
 
+def simp_semeval_sent(filename, sent_file):
+    num_sentences = 0
+    num_splitted_sentences = 0
+    #data = json.load(open(datafile))
+    # docs = OrderedDict() # store the info - docs[sentence] = [id,...]
+    
+    #soup = BeautifulSoup(open(filename), "lxml")
+
+    # number of sentences, based on the 'sent' tag
+    #sentences = soup.find_all("instance")
+    #num_sentences = len(sentences)
+
+    #p = re.compile(r'<.*?>')
+    #import pdb; pdb.set_trace()
+    output = OrderedDict()
+    _output = OrderedDict()
+    soup = BeautifulSoup(open(filename), "lxml")
+
+    """
+    num_sentences = 0
+    num_tokens = 0
+    num_words_syns = 0
+    """
+
+    num = 0
+    # semeval = OrderedDict()  # semeval -> {side.n 301 : [sent], [synsets]}
+    
+    lexelts = soup.find_all("lexelt")
+    for lex in lexelts:
+        # num_words_syns = num_words_syns + 1
+        item = lex["item"]
+        for sentence in lex.find_all("instance"):
+            num_sentences = num_sentences + 1
+
+            id = sentence["id"]
+            key = item + " " + id
+            se = sentence.context.get_text()
+
+            # import pdb; pdb.set_trace()
+            # words = sent.split()
+            # num_tokens = num_tokens + len(words) - 1
+
+            """
+            semeval[key] = []
+            semeval[key].append(sent)
+            if key in synsets:
+                # print(synsets[key])
+                semeval[key].append(synsets[key])
+            """    
+  
+            #import pdb; pdb.set_trace()
+            num_sentences = num_sentences + 1
+            #print(sentence)
+            #sent = str(p.sub('', str(sentence)))
+            #se = re.sub(r'^”|”$', '', sent)
+            #se = sentence.context.get_text()
+            #sent = str(BeautifulSoup(sentence).text)
+            #obj = line.split("\t")
+            #se = re.sub(r'^"|"$', '', obj[0])
+            #print(se)
+            # write the sentence
+            #res = ""
+            #res = punct.simp_syn_sent_(se)
+            #res = coordi.simp_syn_sent_(se)
+            #res = subordi.simp_syn_sent_(str(se))
+            #res = adverb.simp_syn_sent_(str(se))
+            #res = parti.simp_syn_sent_(str(se))
+            #res = adjec.simp_syn_sent_(str(se))
+            #res = appos.simp_syn_sent_(str(se))
+            #res = passive.simp_syn_sent_(str(se))
+            #res = paratax.simp_syn_sent_(str(se))
+            #res = alg.simp_passive_sent(str(re))
+            res = simp_syn_sent(str(se))
+            #import pdb; pdb.set_trace()
+            #print "res: ", res
+            if res:  # the
+                num_splitted_sentences = num_splitted_sentences + 1
+
+            #import pdb; pdb.set_trace()
+            output[se] = res
+            #import pdb; pdb.set_trace()
+        
+            with open(sent_file, 'a') as outfile:
+                outfile.write(str(se)+'\n')
+                outfile.write("OUTPUT: " + res + '\n')
+                outfile.write('-----------------------\n')
+                #json.dump(output, outfile, indent=2)
+
+            _output[se] = [se, res]
+            with codecs.open('semeval_sent.csv', 'a') as _outfile:
+                wr = csv.writer(_outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
+                wr.writerow(_output[se])
+            """    
+            num = num + 1
+            if num == 20:
+                break
+            """
+              
+    return num_sentences, num_splitted_sentences    
+
+
+def simp_semeval_sent(filename, sent_file):
+    num_sentences = 0
+    num_splitted_sentences = 0
+    #data = json.load(open(datafile))
+    #docs = OrderedDict() # store the info - docs[sentence] = [id,...]
+    
+    #soup = BeautifulSoup(open(filename), "lxml")
+
+    # number of sentences, based on the 'sent' tag
+    #sentences = soup.find_all("instance")
+    #num_sentences = len(sentences)
+
+    #p = re.compile(r'<.*?>')
+    #import pdb; pdb.set_trace()
+    output = OrderedDict()
+    _output = OrderedDict()
+    soup = BeautifulSoup(open(filename), "lxml")
+
+    # num_sentences = 0
+    # num_tokens = 0
+
+    #semeval = OrderedDict()  # semeval -> {side.n 301 : [sent], [synsets]}
+    num = 0
+    lexelts = soup.find_all("lexelt")
+    for lex in lexelts:
+        # num_words_syns = num_words_syns + 1
+        item = lex["item"]
+        for sentence in lex.find_all("instance"):
+            num_sentences = num_sentences + 1
+
+            # id = sentence["id"]
+            # key = item + " " + id
+            se = sentence.context.get_text()
+
+            # import pdb; pdb.set_trace()
+            #words = sent.split()
+            #num_tokens = num_tokens + len(words) - 1
+
+            """
+            semeval[key] = []
+            semeval[key].append(se)
+            if key in synsets:
+                # print(synsets[key])
+                semeval[key].append(synsets[key])
+            """
+
+            #import pdb; pdb.set_trace()
+            num_sentences = num_sentences + 1
+            #print(sentence)
+            #sent = str(p.sub('', str(sentence)))
+            #se = re.sub(r'^”|”$', '', sent)
+            #se = sentence.context.get_text()
+            #sent = str(BeautifulSoup(sentence).text)
+            #obj = line.split("\t")
+            #se = re.sub(r'^"|"$', '', obj[0])
+            #print(se)
+            # write the sentence
+            #res = ""
+            #res = punct.simp_syn_sent_(se)
+            #res = coordi.simp_syn_sent_(se)
+            #res = subordi.simp_syn_sent_(str(se))
+            #res = adverb.simp_syn_sent_(str(se))
+            #res = parti.simp_syn_sent_(str(se))
+            #res = adjec.simp_syn_sent_(str(se))
+            #res = appos.simp_syn_sent_(str(se))
+            #res = passive.simp_syn_sent_(str(se))
+            #res = paratax.simp_syn_sent_(str(se))
+            #res = alg.simp_passive_sent(str(re))
+            res = simp_syn_sent(str(se))
+            #import pdb; pdb.set_trace()
+            #print "res: ", res
+            if res:  # the
+                num_splitted_sentences = num_splitted_sentences + 1
+
+            #import pdb; pdb.set_trace()
+            output[se] = res
+            #import pdb; pdb.set_trace()
+        
+            with open(sent_file, 'a') as outfile:
+                outfile.write(str(se)+'\n')
+                outfile.write("OUTPUT: " + res + '\n')
+                outfile.write('-----------------------\n')
+                #json.dump(output, outfile, indent=2)
+
+            _output[se] = [se, res]
+            with codecs.open('semeval_sent.csv', 'a') as _outfile:
+                wr = csv.writer(_outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
+                wr.writerow(_output[se])
+                
+            num = num + 1
+            if num == 20:
+                break
+               
+            
+    return num_sentences, num_splitted_sentences    
+
+def simp_coinco_sent(filename, sent_file):
+    num_sentences = 0
+    num_splitted_sentences = 0
+    #data = json.load(open(datafile))
+    #docs = OrderedDict() # store the info - docs[sentence] = [id,...]
+    
+    docs = OrderedDict()  # store the info - docs[sentence] = [id,...]
+    output = OrderedDict()
+    _output = OrderedDict()
+    soup = BeautifulSoup(open(filename), "lxml")
+
+    # number of sentences, based on the 'sent' tag
+    sentences = soup.find_all("targetsentence")
+    # num_sentences = len(sentences)
+    num = 0
+    # number of tokens, based on the 'token' tag
+    # num_tokens = len(soup.find_all("token"))
+
+    p = re.compile(r'<.*?>')
+    # import pdb; pdb.set_trace()
+    #output = OrderedDict()
+    for sentence in sentences:
+        # print(sentence)
+        se = str(p.sub('', str(sentence)))
+        num_sentences = num_sentences + 1
+
+            #print(sentence)
+            #sent = str(p.sub('', str(sentence)))
+            #se = re.sub(r'^”|”$', '', sent)
+            #se = sentence.context.get_text()
+            #sent = str(BeautifulSoup(sentence).text)
+            #obj = line.split("\t")
+            #se = re.sub(r'^"|"$', '', obj[0])
+            #print(se)
+            # write the sentence
+            #res = ""
+            #res = punct.simp_syn_sent_(se)
+            #res = coordi.simp_syn_sent_(se)
+            #res = subordi.simp_syn_sent_(str(se))
+            #res = adverb.simp_syn_sent_(str(se))
+            #res = parti.simp_syn_sent_(str(se))
+            #res = adjec.simp_syn_sent_(str(se))
+            #res = appos.simp_syn_sent_(str(se))
+            #res = passive.simp_syn_sent_(str(se))
+            #res = paratax.simp_syn_sent_(str(se))
+            #res = alg.simp_passive_sent(str(re))
+        res = simp_syn_sent(str(se))
+            #import pdb; pdb.set_trace()
+            #print "res: ", res
+        if res:  # the
+            num_splitted_sentences = num_splitted_sentences + 1
+
+            #import pdb; pdb.set_trace()
+        output[se] = res
+            #import pdb; pdb.set_trace()
+        
+        with open(sent_file, 'a') as outfile:
+            outfile.write(str(se)+'\n')
+            outfile.write("OUTPUT: " + res + '\n')
+            outfile.write('-----------------------\n')
+                #json.dump(output, outfile, indent=2)
+
+        _output[se] = [se, res]
+        with codecs.open('coinco_sent.csv', 'a') as _outfile:
+            wr = csv.writer(_outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
+            wr.writerow(_output[se])
+        
+        """        
+        num = num + 1
+        if num == 20:
+            break
+        """      
+            
+    return num_sentences, num_splitted_sentences    
+
+
 def simp_syn_sent(sent):
     strs = ""
     # the original tokens in the sent
@@ -581,7 +853,8 @@ def main():
     #filename = dir + "utils/testset_gt_adverb.md"
     #filename = dir + "utils/testset_gt_appos.md"
 
-    #_info = cal_mturk_sent(filename)
+    filename = dir + "utils/testset/sent_mturk_l4_.md"
+    _info = cal_mturk_sent(filename)
     
     """
     lemmas = []
@@ -596,11 +869,20 @@ def main():
     print lemmas
     """
 
-    #simp_syn_sent(filename)
-    info = simp_mturk_sent(filename, sent_file)
-    print "#sentence in mturk: ", info[0]
+    """
+    filename = dir + "utils/semeval/test/lexsub_test.xml"
+    sent_file = dir + "utils/testset/sent_semeval_l4_.md"
+    info = simp_semeval_sent(filename, sent_file)
+    print "#sentence in semeval: ", info[0]
     print "#sentence with Syntactic simplification: ", info[1]
-    
+    """
+    """
+    filename = dir + "utils/coinco/coinco.xml"
+    sent_file = dir + "utils/testset/sent_coinco_l4_.md"
+    info = simp_coinco_sent(filename, sent_file)
+    print "#sentence in coinco: ", info[0]
+    print "#sentence with Syntactic simplification: ", info[1]
+    """
 
 if __name__ == '__main__':
      main()
