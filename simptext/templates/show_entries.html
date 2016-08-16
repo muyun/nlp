@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
-<script type=text/javascript>
 
+<script type=text/javascript>
 $(function() {
   $('#edit-1').click(function(){
     document.getElementById("reverse-1").contentEditable = true;
@@ -29,8 +29,8 @@ $(function() {
   });
 
 });
-
 </script>
+
   {% if session.logged_in %}
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
       <dl>
@@ -40,9 +40,8 @@ $(function() {
         <dt>Output:
         <dd><textarea name=output rows=5 cols=60></textarea>
         #}
-        <dd><input type='button' value=Simplify>
+        <dd><input type=submit value=simplify>
       </dl>
-
 
     </form>
 
@@ -90,6 +89,7 @@ $(function() {
 
    {% endfor %}  
    </li>
+
    {#
    <dd><input type='button' id="edit" value='Edit'/>
    <input type='button' id="undo1" value='Undo-S1'/>
@@ -97,22 +97,6 @@ $(function() {
    #}
 
 </ul>
-  <!--
-  <script type="text/javascript">
-    $(document).ready(function(){
-    
-    $("#Simplify").click(function(){
-
-     $.getJSON('/', function(dat){
-       console.log("Ajax received data!");
-       console.dir(dat);
-    });
-    
-    });
-
-    });
-  </script>
-  -->
   
  {#
   <ul class="entries">

@@ -24,8 +24,18 @@
       > pip freeze > requirements.txt   
       > pip install -r requirements.txt 
 
-* Structuring
+* about the sqlalcemy
+      >>> from app import db
+      >>> db.create_all()
+      >>> import models
+      >>> txt = models.Entry('this is a demo')
+      >>> db.session.add(txt)
+      >>> db.session.commit()      
+
+* Structuring is the key
     - module
+
+* 
 
 * unicode 
    - text is encoded (An encoding is a set of rules that assign numeric values to each text character)  

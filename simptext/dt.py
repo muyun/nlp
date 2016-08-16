@@ -37,8 +37,8 @@ from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, pass
 #from utils import algs, base
 #import utils.base, utils.algs
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 def read_xlsx_file(filename, sheetnums):
     """read the xlsx file and stored first sheetnums into words list"""
@@ -348,16 +348,30 @@ def print_mturk_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences
 
 
-def cal_mturk_sent(filename):
+def cal_mturk_sent(filename, gt):
     f = open(filename, 'rU')
-    _num_wrong_output = 0
-    num_false = 0
+    _num_output = 0
+    num_negative = 0
     num_false_positive = 0
+    num_true_negative = 0
     num_false_negative = 0
-    num_true = 0
+    num_true_positive = 0
+    num_positive = 0
+    num = 0
+    len_input = 0
+    len_output = 0
     for line in f:
         line = line.strip('\n')
-        if "OUTPUT" in line:
+        
+        if "OUTPUT" not in line:
+            len_input = len(line)
+            #print "Input: ", line    
+
+        #import pdb; pdb.set_trace()
+        else:
+            #print "gt-out: ", gt[num]
+            #print "out: ", line
+            len_output = len(line)
             #import pdb; pdb.set_trace()
             #num_output = num_output + 1
             #print(sentence)
@@ -369,28 +383,46 @@ def cal_mturk_sent(filename):
             ot = line.split(':')[1].strip() # having output or not
 
             #import pdb; pdb.set_trace()
-            if ot_flag == "#OUTPUT":  # the wrong classifier
-                _num_wrong_output = _num_wrong_output + 1
+            if ot_flag == "OUTPUT":  # the num
+                _num_output = _num_output + 1
 
             if not ot: #don't have the output,consider it as false positive
-                num_false = num_false + 1
-                if ot_flag == "#OUTPUT":
-                    num_false_positive = num_false_positive + 1
-            else: # having the output
-                num_true = num_true + 1
-                if ot_flag == "#OUTPUT": #False Negative
+                num_negative = num_negative + 1
+                if gt[num] != 'x':
                     num_false_negative = num_false_negative + 1
-                    
+                else:
+                    num_true_negative = num_true_negative + 1
+            else: # having the output
+                num_positive = num_positive + 1
+
+                """
+                if gt[num] == 'x': #False positive
+                    num_false_positive = num_false_positive + 1
+                else:
+                    num_true_positive = num_true_positive + 1
+                """
+                
+                if abs(len(gt[num]) - len_output) <= 5 :
+                    num_true_positive = num_true_positive + 1
+                else:
+                    num_false_positive = num_false_positive + 1
+                 
+
+            num = num + 1
+            if num == 300:
+                break
 
     #import pdb; pdb.set_trace()
             #match = re.search(r'(^(#OUTPUT):(\w*))', line)
-    print "#num_flase: ", num_false
+    print "#num_negative: ", num_negative
     print "#num_false_positive: ", num_false_positive
+    print "#num_true_positive: ", num_true_positive
     print "#num_false_negative: ", num_false_negative
-    print "#num_true: ", num_true
-    print "#_num_wrong_output: ", _num_wrong_output
+    print "#num_true_negative: ", num_true_negative
+    print "#num_positive: ", num_positive
+    print "#_num_output: ", _num_output
     
-    return num_false, num_false_positive, num_false_negative, num_true       
+    return num_negative, num_false_positive, num_false_negative, num_positive       
 
 
 def simp_mturk_sent(filename, sent_file):
@@ -457,11 +489,11 @@ def simp_mturk_sent(filename, sent_file):
                 wr = csv.writer(_outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
                 wr.writerow(_output[se])
                 
-            """
+            
             num = num + 1
-            if num == 20:
+            if num == 300:
                 break
-            """    
+               
             
     return num_sentences, num_splitted_sentences        
 
@@ -840,6 +872,7 @@ def main():
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
     sent_file = dir + "utils/testset/sent_mturk_l4_.md"
+    gt_file = dir + "dataset/simplify_testset_0814.xlsx"
     
     #_info = print_mturk_sent(filename, sent_file)
     #print "Type: Paratax Clauses:"
@@ -854,7 +887,8 @@ def main():
     #filename = dir + "utils/testset_gt_appos.md"
 
     filename = dir + "utils/testset/sent_mturk_l4_.md"
-    _info = cal_mturk_sent(filename)
+    gt = read_xlsx_file(gt_file, 1)
+    _info = cal_mturk_sent(filename, gt)
     
     """
     lemmas = []

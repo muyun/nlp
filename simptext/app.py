@@ -39,9 +39,11 @@ def show_entries():
     if len(entries) > 0: #Syntactic simplification firstly
         #tokens = StanfordTokenizer().tokenize(entries)
         syn_ret = dt.simp_syn_sent(entries)
-        #print "Syntactic result: ", syn_ret
+        print "Syntactic result: ", syn_ret
         if len(syn_ret) > 0: # next simplify the word
             outputs = utils.wordcal.check_word(syn_ret, words)
+        else:
+            outputs = utils.wordcal.check_word(entries, words)    
                   
     print "output: ", outputs
 
