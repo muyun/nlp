@@ -40,7 +40,7 @@ $(function() {
         <dt>Output:
         <dd><textarea name=output rows=5 cols=60></textarea>
         #}
-        <dd><input type=submit value=simplify>
+        <dd><input type=submit value=Simplify>
       </dl>
 
     </form>
@@ -77,7 +77,9 @@ $(function() {
 
            {% if item == "." %}  {# is a sentence? #} 
                <input type='button' id="edit-{{counter|length}}" value='Edit'/>
-               <input type='button' id="undo-{{counter|length}}" value='Undo'/>
+               {% if counter|length is not equalto 1 %}
+                   <input type='button' id="undo-{{counter|length}}" value='Undo'/>
+               {% endif %}
                {% if counter.append('1') %}
                {% endif %}
      

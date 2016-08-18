@@ -37,8 +37,8 @@ from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, pass
 #from utils import algs, base
 #import utils.base, utils.algs
 
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 def read_xlsx_file(filename, sheetnums):
     """read the xlsx file and stored first sheetnums into words list"""
@@ -311,7 +311,7 @@ def print_mturk_sent(filename, sent_file):
             #sent = str(BeautifulSoup(sentence).text)
             obj = line.split("\t")
             se = re.sub(r'^"|"$', '', obj[0])
-            #print(se)
+            print(se)
             # write the sentence
             #res = ""
             #res = punct.simp_syn_sent_(se)
@@ -322,10 +322,11 @@ def print_mturk_sent(filename, sent_file):
             #res = adjec.simp_syn_sent_(str(se))
             #res = appos.simp_syn_sent_(str(se))
             #res = passive.simp_syn_sent_(str(se))
-            res = paratax.simp_syn_sent_(str(se))
+            #res = paratax.simp_syn_sent_(str(se))
             #res = alg.simp_passive_sent(str(re))
+            res = simp_syn_sent(str(re))
             #import pdb; pdb.set_trace()
-            #print "res: ", res
+            print "res: ", res
             if res: # the
                 num_splitted_sentences = num_splitted_sentences + 1
 
@@ -336,7 +337,7 @@ def print_mturk_sent(filename, sent_file):
             with open(sent_file, 'a') as outfile:
                 outfile.write(str(se)+'\n')
                 outfile.write("OUTPUT: " + res + '\n')
-                outfile.write('-----------------------\n')
+                #outfile.write('-----------------------\n')
                 #json.dump(output, outfile, indent=2)
 
             """  
@@ -356,22 +357,34 @@ def cal_mturk_sent(filename, gt):
     num_true_negative = 0
     num_false_negative = 0
     num_true_positive = 0
+    _num_false_positive = 0
+    _num_true_negative = 0
+    _num_false_negative = 0
+    _num_true_positive = 0
     num_positive = 0
     num = 0
     len_input = 0
     len_output = 0
+    _input = ""
+    output = OrderedDict()
     for line in f:
         line = line.strip('\n')
-        
-        if "OUTPUT" not in line:
-            len_input = len(line)
+
+        #import pdb; pdb.set_trace()
+        if "OUTPUT" not in line :
+            match = re.search(r'--+', line)
+            if match:
+                pass
+            else:
+                _input = line
+                len_input = len(re.findall("\w+", line))
             #print "Input: ", line    
 
         #import pdb; pdb.set_trace()
         else:
             #print "gt-out: ", gt[num]
             #print "out: ", line
-            len_output = len(line)
+            len_output = len(re.findall("\w+", line))
             #import pdb; pdb.set_trace()
             #num_output = num_output + 1
             #print(sentence)
@@ -386,31 +399,58 @@ def cal_mturk_sent(filename, gt):
             if ot_flag == "OUTPUT":  # the num
                 _num_output = _num_output + 1
 
-            if not ot: #don't have the output,consider it as false positive
+            if not ot: #don't have the output,consider it as false negative
                 num_negative = num_negative + 1
+                _sp = ['N']
+                
                 if gt[num] != 'x':
                     num_false_negative = num_false_negative + 1
+                    #_sp = ['N']
                 else:
                     num_true_negative = num_true_negative + 1
+                    #_sp = ['N']
+
+                if gt[num] != 'x':
+                    _num_false_negative = _num_false_negative + 1
+                    _gen = ['N']
+                else:
+                    _num_false_positive = _num_false_positive + 1
+                    _gen =['N']
+                    
             else: # having the output
                 num_positive = num_positive + 1
+                _sp = ['Y']
 
-                """
                 if gt[num] == 'x': #False positive
                     num_false_positive = num_false_positive + 1
+                    #_sp = ['Y']
+                    
                 else:
                     num_true_positive = num_true_positive + 1
-                """
+                    #_sp = ['Y']
                 
-                if abs(len(gt[num]) - len_output) <= 5 :
-                    num_true_positive = num_true_positive + 1
+                if abs(len(re.findall("\w+", gt[num])) - len_output) <= 5 :
+                    _num_true_positive = _num_true_positive + 1
+                    _gen = ['Y']
                 else:
-                    num_false_positive = num_false_positive + 1
-                 
+                    _num_false_positive = _num_false_positive + 1
+                    _gen =['N']
+
+            
+            output[num] = [_input,
+                         gt[num],
+                         ot,
+                         _sp,
+                        _gen]
+            
+            #import pdb; pdb.set_trace()
+            with codecs.open('mturk_sent_l5.csv', 'a', encoding='utf-8') as outfile:
+                wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
+                wr.writerow(output[num])
 
             num = num + 1
             if num == 300:
-                break
+                break    
 
     #import pdb; pdb.set_trace()
             #match = re.search(r'(^(#OUTPUT):(\w*))', line)
@@ -489,11 +529,11 @@ def simp_mturk_sent(filename, sent_file):
                 wr = csv.writer(_outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
                 wr.writerow(_output[se])
                 
-            
+            """
             num = num + 1
             if num == 300:
                 break
-               
+            """  
             
     return num_sentences, num_splitted_sentences        
 
@@ -889,6 +929,7 @@ def main():
     filename = dir + "utils/testset/sent_mturk_l4_.md"
     gt = read_xlsx_file(gt_file, 1)
     _info = cal_mturk_sent(filename, gt)
+    
     
     """
     lemmas = []
