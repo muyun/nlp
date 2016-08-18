@@ -8,7 +8,6 @@
 
 from wtforms import Form, StringField, SubmitField, PasswordField, validators
 
-
 class LoginForm(Form):
     username=StringField('username', [validators.Length(min=4, max=25)])
     #password= PasswordField('password',[validators.DataRequired()])

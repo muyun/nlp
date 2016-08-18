@@ -7,7 +7,7 @@
   * hand-engineered features -> assign label to words 
 
 
-##### note about Flask
+##### note about Flask and Python
 * Use virtual Environments to separate the development from the maintance 
     - virtualenvwrapper is used for the virtual env management
       > $ export WORKON_HOME = $HOME/.virtualenvs  
@@ -24,27 +24,25 @@
       > pip freeze > requirements.txt   
       > pip install -r requirements.txt 
 
-* about the sqlalcemy
-      >>> from app import db
-      >>> db.create_all()
-      >>> import models
-      >>> txt = models.Entry('this is a demo')
-      >>> db.session.add(txt)
-      >>> db.session.commit()      
+* About the sqlalcemy
+      > from app import db   
+      > db.create_all()  
+      > import models  
+      > txt = models.Entry('this is a demo')  
+      > db.session.add(txt)   
+      > db.session.commit()  
 
 * Structuring is the key
     - module
 
-* 
-
-* unicode 
+* About the unicode 
    - text is encoded (An encoding is a set of rules that assign numeric values to each text character)  
    - UTF-8 is an extension of ASCII  
 
    - s.decode(encoding) -> str-> unicode  
      u.encode(encoding) -> unicode -> str  
 
-   - unique is a way to represent text without bytes  
+   - unicode is a way to represent text without bytes  
     unicode is a concept, to save unicode to disk you have to encode it
 
    - The default python2 encoding is ASCII  
@@ -52,7 +50,7 @@
 
     - python2 unicode incompatibility - csv module   
 
-    - decode early, unicode everywhere, encode late
+    - the rule is to decode early, unicode everywhere, encode late
 
 
    
