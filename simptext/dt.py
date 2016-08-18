@@ -37,8 +37,10 @@ from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, pass
 #from utils import algs, base
 #import utils.base, utils.algs
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# the models
+
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 def read_xlsx_file(filename, sheetnums):
     """read the xlsx file and stored first sheetnums into words list"""
@@ -82,6 +84,18 @@ def read_xml_file(filename, word):
     return tuple(lemmas)
 
 
+def get_edblist(fin): #load EDB_List
+    flist = open(fin,'r')
+    edb_list = []
+    ltines = flist.readlines()
+    for l in ltines:
+        if l:
+            edb_list.append(l.strip())
+        else:
+            break
+    return edb_list
+
+ 
 def get_stat_info(filename, store_filename):
     """ read the filename and store the words with lemmas in store_filename"""
 
@@ -829,7 +843,7 @@ def simp_syn_sent(sent):
     #print "parse_tree:", w
     
 
-    #TODO: use the tree structure, check again
+    #TODO: use the tree structure, Check again
     node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     for node in result.nodes.items():
         node_list.append(base.get_triples(node))

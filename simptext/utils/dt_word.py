@@ -28,8 +28,8 @@ import roget, cal
 
 import wordcal
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 
 
 def read_xlsx_file(filename, sheetnums):
