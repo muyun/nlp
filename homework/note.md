@@ -27,8 +27,8 @@
 * About the sqlalcemy
       > from app import db   
       > db.create_all()  
-      > import models  
-      > txt = models.Entry('this is a demo')  
+      > import model  
+      > txt = model.Entry('this is a demo')  
       > db.session.add(txt)   
       > db.session.commit()  
 

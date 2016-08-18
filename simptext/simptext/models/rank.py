@@ -1,3 +1,7 @@
+"""
+ This is from Ms.XIE
+
+"""
 import kenlm
 import os
 import argparse
@@ -5,8 +9,8 @@ import sys, operator, time, nltk
 import gensim
 from nltk.stem.wordnet import WordNetLemmatizer
 
-ken_model = kenlm.Model('/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/utils/model/bin/europarl.bin')
-w2v_model=gensim.models.Word2Vec.load_word2vec_format('/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/utils/model/bin/en.bin',binary=True)
+ken_model = kenlm.Model('/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/models/bin/europarl.bin')
+w2v_model=gensim.models.Word2Vec.load_word2vec_format('/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/models/bin/en.bin',binary=True)
 lmtzr = WordNetLemmatizer()
 EDB_list=[]
 
