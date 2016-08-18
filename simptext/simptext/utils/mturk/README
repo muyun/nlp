@@ -1,0 +1,8 @@
+This file contains annotations for 500 sentences from English Wikipedia (column 1).  A word from the sentence was selected for simplification (column 2).  50 workers on Amazon's Mechanical Turk provided simplifications for the word in the context of the sentence (columns 3-52).
+
+The file is a tab delimited file.
+
+For more details and to cite, see:
+Colby Horn, Katie Manduca and David Kauchak (2014). Learning a Lexical Simplifier Using Wikipedia. In Proceedings of ACL.
+
+If you download this data and decide to use it, please send David Kauchak an e-mail.
