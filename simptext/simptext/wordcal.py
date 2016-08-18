@@ -18,7 +18,6 @@ from nltk.tokenize import StanfordTokenizer
 #from nltk.tokenize import wordpunct_tokenize
 
 # lemma
-
 from nltk.stem import WordNetLemmatizer
 wnl = WordNetLemmatizer()
 

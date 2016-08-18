@@ -24,16 +24,8 @@
       > pip freeze > requirements.txt   
       > pip install -r requirements.txt 
 
-* About the sqlalcemy
-      > from app import db   
-      > db.create_all()  
-      > import model  
-      > txt = model.Entry('this is a demo')  
-      > db.session.add(txt)   
-      > db.session.commit()  
-
-* Structuring is the key
-    - module
+* Structure is the key  
+    - module  
 
 * About the unicode 
    - text is encoded (An encoding is a set of rules that assign numeric values to each text character)  
@@ -48,9 +40,9 @@
    - The default python2 encoding is ASCII  
       sys.setdefaultencoding('utf-8')  
 
-    - python2 unicode incompatibility - csv module   
+   - python2 unicode incompatibility - csv module   
 
-    - the rule is to decode early, unicode everywhere, encode late
+   - the rule is to decode early, unicode everywhere, encode late
 
 
    
