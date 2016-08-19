@@ -11,6 +11,7 @@ import inspect
 from nltk import Tree
 
 from nltk.tokenize import StanfordTokenizer
+#from nltk.tokenize import wordpunct_tokenize
 
 # use the wrapper or use the standard lib?
 from nltk.parse.stanford import StanfordDependencyParser
@@ -193,6 +194,7 @@ def simp_syn_sent_(sent):
     #print(sent)
     #import pdb; pdb.set_trace()
     tokens = StanfordTokenizer().tokenize(str(sent))
+    #tokens = wordpunct_tokenize(str(sent))
     tokens.insert(0, '')
 
     result = list(eng_parser.raw_parse(sent))[0]

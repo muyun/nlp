@@ -19,6 +19,7 @@ from collections import OrderedDict
 import openpyxl, json, csv
 
 from nltk.tokenize import StanfordTokenizer
+#from nltk.tokenize import wordpunct_tokenize
 from nltk.tag import StanfordPOSTagger
 eng_tagger = StanfordPOSTagger('english-bidirectional-distsim.tagger')
 # use the wrapper or use the standard lib?
@@ -826,6 +827,7 @@ def simp_syn_sent(sent):
     #print "syn sent: ", sent
     #import pdb; pdb.set_trace()
     tokens = StanfordTokenizer().tokenize(sent)
+    #tokens = wordpunct_tokenize(strs)
     tokens.insert(0, '')
 
     taggers = eng_tagger.tag(sent.split())
@@ -853,10 +855,12 @@ def simp_syn_sent(sent):
             if len(strs) > 0:
                 return strs
             else:
+                
                 strs = coordi.simp_coordi_sent(tokens, node_list)
                 if len(strs) > 0:
                     return strs
                 else:
+                
                     strs = subordi.simp_subordi_sent(tokens, node_list)
                     if len(strs) > 0:
                         return strs

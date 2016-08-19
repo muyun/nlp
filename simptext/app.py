@@ -17,21 +17,21 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # this model is the db model
-import model
+import models
 
 #from algs import simp
-from simptext import dt, wordcal
+from simptext import dt_sent, wordcal
 #import simptext
 
-#words = dt.read_xlsx_file('./dataset/wordlist.xlsx', 1)
-words = dt.get_edblist('simptext/dataset/EDB_List.txt')
+#words = dt_sent.read_xlsx_file('./dataset/wordlist.xlsx', 1)
+words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
 #from nltk.tokenize import StanfordTokenizer
 
 @app.route('/')
 def show_entries():
     # the the latest text from database
-    m = db.session.query(db.func.max(model.Entry.id).label("max_id")).one()
-    txt = db.session.query(model.Entry).get(m.max_id)
+    m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
+    txt = db.session.query(models.Entry).get(m.max_id)
     entries = str(txt.text)
     print "entries: ", entries
 
@@ -40,7 +40,7 @@ def show_entries():
      
     if len(entries) > 0: #Syntactic simplification firstly
         #tokens = StanfordTokenizer().tokenize(entries)
-        syn_ret = dt.simp_syn_sent(entries)
+        syn_ret = dt_sent.simp_syn_sent(entries)
         print "Syntactic result: ", syn_ret
         if len(syn_ret) > 0: # next simplify the word
             #outputs = utils.wordcal.check_word_(syn_ret, words)
@@ -48,7 +48,7 @@ def show_entries():
         else:
             outputs = wordcal.check_word_(entries, words)    
           
-    #outputs = utils.wordcal.check_word_(entries, words)         
+        #outputs = wordcal.check_word_(entries, words)         
     print "output: ", outputs
 
     return render_template('show_entries.html', entries=entries , outputs=outputs )
@@ -62,7 +62,7 @@ def add_entry():
 
     txt = request.form['input']
     #print 'txt: ', txt
-    db.session.add(model.Entry(txt))
+    db.session.add(models.Entry(txt))
     db.session.commit()
 
     flash('New entry was successfully posted')

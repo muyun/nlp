@@ -14,8 +14,8 @@ import nltk
 from nltk.corpus import wordnet as wn
 
 #Use StanfordTokenizer
-from nltk.tokenize import StanfordTokenizer
-#from nltk.tokenize import wordpunct_tokenize
+#from nltk.tokenize import StanfordTokenizer
+from nltk.tokenize import wordpunct_tokenize
 
 # lemma
 from nltk.stem import WordNetLemmatizer
@@ -71,7 +71,8 @@ def check_word(strs, words):
 
     #import pdb; pdb.set_trace()
     #for w in str(strs).split():
-    tokens = StanfordTokenizer().tokenize(strs)
+    #tokens = StanfordTokenizer().tokenize(strs)
+    tokens = wordpunct_tokenize(strs)
     for ind in range(len(tokens)):
         #print 'token: ', token
         if tokens[ind] in string.punctuation:
@@ -111,7 +112,7 @@ def check_word(strs, words):
     #return ' '.join(str(w) for w in output)
     return tokens
 
-def check_word_(strs, words):
+def _check_word(strs, words):
     """ check the word is words list, and return the string"""
     #output=[]
     #output= OrderedDict()
@@ -119,7 +120,8 @@ def check_word_(strs, words):
 
     #import pdb; pdb.set_trace()
     #for w in str(strs).split():
-    tokens = StanfordTokenizer().tokenize(strs)
+    #tokens = StanfordTokenizer().tokenize(strs)
+    tokens = wordpunct_tokenize(strs)
     for ind in range(len(tokens)):
         #print 'token: ', token
         if tokens[ind] in string.punctuation:
@@ -166,6 +168,17 @@ def check_word_(strs, words):
     #return ' '.join(str(w) for w in output)
     return tokens
 
+
+def check_word_(strs, words):
+    """ check the word is words list, and return the string"""
+    #output=[]
+    #output= OrderedDict()
+    print "strs: ", strs
+
+    tokens = []
+    tokens = rank._interface(strs, words)
+
+    return tokens
 
 def lemma_words(words):
     output=[]
