@@ -31,7 +31,7 @@ $(function() {
 });
 </script>
 
-  {% if session.logged_in %}
+{% if session.logged_in %}
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
       <dl>
         <dt>Input:
@@ -45,8 +45,6 @@ $(function() {
 
     </form>
 
-  {% endif %}
-  
 <ul class="entries">
   {% if entries %}
      <li><h2>Input:</h2>
@@ -99,16 +97,8 @@ $(function() {
    #}
 
 </ul>
-  
- {#
-  <ul class="entries">
-  {% for entry in entries %}
-    <li>{{ entry.output|safe }}
-  {% else %}
-    <li><em>Unbelievable.  No entries here so far</em>
-  {% endfor %}
-  </ul>
-  #}
+
+{% endif %}
 
 <br>
 {% include 'footer.html' %}
