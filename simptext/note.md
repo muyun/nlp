@@ -1,4 +1,4 @@
-#### 
+####  NOTE
 
 #### The installaton note
 * virtualenvwrapper is used for the virtual env management  

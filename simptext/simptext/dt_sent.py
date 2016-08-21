@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #  
 """
-   simptext.dt
+   simptext.dt_sent
    ~~~~~~~~~~
-   data processing
+   about data processing of the sentences 
 
 @author wenlong
 

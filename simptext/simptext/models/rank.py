@@ -44,6 +44,7 @@ def _Stem(sub_sent,edblist):
 				word_pre.append(temp)
 		else:
 			word_pre.append(e[0])
+			
 	sub_words = []
 	print word_pre
 	for w in word_list:
