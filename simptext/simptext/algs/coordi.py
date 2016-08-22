@@ -16,6 +16,53 @@ from alg import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
+def connect_sent(conj_ind, tokens, node_list):
+    #
+    _strs = ""
+    another_cc_ind = 0
+    another_conj_ind = 0
+    
+    _cc_ind = 0
+    _conj_ind = 0
+    nsubj_ind = 0
+    for _nd in node_list[1:]:
+        if conj_ind == _nd[0]: 
+            if ('conj' in _nd[4].keys()) and ('cc' in _nd[4].keys()):
+                _conj_ind = _nd[4]['conj'][0]
+                _cc_ind = _nd[4]['cc'][0]
+                
+    for _nd in node_list[1:]:
+        if _conj_ind == _nd[0]:
+            if ('nsubj' in _nd[4].keys()):
+                nsubj_ind = _nd[4]['nsubj'][0]
+
+            if ('conj' in _nd[4].keys() and ('cc' in _nd[4].keys())):
+                another_cc_ind = _nd[4]['cc'][0]
+                another_conj_ind = _nd[4]['conj'][0]    
+                
+    #import pdb; pdb.set_trace()
+    nsubj = ' '
+    tokens[_cc_ind] = ''
+    #if tokens[_cc_ind - 1] == '':  # no word before the conjunction word
+    #    pass
+    if tokens[_cc_ind - 1] in PUNCTUATION:
+        tokens[_cc_ind - 1] = ''
+        tokens[_cc_ind] = '.'
+    if tokens[_cc_ind + 1] in PUNCTUATION:
+        tokens[_cc_ind + 1] = ''
+    
+    nsubj = base.upper_first_char(tokens[nsubj_ind]) + nsubj
+    
+    if (another_cc_ind != 0) and (another_conj_ind != 0):  # one more cc
+        _str2 = connect_sent(_conj_ind, tokens[another_cc_ind:], node_list)
+        _strs = nsubj + " ".join(tokens[(nsubj_ind+1):]) + " . " + _str2
+        
+    else:
+        _strs = nsubj + " ".join(tokens[(nsubj_ind+1):])
+        
+    return _strs
+
+        
 def simp_coordi_sent(tokens, node_list):
     """
     tokens = StanfordTokenizer().tokenize(sent)
@@ -84,7 +131,7 @@ def simp_coordi_sent(tokens, node_list):
             ret.append(lst_)
         """
         if (root in nd) and ('conj' in nd[4].keys()) and ('cc' in nd[4].keys()):
-              # coordination
+            # coordination
             # Note: remove the conjunction word, and
             #       if there is words before the conjunction, we consider it as a sent,
             #       or,
@@ -93,22 +140,36 @@ def simp_coordi_sent(tokens, node_list):
             nsubj = " "
             nsubj_ind = 0
             FLAG = 0
+
+            # one more cc?
+            another_cc_ind = 0
+            another_conj_ind = 0
+            
             #Assume the nsubj is the before word of the conj_ind
             conj_ind = nd[4]['conj'][0]
+            conj_nsubj_ind = 0
             for _nd in node_list[1:]:
-                if conj_ind == _nd[0]:
+                if conj_ind == _nd[0]: # the first cc
                     if ('nsubj' in _nd[4].keys()) or ('nsubjpass' in _nd[4].keys()):
                         # another subj :THE ASSUME
-                        nsubj_ind = conj_ind - 1
-                        conj_nsubj = base.upper_first_char(tokens[nsubj_ind]) + nsubj
+                        #nsubj_ind = conj_ind - 1
+                        conj_nsubj_ind = _nd[4]['nsubj'][0]
+                        conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind]) + nsubj
                         FLAG = 1 # use the subj
+                        
+                        #break
+                    # there is one more cc    
+                    if ('conj' in _nd[4].keys() and ('cc' in _nd[4].keys())):
+                        another_cc_ind = _nd[4]['cc'][0]
+                        another_conj_ind = _nd[4]['conj'][0]
+                        
+                    break        
 
             # get nsubj
             #nsubj = " "
             if ('nsubj' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubj'][0]
                 nsubj =  base.upper_first_char(tokens[nsubj_ind]) + nsubj
-
 
             if ('nsubjpass' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubjpass'][0]
@@ -122,7 +183,7 @@ def simp_coordi_sent(tokens, node_list):
 
             #import pdb; pdb.set_trace()
             tokens[cc_ind] = ''
-            if tokens[cc_ind - 1] == '':# no word before the conjunction word
+            if tokens[cc_ind - 1] == '':  # no word before the conjunction word
                 pass
             elif tokens[cc_ind - 1] in PUNCTUATION:
                 tokens[cc_ind - 1] = ''
@@ -134,13 +195,24 @@ def simp_coordi_sent(tokens, node_list):
 
             str1 = nsubj + " ".join(tokens[(nsubj_ind+1):(cc_ind+1)])
 
-            #NOTE: We can consider the next word after the conjunction as the first word of 2nd sentence
+            #NOTICE: We can consider the next word after the conjunction as the first word of 2nd sentence
             # str2
-            if not FLAG:
-                str2 = nsubj + " ".join(tokens[(cc_ind + 1):])
-            else:
-                str2 = conj_nsubj + " ".join(tokens[conj_ind:])
+            
+            #NOTICE: one more cc?
 
+            #import pdb; pdb.set_trace()
+            if (another_cc_ind != 0) and (another_conj_ind != 0):  # one more cc
+                _str2 = connect_sent(conj_ind, tokens, node_list)
+                if FLAG:
+                    #str2 =  nsubj + " ".join(tokens[(cc_ind+1):another_cc_ind]) + " . " + _str2
+                    str2 =  conj_nsubj + " ".join(tokens[(conj_nsubj_ind+1):another_cc_ind]) + " . " + _str2
+                    
+            else:
+                if not FLAG:
+                    str2 = nsubj + " ".join(tokens[(cc_ind + 1):])
+                else:
+                    str2 = conj_nsubj + " ".join(tokens[conj_ind:])
+                
             """
             lst = []
             lst.append(row[0][0])
@@ -304,6 +376,8 @@ def main():
     #sent = "I ate an apple and an orange."
     sent = "I ate an apple and an orange."
     sent = "He is an actor and a musician."
+    sent = "I ate fish and he drank wine and she ate fish."
+    sent = "I am a student and he is a teacher and she is a doctor."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

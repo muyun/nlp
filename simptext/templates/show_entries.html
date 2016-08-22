@@ -73,8 +73,10 @@ $(function() {
         {% else %}
            {{ item |safe }}
 
-           {% if item == "." %}  {# is a sentence? #} 
+           {% if item == "." %}  {# is a sentence? #}
+               {#
                <input type='button' id="edit-{{counter|length}}" value='Edit'/>
+               #}
                {% if counter|length is not equalto 1 %}
                    <input type='button' id="undo-{{counter|length}}" value='Undo'/>
                {% endif %}
