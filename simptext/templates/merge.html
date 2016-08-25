@@ -1,0 +1,20 @@
+<li id="merge">  {# TODO: update the bad solution #}
+   {% for item in outputs %} 
+        {% if item is mapping %} {# not change #}
+   
+          {% for key, value in item.iteritems() %}
+            <select>
+              {% for v in value %}
+                 <option value={{ v }} >{{ v |safe}} </option>
+              {% endfor %}
+            </select>
+         
+          {% endfor %}
+
+        {% else %}
+           {{ item |safe }}
+              
+        {% endif %}
+
+   {% endfor %}  
+</li>

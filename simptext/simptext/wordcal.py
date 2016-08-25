@@ -23,7 +23,7 @@ wnl = WordNetLemmatizer()
 
 import string
 
-import sys
+#import sys
 #sys.setrecursionlimit(1000)
 
 # the Models about the training model about the word rank
@@ -63,7 +63,7 @@ def get_hyponyms(w):
 def get_lemma(word):
     return wnl.lemmatize(word.lower(), pos='v')
 
-def check_word(strs, words):
+def _check_word(strs, words):
     """ check the word is words list, and return the string"""
     #output=[]
     #output= OrderedDict()
@@ -112,64 +112,8 @@ def check_word(strs, words):
     #return ' '.join(str(w) for w in output)
     return tokens
 
-def _check_word(strs, words):
-    """ check the word is words list, and return the string"""
-    #output=[]
-    #output= OrderedDict()
-    print "strs: ", strs
 
-    #import pdb; pdb.set_trace()
-    #for w in str(strs).split():
-    #tokens = StanfordTokenizer().tokenize(strs)
-    tokens = wordpunct_tokenize(strs)
-    for ind in range(len(tokens)):
-        #print 'token: ', token
-        if tokens[ind] in string.punctuation:
-            #print "stro :", token
-            #output[token] = token
-            pass
-        else:
-            #_w = w.lower()
-            # so slow here
-            #_token_ = StanfordTokenizer().lemmatize(token.lower())
-            #_token = wnl.lemmatize(token.lower(), pos='v')
-            _token = get_lemma(tokens[ind])
-
-            #print "token: ", token
-            if _token in words:
-                 #output[token] = token
-                 pass
-            else:
-                 tokens_dict = {}
-                 _output = []
-                 #_output.append(tokens[ind]) # put the word itself at first
-
-                 """
-                 wordnet_list = get_wordnet_list(_token)
-
-                 for _w in wordnet_list:
-                     if _w in words: # w in EDB list?
-                         _output.append(_w)
-                 """
-
-                 #import pdb; pdb.set_trace()
-                 #_output.append(rank._interface(_token, strs, words))
-                 _output = list(rank._interface(_token, strs, words))
-                 _output.insert(0, tokens[ind])
-
-                 if len(_output) >= (1+1): # there is a replace including the word iteself
-                     tokens_dict[tokens[ind]] = _output
-                     tokens[ind] = tokens_dict
-                 else:
-                     pass
-
-    #print "tokens:", tokens
-    #import pdb; pdb.set_trace()
-    #return ' '.join(str(w) for w in output)
-    return tokens
-
-
-def check_word_(strs, words):
+def check_word(strs, words):
     """ check the word is words list, and return the string"""
     #output=[]
     #output= OrderedDict()
@@ -177,6 +121,7 @@ def check_word_(strs, words):
 
     tokens = []
     tokens = rank._interface(strs, words)
+    print "tokens:", tokens
 
     return tokens
 

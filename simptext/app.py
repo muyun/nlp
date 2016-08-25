@@ -11,6 +11,8 @@ from flask import Flask, request, render_template, session, g, redirect, url_for
 
 from flask_sqlalchemy import SQLAlchemy
 
+import json
+
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -40,15 +42,17 @@ def show_entries():
      
     if len(entries) > 0: #Syntactic simplification firstly
         #tokens = StanfordTokenizer().tokenize(entries)
-        syn_ret = dt_sent.simp_syn_sent(entries)
-        print "Syntactic result: ", syn_ret
-        if len(syn_ret) > 0: # next simplify the word
-            #outputs = utils.wordcal.check_word_(syn_ret, words)
-            outputs = wordcal.check_word_(syn_ret, words)
-        else:
-            outputs = wordcal.check_word_(entries, words)    
-          
-        #outputs = wordcal.check_word_(entries, words)         
+        _syn_ret = dt_sent.simp_syn_sent(entries)
+        if len(_syn_ret)>0:
+            syn_ret = dt_sent._get_split_ret(_syn_ret)  
+            print "Syntactic result: ", syn_ret
+
+            if len(syn_ret) > 0: # next simplify the word
+                #outputs = utils.wordcal.check_word_(syn_ret, words)
+                outputs = wordcal.check_word(syn_ret, words)
+            else:
+                outputs = wordcal.check_word(entries, words)    
+
     print "output: ", outputs
 
     return render_template('show_entries.html', entries=entries , outputs=outputs )

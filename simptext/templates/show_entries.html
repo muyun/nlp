@@ -3,29 +3,79 @@
 
 <script type=text/javascript>
 $(function() {
-  $('#edit-1').click(function(){
-    document.getElementById("reverse-1").contentEditable = true;
-  });
 
-  $('#edit-2').click(function(){
-    document.getElementById("reverse-2").contentEditable = true;
-  });
-
-  $('#edit-3').click(function(){
-    document.getElementById("reverse-2").contentEditable = true;
-  });
-
-  var lastInput = {{ entries | tojson }};
-  $('#undo-1').click(function(){
-    document.getElementById("reverse-1").innerHTML = lastInput;
-  });
+  //var lastInput = {{ entries | tojson }};
+  //var merge = document.getElementById('merge').innerHTML;
+  //document.getElementById('merge').style.visibility = "hidden";
 
   $('#undo-2').click(function(){
-    document.getElementById("reverse-2").innerHTML = lastInput;
+  	var _lastSent = document.getElementById("reverse-1").innerHTML;
+  	var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
+  	//console.log(lastSent)
+  	var merge2 = lastSent + document.getElementById("reverse-2").innerHTML;
+  	//console.log(merge2)
+  	//document.getElementById("reverse-1").innerHTML = '';
+  	$('#reverse-1').remove();
+    document.getElementById("reverse-2").innerHTML = merge2;
+
+    //document.getElementById('undo-2').style.visibility='hidden';
+    $('#undo-2').remove();
+
   });
 
   $('#undo-3').click(function(){
-    document.getElementById("reverse-3").innerHTML = lastInput;
+  	var _lastSent = document.getElementById("reverse-2").innerHTML;
+  	var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
+  	//console.log(lastSent)
+  	var merge3 = lastSent + document.getElementById("reverse-3").innerHTML;
+  	//document.getElementById("reverse-2").innerHTML = '';
+  	$('#reverse-2').remove();
+    document.getElementById("reverse-3").innerHTML = merge3;
+
+    //document.getElementById('undo-3').style.visibility='hidden';
+    $('#undo-2').remove();
+    $('#undo-3').remove();
+  });
+
+  $('#undo-4').click(function(){
+  	var _lastSent = document.getElementById("reverse-3").innerHTML;
+  	var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
+  	//console.log(lastSent)
+  	var merge4 = lastSent + document.getElementById("reverse-4").innerHTML;
+  	//document.getElementById("reverse-3").innerHTML = '';
+  	$('#reverse-3').remove();
+    document.getElementById("reverse-4").innerHTML = merge4;
+
+    //document.getElementById('undo-4').style.visibility='hidden';
+    $('#undo-3').remove();
+    $('#undo-4').remove();
+  });  
+  
+  $('#undo-5').click(function(){
+    var _lastSent = document.getElementById("reverse-4").innerHTML;
+    var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
+    //console.log(lastSent)
+    var merge4 = lastSent + document.getElementById("reverse-5").innerHTML;
+    //document.getElementById("reverse-3").innerHTML = '';
+    $('#reverse-4').remove();
+    document.getElementById("reverse-5").innerHTML = merge4;
+
+    //document.getElementById('undo-4').style.visibility='hidden';
+    $('#undo-5').remove();
+  });
+
+  $('#undo-6').click(function(){
+    var _lastSent = document.getElementById("reverse-5").innerHTML;
+    var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
+    //console.log(lastSent)
+    var merge4 = lastSent + document.getElementById("reverse-6").innerHTML;
+    //document.getElementById("reverse-3").innerHTML = '';
+    $('#reverse-5').remove();
+    document.getElementById("reverse-6").innerHTML = merge4;
+
+    //document.getElementById('undo-4').style.visibility='hidden';
+    $('#undo-5').remove();
+    $('#undo-6').remove();
   });
 
 });
@@ -57,7 +107,7 @@ $(function() {
 
   <li><h2>Output:<h2></li>
   {% set counter = ['1'] %}
-  <li id="reverse-{{counter|length}}">
+  <li id="reverse-1" contenteditable="true">
    {% for item in outputs %} 
         {% if item is mapping %} {# not change #}
    
@@ -74,16 +124,15 @@ $(function() {
            {{ item |safe }}
 
            {% if item == "." %}  {# is a sentence? #}
-               {#
-               <input type='button' id="edit-{{counter|length}}" value='Edit'/>
-               #}
+               
                {% if counter|length is not equalto 1 %}
-                   <input type='button' id="undo-{{counter|length}}" value='Undo'/>
+                   <input type='button' id="undo-{{counter|length}}" value='Merge'/>
                {% endif %}
+
                {% if counter.append('1') %}
                {% endif %}
      
-               <br></li><li id="reverse-{{counter|length}}">
+               <br></li><li id="reverse-{{counter|length}}" contenteditable="true">
                
            {% endif %}
               
@@ -92,19 +141,12 @@ $(function() {
    {% endfor %}  
    </li>
 
-   {#
-   <dd><input type='button' id="edit" value='Edit'/>
-   <input type='button' id="undo1" value='Undo-S1'/>
-   <input type='button' id="undo-2" value='Undo-S2'/>
-   #}
-
 </ul>
 
 {% endif %}
-
-<br>
+{#
+{% include 'merge.html' %}
+#}
 {% include 'footer.html' %}
 
 {% endblock %}
-
-

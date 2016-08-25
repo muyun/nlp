@@ -14,7 +14,8 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from alg import base
+#from algs import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -97,10 +98,9 @@ def simp_subordi_sent(tokens, node_list):
             if nsubj_word == nsubj_advcl_word:
                 return strs
            
-
             #import pdb; pdb.set_trace()
             if ('mark' in advcl_dict.keys()):
-                #import pdb; pdb.set_trace()
+                import pdb; pdb.set_trace()
                 mark_ind = mark_list[4]['mark'][0]
                 marker = tokens[mark_ind].lower()
 
@@ -119,7 +119,6 @@ def simp_subordi_sent(tokens, node_list):
 
                     #import pdb; pdb.set_trace()
  
-
                     if nsubj_ind != 0:
                         _str1 = tokens[:(nsubj_ind)]
                         if _str1[-1] in PUNCTUATION:
@@ -219,6 +218,7 @@ def main():
     sent = "Since he came, I left"
     sent = "Before he came, I left"
     sent = "I feel angry when provoked"
+    sent = "After eating dinner, he goes home."
 
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    

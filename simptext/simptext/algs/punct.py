@@ -16,8 +16,8 @@ eng_tagger = StanfordPOSTagger('english-bidirectional-distsim.tagger')
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from alg import base
-
+#from algs import base
+import base
 #PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
 def check_tag(word, taggers):

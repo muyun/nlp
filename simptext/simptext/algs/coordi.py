@@ -12,7 +12,8 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from alg import base
+#from alg import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -201,17 +202,18 @@ def simp_coordi_sent(tokens, node_list):
             #NOTICE: one more cc?
 
             #import pdb; pdb.set_trace()
+            """
             if (another_cc_ind != 0) and (another_conj_ind != 0):  # one more cc
                 _str2 = connect_sent(conj_ind, tokens, node_list)
                 if FLAG:
                     #str2 =  nsubj + " ".join(tokens[(cc_ind+1):another_cc_ind]) + " . " + _str2
                     str2 =  conj_nsubj + " ".join(tokens[(conj_nsubj_ind+1):another_cc_ind]) + " . " + _str2
-                    
+            """       
+            
+            if not FLAG:
+                str2 = nsubj + " ".join(tokens[(cc_ind + 1):])
             else:
-                if not FLAG:
-                    str2 = nsubj + " ".join(tokens[(cc_ind + 1):])
-                else:
-                    str2 = conj_nsubj + " ".join(tokens[conj_ind:])
+                str2 = conj_nsubj + " ".join(tokens[(conj_nsubj_ind + 1):])
                 
             """
             lst = []
@@ -231,6 +233,7 @@ def simp_coordi_sent(tokens, node_list):
             #ret.append(lst_)
             """
             strs = str1 + " " + str2
+            
             return strs
         
         elif (root in nd) and ('dobj' in nd[4].keys() or 'nsubj' in nd[4].keys()):
@@ -378,11 +381,11 @@ def main():
     sent = "He is an actor and a musician."
     sent = "I ate fish and he drank wine and she ate fish."
     sent = "I am a student and he is a teacher and she is a doctor."
+    sent = "I am a student and he is a teacher and she is a doctor and he is a farmer."
+    #sent = "I am a student and he is a teacher ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 
         
 if __name__ == '__main__':
     main()
-
-        

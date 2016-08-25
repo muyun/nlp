@@ -72,6 +72,7 @@ def simp_appos_sent(tokens, node_list):
                 appos_ind = nsubj_dict['appos'][0]
 
                 verb = "be"
+                #verb = base.update_vb_conjugation(verb, root)
 
                 subj = base.upper_first_char(tokens[nsubj_ind])
 
@@ -147,6 +148,7 @@ def main():
     #sent = "I ate an apple and an orange."
     sent = "I ate an apple and an orange."
     sent = "Peter, my son, ate an apple."
+    sent = "Peter, my friend, likes it."
     #TODO: the tense of the output
     print(simp_syn_sent_(sent))
 
