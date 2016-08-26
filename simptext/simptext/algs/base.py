@@ -11,7 +11,7 @@ from collections import defaultdict
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 """
-import en_nb
+#import en_nb
 
 """
 nodes = defaultdict(lambda:  {'address': None,

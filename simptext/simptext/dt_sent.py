@@ -308,6 +308,7 @@ def print_mturk_sent(filename, sent_file):
     output = OrderedDict()
     f = open(filename, 'rU')
     num = 0
+    res = ""
     for line in f:
         line = line.strip('\n')
         if line:
@@ -333,7 +334,9 @@ def print_mturk_sent(filename, sent_file):
             #res = passive.simp_syn_sent_(str(se))
             #res = paratax.simp_syn_sent_(str(se))
             #res = alg.simp_passive_sent(str(re))
-            res = simp_syn_sent(str(re))
+            _res = simp_syn_sent(str(se))
+            if len(_res)>0:
+                res = _get_split_ret(_res)
             #import pdb; pdb.set_trace()
             print "res: ", res
             if res: # the
@@ -517,7 +520,10 @@ def simp_mturk_sent(filename, sent_file):
             #res = passive.simp_syn_sent_(str(se))
             #res = paratax.simp_syn_sent_(str(se))
             #res = alg.simp_passive_sent(str(re))
-            res = simp_syn_sent(str(se))
+            _res = simp_syn_sent(str(se))
+
+            if len(_syn_ret)>0:
+                res = _get_split_ret(_res)
             #import pdb; pdb.set_trace()
             #print "res: ", res
             if res:  # the
@@ -534,7 +540,7 @@ def simp_mturk_sent(filename, sent_file):
                 #json.dump(output, outfile, indent=2)
 
             _output[se] = [se, res]
-            with codecs.open('mturk_sent.csv', 'a') as _outfile:
+            with codecs.open('mturk_sent_.csv', 'a') as _outfile:
                 wr = csv.writer(_outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
                 wr.writerow(_output[se])
                 
@@ -990,6 +996,7 @@ def _get_split_ret(_str):
     syn_ret1 = simp_syn_sent(_syn_ret1)
 
     print "Syntactic result1: ", syn_ret1
+    if _strs[1]:
     _syn_ret2 = _strs[1] + ' .'
     syn_ret2 = simp_syn_sent(_syn_ret2)
     print "Syntactic result2: ", syn_ret2
@@ -1015,10 +1022,10 @@ def _get_split_ret(_str):
 
 # Main test
 def main():
-    dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/"
+    dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/"
 
    
-    filename = dir + "dataset/coinco/coinco.xml"
+    #filename = dir + "dataset/coinco/coinco.xml"
     #store_filename = dir + "dataset/coinco/coinco_lemmas.txt"
 
     """
@@ -1049,13 +1056,13 @@ def main():
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
-    sent_file = dir + "utils/testset/sent_mturk_l4_.md"
+    sent_file = dir + "tests/sent_mturk_l5_.md"
     gt_file = dir + "dataset/simplify_testset_0814.xlsx"
     
-    #_info = print_mturk_sent(filename, sent_file)
+    _info = print_mturk_sent(filename, sent_file)
     #print "Type: Paratax Clauses:"
-    #print "#sentence in mturk: ", _info[0]
-    #print "#sentence with Syntactic simplification: ", _info[1]
+    print "#sentence in mturk: ", _info[0]
+    print "#sentence with Syntactic simplification: ", _info[1]
     
 
     # recall and precision
@@ -1064,10 +1071,11 @@ def main():
     #filename = dir + "utils/testset_gt_adverb.md"
     #filename = dir + "utils/testset_gt_appos.md"
 
-    filename = dir + "utils/testset/sent_mturk_l4_.md"
-    gt = read_xlsx_file(gt_file, 1)
-    _info = cal_mturk_sent(filename, gt)
+    #filename = dir + "utils/testset/sent_mturk_l4_.md"
+    #gt = read_xlsx_file(gt_file, 1)
+    #_info = cal_mturk_sent(filename, gt)
     
+
     
     """
     lemmas = []
@@ -1096,6 +1104,7 @@ def main():
     print "#sentence in coinco: ", info[0]
     print "#sentence with Syntactic simplification: ", info[1]
     """
+
 
 if __name__ == '__main__':
      main()
