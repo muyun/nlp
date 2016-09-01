@@ -27,29 +27,32 @@ $('button').click(function(){
   <div class="flash">{{ message }} </div>
   {% endfor %}
 
-  <!--
+<!--
       jQuery for Ajax
-    -->
-  <!--  
-  <script type=text/javascript src="{{
-   url_for('static', filename='jquery.js')}}"></script>
-
-  <script type=text/javascript>
+-->
+<script type=text/javascript src="{{
+   url_for('static', filename='sortable.js')}}"
+   url_for('static', filename='reverse.js')}}">
+</script>
+  
+<script type=text/javascript>
     $SCRIPT_ROOT= {{request.script_root|tojson|safe}};
-  </script>
-  -->
+</script>
 
 <script type="text/javascript"
   src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js">
 </script>
 
 <!--
-<script src="/static/js/app.js"</script>
+<script src="jquery.sortable.js"></script>
 -->
+<!--
+<script src="/static/js/app.js"</script>
 
 <script type="text/javascript">
   var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 </script>
+-->
 
   {% block body %}
   {% endblock %}

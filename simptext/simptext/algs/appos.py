@@ -71,7 +71,7 @@ def simp_appos_sent(tokens, node_list):
                 #import pdb; pdb.set_trace()
                 appos_ind = nsubj_dict['appos'][0]
 
-                verb = "be"
+                verb = "is"
                 #verb = base.update_vb_conjugation(verb, root)
 
                 subj = base.upper_first_char(tokens[nsubj_ind])
@@ -83,18 +83,34 @@ def simp_appos_sent(tokens, node_list):
                 tokens.insert(nsubj_ind + 1, verb)
 
                 root_ind = tokens.index(root)
-                _str1 = tokens[nsubj_ind:root_ind]
+                # SO bad solution, if the root isnot a 'verb'
+                split_ind = 0
+                if ',' in tokens:
+                    split_ind = tokens.index(',')
 
-                if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
-                    _str1[-1] = ''
-                str1 =  ' '.join(_str1)
-                #print "1st sent: ", str1
+                if tokens[root_ind] > split_ind:
+                    _str1 = tokens[nsubj_ind:split_ind]
+                    tokens[split_ind] = ''
 
-                # upper the 1st char in 2nd sent
-                _str2 = tokens[root_ind:]
-                #w = _w + ' '
-                str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
-                #print "2nd sent: ", str2
+                    if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
+                        _str1[-1] = ''
+                    str1 =  ' '.join(_str1)
+
+                    _str2 = tokens[split_ind:]
+                    str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
+                else:
+                    _str1 = tokens[nsubj_ind:root_ind]
+
+                    if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
+                        _str1[-1] = ''
+                    str1 =  ' '.join(_str1)
+                    #print "1st sent: ", str1
+
+                    # upper the 1st char in 2nd sent
+                    _str2 = tokens[root_ind:]
+                    #w = _w + ' '
+                    str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
+                    #print "2nd sent: ", str2
 
                 strs = str1 + ' . ' + str2
                 return strs
@@ -149,6 +165,7 @@ def main():
     sent = "I ate an apple and an orange."
     sent = "Peter, my son, ate an apple."
     sent = "Peter, my friend, likes it."
+    sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
     #TODO: the tense of the output
     print(simp_syn_sent_(sent))
 

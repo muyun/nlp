@@ -117,7 +117,7 @@ def check_word(strs, words):
     """ check the word is words list, and return the string"""
     #output=[]
     #output= OrderedDict()
-    print "strs: ", strs
+    print "check strs: ", strs
 
     tokens = []
     tokens = rank._interface(strs, words)

@@ -20,7 +20,8 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #from  nltk.parse.stanford import StanfordParser
 #eng_parser = StanfordParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-from alg import base
+#from alg import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 

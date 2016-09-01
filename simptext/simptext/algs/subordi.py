@@ -100,7 +100,7 @@ def simp_subordi_sent(tokens, node_list):
            
             #import pdb; pdb.set_trace()
             if ('mark' in advcl_dict.keys()):
-                import pdb; pdb.set_trace()
+                #import pdb; pdb.set_trace()
                 mark_ind = mark_list[4]['mark'][0]
                 marker = tokens[mark_ind].lower()
 

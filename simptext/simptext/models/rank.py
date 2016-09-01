@@ -1,5 +1,5 @@
 """
- This is from Ms.XIE
+ This is from Ms. XIE
 
 """
 import kenlm
@@ -12,11 +12,19 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.tag import StanfordPOSTagger
 st = StanfordPOSTagger('english-bidirectional-distsim.tagger')
 
+from nltk.tag import StanfordNERTagger
+eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
+
 
 ken_model = kenlm.Model('/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/models/bin/europarl.bin')
 w2v_model=gensim.models.Word2Vec.load_word2vec_format('/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/models/bin/en.bin',binary=True)
 lmtzr = WordNetLemmatizer()
 EDB_list=[]
+
+def isplural(word):
+        lemma = lmtzr.lemmatize(word, 'n')
+        plural = True if word is not lemma else False
+        return plural, lemma
 
 def _Stem(sub_sent,edblist):
 	#words = nltk.word_tokenize(sub_sent)
@@ -51,7 +59,15 @@ def _Stem(sub_sent,edblist):
 		w = w.strip()
 		if w and w not in edblist:
 			sub_words.append(w.strip())
-	return sub_words,word_pre
+
+        # get the person name based on StanfordNERTagger
+        NERTaggers = []
+        for token, title in eng_tagger.tag(words):
+                if title == 'PERSON':
+                        NERTaggers.append(token)
+                         
+	#import pdb; pdb.set_trace()
+	return sub_words, word_pre, NERTaggers
 
 def Initial(fin): #load EDB_List
 	flist = open(fin,'r')
@@ -104,22 +120,32 @@ def _process_args():
     return parser.parse_args(sys.argv[1:])
 
 def _interface(sentence,edblist):
-	target_words, word_pre =  _Stem(sentence,edblist)
+	target_words, word_pre, NERTaggers =  _Stem(sentence,edblist)
 	token_list =[]
+ 
+    #import pdb; pdb.set_trace()
 	for word in word_pre:
-		tokens = {}
-		if word not in target_words:
-			token_list.append(word)
-		else:
-
-			r_sent = []
-			candidates = Generate_candidates_topN(word,sentence,19,edblist)
-			for i in range(len(candidates)):
-				r_sent.append(candidates[i] + "@" + sentence.replace(word,candidates[i]))
-			sub_top10 = kenlm_topn(r_sent,9,sentence)
-			sub_top10.insert(0,word)
-			tokens[word] = sub_top10
-		if tokens : token_list.append(tokens)
+	        tokens = {}
+                if word in NERTaggers: # is a person, subject?
+                        #import pdb; pdb.set_trace()
+                        if not isplural(word): # plural
+                                tokens[word] = [word, "they"]
+                        else:
+                                tokens[word] = [word, "he", "she", "it"]
+	        else:
+		        if word not in target_words:
+			        token_list.append(word)               
+		        else:
+			        r_sent = []
+			        candidates = Generate_candidates_topN(word,sentence,19,edblist)
+			        for i in range(len(candidates)):
+				        r_sent.append(candidates[i] + "@" + sentence.replace(word,candidates[i]))
+			        sub_top10 = kenlm_topn(r_sent,9,sentence)
+			        sub_top10.insert(0,word)
+			        tokens[word] = sub_top10
+                                
+                if tokens: token_list.append(tokens)
+                
 	return token_list
 	
 

@@ -14,6 +14,7 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 
 #from alg import base
 import base
+#from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -149,13 +150,16 @@ def simp_coordi_sent(tokens, node_list):
             #Assume the nsubj is the before word of the conj_ind
             conj_ind = nd[4]['conj'][0]
             conj_nsubj_ind = 0
+            conj_nsubj = ""
             for _nd in node_list[1:]:
                 if conj_ind == _nd[0]: # the first cc
                     if ('nsubj' in _nd[4].keys()) or ('nsubjpass' in _nd[4].keys()):
                         # another subj :THE ASSUME
                         #nsubj_ind = conj_ind - 1
-                        conj_nsubj_ind = _nd[4]['nsubj'][0]
-                        conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind]) + nsubj
+                        conj_nsubj_ind = _nd[4]['nsubj'][0] # get the nsubj of the conj
+                        #conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind]) + nsubj
+                        #conj_nsubj = base.upper_first_char(nsubj)
+                        conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind])
                         FLAG = 1 # use the subj
                         
                         #break
@@ -165,7 +169,7 @@ def simp_coordi_sent(tokens, node_list):
                         another_conj_ind = _nd[4]['conj'][0]
                         
                     break        
-
+     
             # get nsubj
             #nsubj = " "
             if ('nsubj' in nd[4].keys()):
@@ -213,7 +217,7 @@ def simp_coordi_sent(tokens, node_list):
             if not FLAG:
                 str2 = nsubj + " ".join(tokens[(cc_ind + 1):])
             else:
-                str2 = conj_nsubj + " ".join(tokens[(conj_nsubj_ind + 1):])
+                str2 = conj_nsubj + " " + " ".join(tokens[(conj_nsubj_ind + 1):])
                 
             """
             lst = []
@@ -382,10 +386,11 @@ def main():
     sent = "I ate fish and he drank wine and she ate fish."
     sent = "I am a student and he is a teacher and she is a doctor."
     sent = "I am a student and he is a teacher and she is a doctor and he is a farmer."
+    sent = "Peter, my friend, likes it and I also like it."
     #sent = "I am a student and he is a teacher ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 
-        
+
 if __name__ == '__main__':
     main()

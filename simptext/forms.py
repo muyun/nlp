@@ -16,5 +16,6 @@ class LoginForm(Form):
 
 class EntryForm(Form):
     text=StringField('username', [validators.Length(min=4, max=25)])
+    words=StringField('password', [validators.Length(min=4, max=25)])
     #password= PasswordField('password',[validators.DataRequired()])
     submit = SubmitField('Submit')

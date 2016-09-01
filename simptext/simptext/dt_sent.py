@@ -821,8 +821,7 @@ def simp_coinco_sent(filename, sent_file):
         num = num + 1
         if num == 20:
             break
-        """      
-            
+        """                
     return num_sentences, num_splitted_sentences    
 
 
@@ -844,7 +843,6 @@ def simp_syn_sent(sent):
     #w = result.tree()
     #print "parse_tree:", w
     
-
     #TODO: use the tree structure, Check again
     node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     for node in result.nodes.items():
@@ -860,13 +858,11 @@ def simp_syn_sent(sent):
             strs = punct.simp_punct_sent(tokens, taggers, node_list)
             if len(strs) > 0:
                 return strs
-            else:
-                
+            else:               
                 strs = coordi.simp_coordi_sent(tokens, node_list)
                 if len(strs) > 0:
                     return strs
-                else:
-                
+                else:        
                     strs = subordi.simp_subordi_sent(tokens, node_list)
                     if len(strs) > 0:
                         return strs
@@ -891,87 +887,7 @@ def simp_syn_sent(sent):
                                         if len(strs) > 0:
                                             return strs
 
-    return strs
-
-def simp_syn_sent_(sent):
-    strs = ""
-    """
-    # the original tokens in the sent
-    #import pdb; pdb.set_trace()
-    #print "syn sent: ", sent
-    #import pdb; pdb.set_trace()
-    tokens = StanfordTokenizer().tokenize(sent)
-    #tokens = wordpunct_tokenize(strs)
-    tokens.insert(0, '')
-
-    taggers = eng_tagger.tag(sent.split())
-
-    result = list(eng_parser.raw_parse(sent))[0]
-    root = result.root['word']
-
-    #w = result.tree()
-    #print "parse_tree:", w
-
-    #TODO: use the tree structure, Check again
-    node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
-    for node in result.nodes.items():
-        node_list.append(base.get_triples(node))
-        #node_list[base.get_triples[0]] = base.get_triples(node)
-    """
-    #import pdb; pdb.set_trace()
-    if len(sent) > 0:
-        strs = paratax.simp_syn_sent_(sent)
-        print "paratax: ", strs
-        if len(strs) > 0:
-            strs = punct.simp_syn_sent_(sent)
-            print "punct: ", strs
-            if len(strs) > 0:
-                strs = coordi.simp_syn_sent_(sent)
-                print "coordi: ", strs
-                if len(strs) > 0:
-                    strs = subordi.simp_subordi_sent(sent)
-                    print "subordi: ", strs
-                    if len(strs) > 0:
-                        strs = adverb.simp_adverb_sent(sent)
-                        print "adverb: ", strs
-                        if len(strs) > 0:
-                            strs = passive.simp_passive_sent(sent)
-                            print "passive: ", strs
-                            if len(strs) > 0:
-                                strs = parti.simp_parti_sent(sent)
-                                print "parti: ", strs
-                                if len(strs) > 0:
-                                    strs = appos.simp_appos_sent(sent)
-                                    print "appos: ", strs
-                                    if len(strs) > 0:
-                                        strs = adjec.simp_adjec_sent(sent)
-                                        print "adjec: ", strs
-                                        if len(strs) > 0:
-                                            return strs
-                                    else: # adjec
-                                        return strs
-                                else: # parti
-                                    return strs
-
-                            else: #passive
-                                return strs
-
-                        else: # adverb
-                            return strs
-
-                    else: #subordi
-                        return strs
-
-                else: # coordi
-                    return strs
-
-            else: # punct
-                return strs
-
-        else: #paratax
-            return strs
-
-    return strs    
+    return strs 
 
 
 def get_split_ret(sents):
@@ -988,29 +904,38 @@ def get_split_ret(sents):
     return ret
 
 def _get_split_ret(_str):
-    print "Syntactic result0: ", _str
+    print "S1+S2: ", _str
     syn_ret = ""
     _strs = _str.split('.')
 
-    _syn_ret1 = _strs[0] + ' . '
-    syn_ret1 = simp_syn_sent(_syn_ret1)
+    s1 = _strs[0] + ' . '
+    print "S1: ", s1
+    s1_child = ""
+    s2 = ""
+    s2_child = ""
+    #syn_ret = ""
+    if len(_strs[1]) == 0:
+        return (s1, s1_child, s2, s2_child, _str)
+        
+    s1_child = simp_syn_sent(s1)
+    print "S11+S12: ", s1_child
+    
+    #print "str2: ", _strs[1] 
+    s2 = _strs[1] + ' .'
+    print "S2: ", s2
+    s2_child = simp_syn_sent(s2)
+    print "S21+S22: ", s2_child
 
-    print "Syntactic result1: ", syn_ret1
-    if _strs[1]:
-    _syn_ret2 = _strs[1] + ' .'
-    syn_ret2 = simp_syn_sent(_syn_ret2)
-    print "Syntactic result2: ", syn_ret2
-
-    if len(syn_ret1)>0: # syn_ret1
-        if len(syn_ret2)>0: # syn_ret2
-            syn_ret = syn_ret1 + syn_ret2
+    if len(s1_child)>0: # syn_ret1
+        if len(s2_child)>0: # syn_ret2
+            syn_ret = s1_child + s2_child
             print "1+2: ", syn_ret
         else:
-            syn_ret = syn_ret1 + _syn_ret2 
+            syn_ret = s1_child + s2 
             print "1+in+2: ", syn_ret
     else:
-        if len(syn_ret2)>0:
-            syn_ret = _syn_ret1 + syn_ret2
+        if len(s2_child)>0:
+            syn_ret = s1 + s2_child
             print "in+1+2: ", syn_ret
         else:
             syn_ret = _str 
@@ -1018,7 +943,7 @@ def _get_split_ret(_str):
 
     print "Syntactic result: ", syn_ret
 
-    return syn_ret
+    return (s1, s1_child, s2, s2_child, syn_ret)
 
 # Main test
 def main():
