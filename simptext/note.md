@@ -22,5 +22,22 @@
   $ import model  
   $ txt = model.Entry('this is a demo')  
   $ db.session.add(txt)  
-  $ db.session.commit()  
+  $ db.session.commit() 
+
+
+#### example 
+ Peter, my friend, likes it.
+ Peter, my friend, likes it and I also like it.
+
+
+#### questions
+* the database?
+
+* AJAX with jQuery in Flask ?
+
+* Python loading dir?
+
+
+
+ 
   

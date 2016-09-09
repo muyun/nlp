@@ -37,7 +37,7 @@ from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, pass
 #reload(sys)
 #sys.setdefaultencoding('utf-8')
 
-def read_xlsx_file(filename, sheetnums):
+def read_xlsx_file(filename, sheetnums, columnnum):
     """read the xlsx file and stored first sheetnums into words list"""
     # using the openpyxl lib here
     wb = openpyxl.load_workbook(filename)
@@ -53,7 +53,7 @@ def read_xlsx_file(filename, sheetnums):
     for sheet_name in sheet_names:
         worksheet = wb.get_sheet_by_name(sheet_name)
         for x in range(1, worksheet.max_row+1):
-            words.append(str(worksheet.cell(row=x, column=1).value).lower())
+            words.append(str(worksheet.cell(row=x, column=columnnum).value).lower())
 
     # now removing it
     # TODO- the replace function
@@ -335,11 +335,13 @@ def print_mturk_sent(filename, sent_file):
             #res = paratax.simp_syn_sent_(str(se))
             #res = alg.simp_passive_sent(str(re))
             _res = simp_syn_sent(str(se))
-            if len(_res)>0:
-                res = _get_split_ret(_res)
-            #import pdb; pdb.set_trace()
-            print "res: ", res
-            if res: # the
+            if len(_res)>0:            
+                (s1, s1_child, s2, s2_child, res) = _get_split_ret(_res)
+                print "res: ", res
+            else:
+                res = _res
+
+            if _res: # the
                 num_splitted_sentences = num_splitted_sentences + 1
 
             #import pdb; pdb.set_trace()
@@ -906,6 +908,7 @@ def get_split_ret(sents):
 def _get_split_ret(_str):
     print "S1+S2: ", _str
     syn_ret = ""
+
     _strs = _str.split('.')
 
     s1 = _strs[0] + ' . '
@@ -914,7 +917,7 @@ def _get_split_ret(_str):
     s2 = ""
     s2_child = ""
     #syn_ret = ""
-    if len(_strs[1]) == 0:
+    if len(_strs) == 1:
         return (s1, s1_child, s2, s2_child, _str)
         
     s1_child = simp_syn_sent(s1)
@@ -982,12 +985,13 @@ def main():
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
     sent_file = dir + "tests/sent_mturk_l5_.md"
-    gt_file = dir + "dataset/simplify_testset_0814.xlsx"
-    
-    _info = print_mturk_sent(filename, sent_file)
+    gt_file = dir + "dataset/simplify_testset_0817.xlsx"
+
+    # generate the output
+    #_info = print_mturk_sent(filename, sent_file)
     #print "Type: Paratax Clauses:"
-    print "#sentence in mturk: ", _info[0]
-    print "#sentence with Syntactic simplification: ", _info[1]
+    #print "#sentence in mturk: ", _info[0]
+    #print "#sentence with Syntactic simplification: ", _info[1]
     
 
     # recall and precision
@@ -997,11 +1001,10 @@ def main():
     #filename = dir + "utils/testset_gt_appos.md"
 
     #filename = dir + "utils/testset/sent_mturk_l4_.md"
-    #gt = read_xlsx_file(gt_file, 1)
-    #_info = cal_mturk_sent(filename, gt)
+    gt = read_xlsx_file(gt_file, 1)
+    _info = cal_mturk_sent(sent_file, gt)
     
 
-    
     """
     lemmas = []
     wd ='mission'

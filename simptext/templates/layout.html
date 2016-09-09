@@ -19,8 +19,10 @@ $('button').click(function(){
     {% if not session.logged_in %}
     <a href="{{ url_for('login') }}">log in</a>
     {% else %}
+    <a  href="{{ url_for('setting') }}">setting</a>
     <a href="{{ url_for('logout') }}">log out</a>
     {% endif %}
+
   </div>
 
   {% for message in get_flashed_messages() %}
@@ -30,18 +32,26 @@ $('button').click(function(){
 <!--
       jQuery for Ajax
 -->
+
+<!--  
 <script type=text/javascript src="{{
-   url_for('static', filename='sortable.js')}}"
    url_for('static', filename='reverse.js')}}">
-</script>
-  
-<script type=text/javascript>
-    $SCRIPT_ROOT= {{request.script_root|tojson|safe}};
-</script>
+</script>  
+-->
+
 
 <script type="text/javascript"
   src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js">
 </script>
+
+<script type=text/javascript>
+    $SCRIPT_ROOT= {{request.script_root|tojson|safe}};
+</script>
+
+<script type=text/javascript src="{{
+   url_for('static', filename='sortable.js')}}">
+</script>
+
 
 <!--
 <script src="jquery.sortable.js"></script>

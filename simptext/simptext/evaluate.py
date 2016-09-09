@@ -114,7 +114,7 @@ def print_mturk_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences
 
 
-def check_sent_similar(sent1, sent2, threshold=0.5):
+def check_sent_similar(sent1, sent2):
     """ check whether the two sents are the similar """
     pos_1 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent1)))
     pos_2 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent2)))
@@ -124,6 +124,25 @@ def check_sent_similar(sent1, sent2, threshold=0.5):
                     if token.lower().strip(string.punctuation) not in stopwords]
 
     return (lemmae_1 == lemmae_2)
+
+
+def check_sent_similar(sent1, sent2, threshold=0.5):
+    """Check if a and b are matches."""
+    pos_1 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent1)))
+    pos_2 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent1)))
+    lemmae_1 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_1 \
+                    if pos == wordnet.NOUN and token.lower().strip(string.punctuation) not in stopwords]
+    lemmae_2 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_2 \
+                    if pos == wordnet.NOUN and token.lower().strip(string.punctuation) not in stopwords]
+
+    # Calculate Jaccard similarity
+    len_union = len(set(lemmae_1).union(lemmae_2))
+    if len_union > 0:
+        ratio = len(set(lemmae_1).intersection(lemmae_2)) / float(len(set(lemmae_1).union(lemmae_2)))
+        return (ratio >= threshold)
+    else:
+        return False
+
 
 def is_similar(sent1, sent2):
     """ if the sent is multi-sentence;
@@ -136,14 +155,23 @@ def is_similar(sent1, sent2):
      # Assume sent1 and sent2 are two splitted sentences
     _str1 = str1[0] + ' . '
     _str2 = str2[0] + ' . '
-    if check_sent_similar(_str1, _str2):
-           # check 2nd part
-        _str1 = str1[1] + ' . '
-        _str2 = str2[1] + ' . '
-        if check_sent_similar(_str1, _str2):
+    if check_sent_similar(_str1, _str2, 0.5):
+        if len(str1) == 1 and len(str2) == 1:
             return True
+
+        # check 2nd part
+        elif len(str1) > 1 and len(str2) > 1:
+            _str1 = str1[1] + ' . '
+            _str2 = str2[1] + ' . '
+
+            if check_sent_similar(_str1, _str2, 0.5):
+                return True
+            else:
+                return False
+
         else:
             return False
+
     else:
         return False
 
@@ -264,10 +292,10 @@ def main():
     #print "#sentence with Syntactic simplification: ", _info[1]
 
 
-    #sent1 = "it was often convenient regard man as clockwork automata."
-    #sent2 = " it was often convenient regard man as clockwork automata."
+    sent1 = "it was often convenient regard man clockwork automata."
+    sent2 = " it was often convenient regard man as clockwork automata."
     #print(check_sent_similar(sent1, sent2))
-    #print(is_similar(sent1, sent2))
+    print(is_similar(sent1, sent2))
 
     # recall and precision
     #filename = dir + "utils/testset_groundtruth.md"
@@ -276,8 +304,8 @@ def main():
     #filename = dir + "utils/testset_gt_appos.md"
 
     #filename = dir + "utils/testset/sent_mturk_l4_.md"
-    gt = dt_sent.read_xlsx_file(gt_file, 1, 2)
-    _info = cal_mturk_sent(sent_file, gt)
+    #gt = dt_sent.read_xlsx_file(gt_file, 1, 2)
+    #_info = cal_mturk_sent(sent_file, gt)
 
 
 if __name__ == '__main__':

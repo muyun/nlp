@@ -101,7 +101,7 @@ def add_entry():
         abort(401)
 
     txt = request.form['input']
-    wordlist = request.form['words']
+    wordlist = ""
     #_wordlist = request.form['words']
     #print "wordlist: ", _wordlist
     #print 'txt: ', txt
@@ -136,6 +136,16 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('show_entries'))
+
+@app.route('/setting', methods=['GET', 'POST'])
+def setting():
+    wordlist = None
+    if request.method == 'POST':
+	wordlist = request.form['username']
+        return redirect(url_for('show_entries'))
+
+    return render_template('setting.html', wordlist=wordlist)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

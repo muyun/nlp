@@ -153,7 +153,9 @@ def simp_coordi_sent(tokens, node_list):
             conj_nsubj = ""
             for _nd in node_list[1:]:
                 if conj_ind == _nd[0]: # the first cc
-                    if ('nsubj' in _nd[4].keys()) or ('nsubjpass' in _nd[4].keys()):
+                    if ('nsubj' in _nd[4].keys()):
+
+                        #import pdb; pdb.set_trace()
                         # another subj :THE ASSUME
                         #nsubj_ind = conj_ind - 1
                         conj_nsubj_ind = _nd[4]['nsubj'][0] # get the nsubj of the conj
@@ -161,6 +163,11 @@ def simp_coordi_sent(tokens, node_list):
                         #conj_nsubj = base.upper_first_char(nsubj)
                         conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind])
                         FLAG = 1 # use the subj
+                        
+                    if ('nsubjpass' in _nd[4].keys()):
+                        conj_nsubj_ind = _nd[4]['nsubjpass'][0]
+                        conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind])
+                        FLAG = 1
                         
                         #break
                     # there is one more cc    
@@ -387,6 +394,9 @@ def main():
     sent = "I am a student and he is a teacher and she is a doctor."
     sent = "I am a student and he is a teacher and she is a doctor and he is a farmer."
     sent = "Peter, my friend, likes it and I also like it."
+    sent = "The boys, my friends, like it."
+    sent = "Peter, my friend, likes it."
+    sent = "The storm never approached land during its lifespan , and no damage or casualties were reported ."
     #sent = "I am a student and he is a teacher ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    

@@ -13,6 +13,8 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+#The girls, on the city, like it .import base
+#from algs import base
 import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
@@ -165,7 +167,8 @@ def main():
     sent = "I ate an apple and an orange."
     sent = "Peter, my son, ate an apple."
     sent = "Peter, my friend, likes it."
-    sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
+    sent = "Boys, my friends, like it."
+    #sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
     #TODO: the tense of the output
     print(simp_syn_sent_(sent))
 

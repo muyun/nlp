@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% if session.logged_in %}
+    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+      
+      <dl>
+        <dt>wordlist:
+        <dd><textarea name=input rows=4 cols=60></textarea>    
+        <dd><input type=submit value=Submit>
+
+      </dl>
+
+    </form>
+{% endif %}
+
+{% include 'footer.html' %}
+
+{% endblock %}
