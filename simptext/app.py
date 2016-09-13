@@ -146,8 +146,7 @@ def setting():
         abort(401)
 
     form = SelectForm()
-
-    wordlist = None
+    wordlist = ""
     if request.method == 'POST':
     	"""
         if form.validate() == False:
@@ -155,13 +154,13 @@ def setting():
             return render_template('setting.html', form = form)
         else:
         """
-        if request.form['words']:
-            wordlist = request.form['words']
-            edblist = request.form['edblist']
-            algs = request.form['algs']
-            print "wordlist: ", wordlist
-            print "edblist: ", edblist
-            print "algs: ", algs
+        if form.validate_on_submit():
+            #wordlist = request.form['words']
+            #edblist = request.form['edblist']
+            #algs = request.form['algs']
+            print "wordlist: ", form.words.data
+            print "edblist: ", form.edblist.data
+            print "algs: ", form.algs.data
 
         return redirect(url_for('show_entries'))
 

@@ -7,8 +7,8 @@
 
 @author wenlong
 """
-
-from wtforms import Form, TextField, IntegerField, SubmitField, SelectField, validators, ValidationError
+from flask_wtf import Form
+from wtforms import TextField, IntegerField, SubmitField, SelectField, SelectMultipleField, widgets, validators, ValidationError
 
 class LoginForm(Form):
     username=TextField('username', [validators.Length(min=4, max=25)])
@@ -23,11 +23,14 @@ class EntryForm(Form):
     #password= PasswordField('password',[validators.DataRequired()])
     submit = SubmitField('Submit')
 
+class MultiCheckboxField(SelectMultipleField):
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
 
 class SelectForm(Form):
     words = TextField("words")
     edblist = SelectField('EDBlist', choices = [(1, 'list1'), (2, 'list2'), (3, 'list3'), (4, 'list4')])
-    algs = SelectField('Algorithm', choices = [(1,'punct'), 
+    algs = MultiCheckboxField('Algorithm', choices = [(1,'punct'), 
     	                                       (2,'coordi'), 
     	                                       (3,'subordi'), 
     	                                       (4,'adverb'), 
