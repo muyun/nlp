@@ -40,4 +40,4 @@ class SelectForm(Form):
     	                                       (8,'passive'), 
     	                                       (9,'paratax')])
 
-    submit =SubmitField("Send")
+    submit =SubmitField("Submit")

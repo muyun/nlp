@@ -154,14 +154,14 @@ def setting():
             return render_template('setting.html', form = form)
         else:
         """
-        if form.validate_on_submit():
-            #wordlist = request.form['words']
-            #edblist = request.form['edblist']
-            #algs = request.form['algs']
-            print "wordlist: ", form.words.data
-            print "edblist: ", form.edblist.data
-            print "algs: ", form.algs.data
-
+        #if form.validate_on_submit():
+        #wordlist = form['words']
+        #edblist = form['edblist']
+        #algs = form['algs']
+        print "wordlist: ", form.words.data
+        print "edblist: ", form.edblist.data
+        print "algs: ", form.algs.data
+            
         return redirect(url_for('show_entries'))
 
     return render_template('setting.html', form = form)
