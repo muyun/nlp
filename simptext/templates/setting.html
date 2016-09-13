@@ -2,11 +2,19 @@
 {% block body %}
 
 {% if session.logged_in %}
-    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+    <form action="{{ url_for('setting') }}" method=post class=add-entry>
       
       <dl>
-        <dt>wordlist:
-        <dd><textarea name=input rows=4 cols=60></textarea>    
+        <dt>The wordlist:
+        <dd><textarea name=words rows=3 cols=35></textarea>
+        {{ form.edblist.label }} {{ form.edblist }}
+
+        <br/>
+        <br/>
+        <dt>{{ form.algs.label }}    
+        <dd>{{ form.algs}}
+
+        <br/>
         <dd><input type=submit value=Submit>
 
       </dl>
