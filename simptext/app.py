@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
- Logical Model
+ Logical Model - controller
 
  @author wenlong
 """
@@ -10,6 +10,8 @@ from flask import Flask, request, render_template, session, g, redirect, url_for
     render_template, flash, jsonify
 
 from flask_sqlalchemy import SQLAlchemy
+
+from forms import SelectForm, EntryForm
 
 import json
 
@@ -38,7 +40,7 @@ def show_entries():
     print "txt: ", str(txt)
     _txt = str(txt).split('\'')
     _input = _txt[1].split('@')
-    entries = _input[0]
+    entries = _input[0]   
     print "entries: ", entries
 
     global words
@@ -63,7 +65,7 @@ def show_entries():
         #tokens = StanfordTokenizer().tokenize(entries)
         _syn_ret = dt_sent.simp_syn_sent(entries)
         #BUG here, todo
-        if len(_syn_ret)>0:
+        if len(_syn_ret) > 0:
             #print "S1"            
             (s1, s1_child, s2, s2_child, syn_ret) = dt_sent._get_split_ret(_syn_ret)
             
@@ -101,6 +103,7 @@ def add_entry():
         abort(401)
 
     txt = request.form['input']
+    print "input: ", txt
     wordlist = ""
     #_wordlist = request.form['words']
     #print "wordlist: ", _wordlist
@@ -111,7 +114,7 @@ def add_entry():
 
     flash('New entry was successfully posted')
 
-    #return render_template('show_entries.html', entries=entries)
+    #return render_template('show_entries.html', text=text)
     return redirect(url_for('show_entries'))
 
 
@@ -139,12 +142,30 @@ def logout():
 
 @app.route('/setting', methods=['GET', 'POST'])
 def setting():
+    if not session.get('logged_in'):
+        abort(401)
+
+    form = SelectForm()
+
     wordlist = None
     if request.method == 'POST':
-	wordlist = request.form['username']
+    	"""
+        if form.validate() == False:
+            flash('All fields are required. ')
+            return render_template('setting.html', form = form)
+        else:
+        """
+        if request.form['words']:
+            wordlist = request.form['words']
+            edblist = request.form['edblist']
+            algs = request.form['algs']
+            print "wordlist: ", wordlist
+            print "edblist: ", edblist
+            print "algs: ", algs
+
         return redirect(url_for('show_entries'))
 
-    return render_template('setting.html', wordlist=wordlist)
+    return render_template('setting.html', form = form)
 
 
 if __name__ == '__main__':
