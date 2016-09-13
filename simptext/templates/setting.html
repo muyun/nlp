@@ -5,18 +5,21 @@
     <form action="{{ url_for('setting') }}" method=post class=add-entry>
       
       <dl>
-        <dt>The wordlist:
-        <dd><textarea name=words rows=3 cols=35></textarea>
-        {{ form.edblist.label }} {{ form.edblist }}
+        <dt>Input:
+        <dd><textarea name=wordinput rows=3 cols=40></textarea>
+
+        <br/>
+        <br/>
+        <dt>{{ form.wordlevel.label }}  
+        <dd> {{ form.wordlevel }}
 
         <br/>
         <br/>
         <dt>{{ form.algs.label }}    
-        <dt>{{ form.algs}}
+        <dd>{{ form.algs}}
 
         <br/>
-
-        <dt>{{ form.submit }}
+        <dd>{{ form.submit }}
       </dl>
 
 

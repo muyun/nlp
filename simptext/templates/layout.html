@@ -19,6 +19,7 @@ $('button').click(function(){
     {% if not session.logged_in %}
     <a href="{{ url_for('login') }}">log in</a>
     {% else %}
+    <a  href="{{ url_for('show_entries') }}">home</a>
     <a  href="{{ url_for('setting') }}">setting</a>
     <a href="{{ url_for('logout') }}">log out</a>
     {% endif %}

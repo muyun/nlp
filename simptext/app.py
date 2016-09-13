@@ -146,7 +146,7 @@ def setting():
         abort(401)
 
     form = SelectForm()
-    wordlist = ""
+    wordinput = ""
     if request.method == 'POST':
     	"""
         if form.validate() == False:
@@ -158,8 +158,9 @@ def setting():
         #wordlist = form['words']
         #edblist = form['edblist']
         #algs = form['algs']
-        print "wordlist: ", form.words.data
-        print "edblist: ", form.edblist.data
+        print "wordinput: ", form.wordinput.data
+        #print "wordlist: ", form.wordlist.data
+        print "wordlevel: ", form.wordlevel.data
         print "algs: ", form.algs.data
             
         return redirect(url_for('show_entries'))
