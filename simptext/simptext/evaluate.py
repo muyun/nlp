@@ -15,9 +15,11 @@ import dt_sent
 #import wordcal
 
 import string
+import difflib
 
 # the English stopwords and extend with punctuation
-stopwords = nltk.corpus.stopwords.words('english')
+#stopwords = nltk.corpus.stopwords.words('english')
+stopwords = []
 stopwords.extend(string.punctuation)
 stopwords.append('')
 
@@ -114,26 +116,29 @@ def print_mturk_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences
 
 
-def check_sent_similar(sent1, sent2):
+def check_partial_sent_similar(sent1, sent2, threshold=0.5):
     """ check whether the two sents are the similar """
     pos_1 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent1)))
     pos_2 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent2)))
-    lemmae_1 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_1 \
-                    if token.lower().strip(string.punctuation) not in stopwords]
-    lemmae_2 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_2 \
-                    if token.lower().strip(string.punctuation) not in stopwords]
 
-    return (lemmae_1 == lemmae_2)
+    lemmae_1 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_1]
+    lemmae_2 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_2]
+
+    import pdb; pdb.set_trace()
+    # the sequence matcher
+    s = difflib.SequenceMatcher(None, lemmae_1, lemmae_2)
+
+    #import pdb; pdb.set_trace()
+    return (s.ratio() > threshold)
 
 
-def check_sent_similar(sent1, sent2, threshold=0.5):
+def check_partial_set_sent_similar(sent1, sent2, threshold=0.5):
     """Check if a and b are matches."""
     pos_1 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent1)))
     pos_2 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent1)))
-    lemmae_1 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_1 \
-                    if pos == wordnet.NOUN and token.lower().strip(string.punctuation) not in stopwords]
-    lemmae_2 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_2 \
-                    if pos == wordnet.NOUN and token.lower().strip(string.punctuation) not in stopwords]
+    lemmae_1 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_1 ]
+    lemmae_2 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_2 ]
+
 
     # Calculate Jaccard similarity
     len_union = len(set(lemmae_1).union(lemmae_2))
@@ -155,17 +160,27 @@ def is_similar(sent1, sent2):
      # Assume sent1 and sent2 are two splitted sentences
     _str1 = str1[0] + ' . '
     _str2 = str2[0] + ' . '
-    if check_sent_similar(_str1, _str2, 0.5):
+    if check_partial_sent_similar(_str1, _str2):
+
+        #import pdb; pdb.set_trace()
         if len(str1) == 1 and len(str2) == 1:
             return True
 
         # check 2nd part
         elif len(str1) > 1 and len(str2) > 1:
-            _str1 = str1[1] + ' . '
-            _str2 = str2[1] + ' . '
+            _str1_ = str1[1] + ' . '
+            _str2_ = str2[1] + ' . '
 
-            if check_sent_similar(_str1, _str2, 0.5):
-                return True
+
+            #import pdb; pdb.set_trace()
+            if check_partial_sent_similar(_str1_, _str2_):
+                if not check_partial_sent_similar(_str1, _str2_): # not similar
+                    if not check_partial_sent_similar(_str1_, _str2): # not similar
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
             else:
                 return False
 
@@ -291,10 +306,12 @@ def main():
     #print "#sentence in mturk: ", _info[0]
     #print "#sentence with Syntactic simplification: ", _info[1]
 
-
-    sent1 = "it was often convenient regard man clockwork automata."
-    sent2 = " it was often convenient regard man as clockwork automata."
-    #print(check_sent_similar(sent1, sent2))
+    sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India , and situated on the banks of river Ghaghra ."
+    sent1 = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India . Faizabad situated on the banks of river Ghaghra ."
+    sent2 = "Faizabad is the headquarters of Faizabad District. Faizabad is a municipal board in the state of Uttar Pradesh , India , and Faizabad situated on the banks of river Ghaghra "
+    print (check_partial_sent_similar(sent1, sent2, 0.5))
+    #print(check_partial_set_sent_similar(sent1, sent2))
+    #print (check_partial_sent_similar(sent1, sent2))
     print(is_similar(sent1, sent2))
 
     # recall and precision

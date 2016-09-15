@@ -26,12 +26,20 @@
 
 
 #### example 
- Peter, my friend, likes it.
- Peter, my friend, likes it and I also like it.
+ *  Peter is studying at Stony Brook University .
+
+  The companies -> not "organization"
+
+ *  She is a teacher serving as a volunteer .
+
+
+
+
+
 
 
 #### questions
-* the database?
+* the database
 
 * AJAX with jQuery in Flask ?
 

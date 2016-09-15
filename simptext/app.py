@@ -27,28 +27,61 @@ import models
 from simptext import dt_sent, wordcal
 #import simptext
 
-#words = dt_sent.read_xlsx_file('./dataset/wordlist.xlsx', 1)
-words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
+word1 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 1, 1)
+word2 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 2, 1)
+word3 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 3, 1)
+word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
+#words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
 #from nltk.tokenize import StanfordTokenizer
 
 @app.route('/')
 def show_entries():
     # the the latest text from database
+    entries = ""
     m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
-    txt = db.session.query(models.Entry).get(m.max_id)
+    #txt = str(db.session.query(models.Entry).get(m.max_id))
+    txt = models.Entry.query.get(m.max_id)
     
-    print "txt: ", str(txt)
-    _txt = str(txt).split('\'')
-    _input = _txt[1].split('@')
-    entries = _input[0]   
+    entries = str(txt)   
     print "entries: ", entries
 
-    global words
-    if len(_input[1]) > 0:
-        words = _input[1].split(',')
-        print "words: ", words
-        #print "words-tye: ", type(words)
+    #ret = ""
+    s = db.session.query(db.func.max(models.Setting.id).label("max_id")).one()
+    ret = str(db.session.query(models.Setting).get(s.max_id))
+    print "setting: ", ret
+
+    words = []
+    global word1, word2, word3, word4
+    #_txt = str(txt).split('\'')
+    se = ret.split('@')
+    wordlist = str(se[0])
+    wordlevel = str(se[1])
+    algs = str(se[2])
+
+    print "wordlist: ", wordlist
+    print "wordlevel: ", wordlevel
+    print "algs: ", algs
     
+    if len(wordlist) > 0:
+    	for w in wordlist.split(','):
+    		w = w.strip()
+    		words.append(w)
+        #words = wordlist.split(',')
+        #print "words: ", words
+            #print "words-tye: ", type(words)
+            #wordlevel = 0
+    else:
+    	if int(wordlevel) == 1:
+    		words = word1
+        if int(wordlevel) == 2:
+    		words = word2
+        if int(wordlevel) == 3:
+    		words = word3	
+    	if int(wordlevel) == 4:
+    		words = word4	
+    
+    #print "words: ", words
+    # TODO: update the ALGs
     #outputs = entries
     s_outputs = {}
     s1_output = {}
@@ -97,19 +130,19 @@ def show_entries():
 
 
 # this view let the user add new entries if they are logged in
-@app.route('/add', methods=['POST'])
+@app.route('/add', methods=['GET','POST'])
 def add_entry():
     if not session.get('logged_in'):
         abort(401)
 
     txt = request.form['input']
     print "input: ", txt
-    wordlist = ""
+    #wordlist = ""
     #_wordlist = request.form['words']
     #print "wordlist: ", _wordlist
     #print 'txt: ', txt
     #print "wordlist: ", wordlist
-    db.session.add(models.Entry(txt, wordlist))
+    db.session.add(models.Entry(txt))
     db.session.commit()
 
     flash('New entry was successfully posted')
@@ -158,10 +191,16 @@ def setting():
         #wordlist = form['words']
         #edblist = form['edblist']
         #algs = form['algs']
-        print "wordinput: ", form.wordinput.data
+        words = form.wordinput.data
+        wordlevel = form.wordlevel.data
+        algs = ' '.join(str(e) for e in form.algs.data)
+        print "wordinput: ", words
         #print "wordlist: ", form.wordlist.data
-        print "wordlevel: ", form.wordlevel.data
-        print "algs: ", form.algs.data
+        print "wordlevel: ", wordlevel
+        print "algs: ", algs
+
+        db.session.add(models.Setting(words, wordlevel, algs))
+        db.session.commit()
             
         return redirect(url_for('show_entries'))
 

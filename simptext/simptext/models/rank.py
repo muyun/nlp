@@ -55,19 +55,26 @@ def _Stem(sub_sent,edblist):
 			
 	sub_words = []
 	print word_pre
+
+        #import pdb; pdb.set_trace()
 	for w in word_list:
 		w = w.strip()
 		if w and w not in edblist:
 			sub_words.append(w.strip())
 
         # get the person name based on StanfordNERTagger
-        NERTaggers = []
+        person_taggers = []
         for token, title in eng_tagger.tag(words):
                 if title == 'PERSON':
-                        NERTaggers.append(token)
+                        person_taggers.append(token)
+
+        org_taggers = []
+        for token, title in eng_tagger.tag(words):
+                if title == 'ORGANIZATION':
+                        org_taggers.append(token)
                          
 	#import pdb; pdb.set_trace()
-	return sub_words, word_pre, NERTaggers
+	return sub_words, word_pre, person_taggers, org_taggers
 
 def Initial(fin): #load EDB_List
 	flist = open(fin,'r')
@@ -120,18 +127,24 @@ def _process_args():
     return parser.parse_args(sys.argv[1:])
 
 def _interface(sentence,edblist):
-	target_words, word_pre, NERTaggers =  _Stem(sentence,edblist)
+	target_words, word_pre, person_taggers, org_taggers =  _Stem(sentence,edblist)
 	token_list =[]
  
-    #import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
 	for word in word_pre:
 	        tokens = {}
-                if word in NERTaggers: # is a person, subject?
+                if word in person_taggers: # is a person, subject?
                         #import pdb; pdb.set_trace()
                         if not isplural(word): # plural
                                 tokens[word] = [word, "they"]
                         else:
-                                tokens[word] = [word, "he", "she", "it"]
+                                tokens[word] = [word, "he", "she"]
+                elif word in org_taggers: # is a person, subject?
+                        #import pdb; pdb.set_trace()
+                        if not isplural(word): # plural
+                                tokens[word] = [word, "they"]
+                        else:
+                                tokens[word] = [word, "it"]                    
 	        else:
 		        if word not in target_words:
 			        token_list.append(word)               
