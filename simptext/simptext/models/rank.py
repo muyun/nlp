@@ -15,16 +15,29 @@ st = StanfordPOSTagger('english-bidirectional-distsim.tagger')
 from nltk.tag import StanfordNERTagger
 eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
+from nltk.parse.stanford import StanfordDependencyParser
+eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
 ken_model = kenlm.Model('/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/models/bin/europarl.bin')
 w2v_model=gensim.models.Word2Vec.load_word2vec_format('/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/models/bin/en.bin',binary=True)
 lmtzr = WordNetLemmatizer()
 EDB_list=[]
 
-def isplural(word):
+def isplural(w):
+        word = w.lower()
         lemma = lmtzr.lemmatize(word, 'n')
         plural = True if word is not lemma else False
-        return plural, lemma
+        return plural
+
+def get_triples(node):
+    """
+    Extract dependency triples of the form:
+    (32, u'week', u'NN', u'nmod', defaultdict(<type 'list'>, {u'case': [30], u'det': [31]}))
+    """
+
+    #import pdb; pdb.set_trace()
+    return (node[1]['address'], node[1]['word'], node[1]['ctag'], node[1]['rel'], node[1]['deps'])      
+        
 
 def _Stem(sub_sent,edblist):
 	#words = nltk.word_tokenize(sub_sent)
@@ -33,18 +46,38 @@ def _Stem(sub_sent,edblist):
 	#print "tokens: " tokens
 	#tokens = "nltk.pos_tag(words)
 
+        result = list(eng_parser.raw_parse(sub_sent))[0]
+        node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
+        for node in result.nodes.items():
+                node_list.append(get_triples(node))
+
+        root = ""
+        root_ind = node_list[0][4]['root'][0]
+        for nd in node_list:
+                if root_ind == nd[0]:
+                        root=nd[1]
+
+        nsubj_ind = 1
+        for nd in node_list[1:]:
+                if (root in nd) and ('nsubj' in nd[4].keys()):
+                        nsubj_ind = nd[4]['nsubj'][0]
+                        
+        org_taggers = words[nsubj_ind-1]
+        
 	word_list = []
 	word_pre = []
 	pos = ['NNP','NNPS','POS',',','.','\'','$','WRB','MD','SYM','TO','WP','WDT',':','CD','DT','EX', 'PRP','PRP$']
 	v_pos = ['VBD','VBG','VBN','VBP','VBZ']	
 	n_pos = ['NNS']
+
+        #import pdb; pdb.set_trace()
 	for e in tokens:
 		if e[1] not in pos:
 			temp = e[0].lower()
 			if e[1] in v_pos:
 				word_list.append(lmtzr.lemmatize(temp,'v'))
 				word_pre.append(lmtzr.lemmatize(temp,'v'))
-			elif e[1] in n_pos:
+			elif (e[1] in n_pos) and (e[0] != org_taggers):
 				word_list.append(lmtzr.lemmatize(temp))
 				word_pre.append(lmtzr.lemmatize(temp))
 			else:
@@ -68,13 +101,15 @@ def _Stem(sub_sent,edblist):
                 if title == 'PERSON':
                         person_taggers.append(token)
 
+        """
         org_taggers = []
         for token, title in eng_tagger.tag(words):
                 if title == 'ORGANIZATION':
                         org_taggers.append(token)
+        """
                          
 	#import pdb; pdb.set_trace()
-	return sub_words, word_pre, person_taggers, org_taggers
+	return sub_words, word_pre, person_taggers, org_taggers.lower()
 
 def Initial(fin): #load EDB_List
 	flist = open(fin,'r')
@@ -135,13 +170,13 @@ def _interface(sentence,edblist):
 	        tokens = {}
                 if word in person_taggers: # is a person, subject?
                         #import pdb; pdb.set_trace()
-                        if not isplural(word): # plural
+                        if isplural(word): # plural
                                 tokens[word] = [word, "they"]
                         else:
                                 tokens[word] = [word, "he", "she"]
                 elif word in org_taggers: # is a person, subject?
                         #import pdb; pdb.set_trace()
-                        if not isplural(word): # plural
+                        if isplural(word): # plural
                                 tokens[word] = [word, "they"]
                         else:
                                 tokens[word] = [word, "it"]                    

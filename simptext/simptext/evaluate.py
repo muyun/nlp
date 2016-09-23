@@ -62,6 +62,7 @@ def print_mturk_sent(filename, sent_file):
     f = open(filename, 'rU')
     num = 0
     res = ""
+    #algs = ""
     for line in f:
         line = line.strip('\n')
         if line:
@@ -87,9 +88,11 @@ def print_mturk_sent(filename, sent_file):
             #res = passive.simp_syn_sent_(str(se))
             #res = paratax.simp_syn_sent_(str(se))
             #res = alg.simp_passive_sent(str(re))
-            _res = dt_sent.simp_syn_sent(str(se))
+            alg = ""
+            alg0 = ""
+            _res, alg0 = dt_sent.simp_syn_sent(str(se))
             if len(_res)>0:
-                (s1, s1_child, s2, s2_child, res) = dt_sent._get_split_ret(_res)
+                (s1, s1_child, s2, s2_child, res, alg) = dt_sent._get_split_ret(_res)
                 print "res: ", res
             else:
                 res = _res
@@ -101,9 +104,14 @@ def print_mturk_sent(filename, sent_file):
             output[se] = res
             #import pdb; pdb.set_trace()
 
+            algs = ""
+            if len(alg0)>0:
+                algs = alg0 + "@" + alg
+
             with open(sent_file, 'a') as outfile:
                 outfile.write(str(se)+'\n')
                 outfile.write("OUTPUT: " + res + '\n')
+                outfile.write("ALGS: " + algs + '\n')
                 #outfile.write('-----------------------\n')
                 #json.dump(output, outfile, indent=2)
 
@@ -124,7 +132,7 @@ def check_partial_sent_similar(sent1, sent2, threshold=0.5):
     lemmae_1 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_1]
     lemmae_2 = [lemmatizer.lemmatize(token.lower().strip(string.punctuation), pos) for token, pos in pos_2]
 
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     # the sequence matcher
     s = difflib.SequenceMatcher(None, lemmae_1, lemmae_2)
 
@@ -210,6 +218,7 @@ def cal_mturk_sent(filename, gt):
     _input = ""
     _sp = ""
     _gen = ""
+    algs = ""
     output = OrderedDict()
     for line in f:
         line = line.strip('\n')
@@ -225,7 +234,10 @@ def cal_mturk_sent(filename, gt):
             #print "Input: ", line
 
         #import pdb; pdb.set_trace()
-        else:
+        elif ("ALGS" in line):
+            algs_flag = line.split(':')[0]
+            algs = line.split(':')[1].strip()
+        else: #
             #print "gt-out: ", gt[num]
             #print "out: ", line
             #len_output = len(re.findall("\w+", line))
@@ -269,10 +281,11 @@ def cal_mturk_sent(filename, gt):
                          gt[num],
                          ot,
                          _sp,
-                        _gen]
+                        _gen,
+                        algs]
 
             #import pdb; pdb.set_trace()
-            with codecs.open('mturk_sent_l5.csv', 'a', encoding='utf-8') as outfile:
+            with codecs.open('mturk_sent_l8.csv', 'a', encoding='utf-8') as outfile:
                 wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
                 wr.writerow(output[num])
 
@@ -298,10 +311,10 @@ def main():
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
-    sent_file = dir + "tests/sent_mturk_l5_.md"
+    sent_file = dir + "tests/sent_mturk_l8_.md"
     gt_file = dir + "dataset/simplify_testset_0814.xlsx"
 
-    #_info = print_mturk_sent(filename, sent_file)
+    _info = print_mturk_sent(filename, sent_file)
     #print "Type: Paratax Clauses:"
     #print "#sentence in mturk: ", _info[0]
     #print "#sentence with Syntactic simplification: ", _info[1]
@@ -309,10 +322,10 @@ def main():
     sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India , and situated on the banks of river Ghaghra ."
     sent1 = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India . Faizabad situated on the banks of river Ghaghra ."
     sent2 = "Faizabad is the headquarters of Faizabad District. Faizabad is a municipal board in the state of Uttar Pradesh , India , and Faizabad situated on the banks of river Ghaghra "
-    print (check_partial_sent_similar(sent1, sent2, 0.5))
+    #print (check_partial_sent_similar(sent1, sent2, 0.5))
     #print(check_partial_set_sent_similar(sent1, sent2))
     #print (check_partial_sent_similar(sent1, sent2))
-    print(is_similar(sent1, sent2))
+    #print(is_similar(sent1, sent2))
 
     # recall and precision
     #filename = dir + "utils/testset_groundtruth.md"

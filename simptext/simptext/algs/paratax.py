@@ -15,6 +15,7 @@ from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
 import base
+#from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -32,6 +33,7 @@ def simp_paratax_sent(tokens, node_list):
 
     strs = ""
 
+    nsubj_ind = 0
     #punct_ind = 0
     if PUNCT in tokens:
         # the sentence contains the punctuation, split it
@@ -42,13 +44,30 @@ def simp_paratax_sent(tokens, node_list):
             for ind in inds:
                 tokens[ind] = ''
 
-            _str1 = tokens[:inds[0]] + tokens[inds[1]:]
+            #nsubj_ind = 0
+            for _nd in node_list[1:]:
+                if (root in _nd) and ('nsubj' in _nd[4].keys()):
+                    nsubj_ind = _nd[4]['nsubj'][0]
+
+
+            #import pdb; pdb.set_trace()
+            if tokens[nsubj_ind] in tokens[:inds[0]]:
+                _str1 = tokens[:inds[0]] + tokens[inds[1]:]
+            else:
+                tokens[inds[0]] = ","
+                _str1 = tokens[:inds[0]+1] + tokens[inds[1]:]
+
+            #import pdb; pdb.set_trace()
+            #if tokens[inds[1]:] in PUNCTUATION:
+            #    tokens[inds[1]:] = ''
             str1 = " ".join(_str1)
 
             subj = base.upper_first_char(tokens[inds[0]+1])
-            _str2 = tokens[inds[0]+2:inds[1]]
-            str2 = subj + " " + " ".join(_str2)
 
+            if tokens[inds[1]] in PUNCTUATION:
+                tokens[inds[1]] = ''
+            _str2 = tokens[inds[0]+2:inds[1]]
+            str2 = subj + " " + " ".join(_str2) + " . "
 
             strs = str1  + " " + str2
 
@@ -105,6 +124,7 @@ def main():
     #sent = "I ate an apple and an orange."
     sent = "I ate an apple and an orange."
     sent = "Peter - nobody guessed it - showed up."
+    #sent = "With the high Gulf pressures - a ship reported a pressure of 1015.5 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16 ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

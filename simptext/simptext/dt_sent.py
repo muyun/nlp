@@ -31,11 +31,11 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 
 #the algs about the syntax
 from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, passive, paratax
-
+#import algs
 # the models
 
-#reload(sys)
-#sys.setdefaultencoding('utf-8')
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 def read_xlsx_file(filename, sheetnums, columnnum):
     """read the xlsx file and stored first sheetnums into words list"""
@@ -334,8 +334,8 @@ def print_mturk_sent(filename, sent_file):
             #res = passive.simp_syn_sent_(str(se))
             #res = paratax.simp_syn_sent_(str(se))
             #res = alg.simp_passive_sent(str(re))
-            _res = simp_syn_sent(str(se))
-            if len(_res)>0:            
+            _res, alg = simp_syn_sent(str(se))
+            if len(_res) > 0:            
                 (s1, s1_child, s2, s2_child, res) = _get_split_ret(_res)
                 print "res: ", res
             else:
@@ -376,7 +376,7 @@ def cal_mturk_sent(filename, gt):
     _num_false_negative = 0
     _num_true_positive = 0
     num_positive = 0
-    num = 0
+    num = 2
     len_input = 0
     len_output = 0
     _input = ""
@@ -463,7 +463,7 @@ def cal_mturk_sent(filename, gt):
                 wr.writerow(output[num])
 
             num = num + 1
-            if num == 300:
+            if num == 295:
                 break    
 
     #import pdb; pdb.set_trace()
@@ -749,7 +749,6 @@ def simp_semeval_sent(filename, sent_file):
             if num == 20:
                 break
                
-            
     return num_sentences, num_splitted_sentences    
 
 def simp_coinco_sent(filename, sent_file):
@@ -851,46 +850,89 @@ def simp_syn_sent(sent):
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
 
+    alg = ""
     #import pdb; pdb.set_trace()
     if len(sent) > 0:
         strs = paratax.simp_paratax_sent(tokens, node_list)
         if len(strs) > 0:
-            return strs
+            alg = "paratax"
+            return strs, alg
         else:
             strs = punct.simp_punct_sent(tokens, taggers, node_list)
             if len(strs) > 0:
-                return strs
+                alg = "punct"
+                return strs, alg
             else:               
                 strs = coordi.simp_coordi_sent(tokens, node_list)
                 if len(strs) > 0:
-                    return strs
+                    alg = "coordi"
+                    return strs, alg
                 else:        
                     strs = subordi.simp_subordi_sent(tokens, node_list)
                     if len(strs) > 0:
-                        return strs
+                        alg = "subordi"
+                        return strs, alg
                     else:
                         strs = adverb.simp_adverb_sent(tokens, node_list)
                         if len(strs) > 0:
-                            return strs
+                            alg = "adverb"
+                            return strs, alg
                         else:
-                            strs = passive.simp_passive_sent(tokens, node_list)
+                            strs = parti.simp_parti_sent(tokens, node_list)
                             if len(strs) > 0:
-                                return strs
+                                alg = "parti"
+                                return strs, alg
                             else:
-                                strs = parti.simp_parti_sent(tokens, node_list)
+                                strs = appos.simp_appos_sent(tokens, node_list)
                                 if len(strs) > 0:
-                                    return strs
+                                    alg = "appos"
+                                    return strs, alg
                                 else:
-                                    strs = appos.simp_appos_sent(tokens, node_list)
+                                    strs = adjec.simp_adjec_sent(tokens, node_list)
                                     if len(strs) > 0:
-                                        return strs
+                                        alg = "adjec"
+                                        return strs, alg
                                     else:
-                                        strs = adjec.simp_adjec_sent(tokens, node_list)
+                                        strs = passive.simp_passive_sent(tokens, node_list)
                                         if len(strs) > 0:
-                                            return strs
+                                            alg = "passive"
+                                            return strs, alg
 
-    return strs 
+    return strs, alg
 
+
+def split_sent(entries):
+    alg0 = ""
+    _syn_ret, alg0 = simp_syn_sent(entries)
+    #print "alg: ", algs
+        #BUG here, todo
+    if len(_syn_ret) > 0:
+            #print "S1"            
+        (s1, s1_child, s2, s2_child, syn_ret, algs) = _get_split_ret(_syn_ret)
+            
+        if len(syn_ret) > 0: # there is the child - 3 layers
+                #outputs = utils.wordcal.check_word_(syn_ret, words)
+                #s_outputs = wordcal.check_word(_syn_ret, words)
+
+            if len(s1_child) > 0:
+                s1_output = s1
+                s1_child_output = s1_child
+            else:
+                s1_output = s1
+
+            if len(s2_child) > 0: 
+                s2_output = s2
+                s2_child_output = s2_child 
+            else:
+                s2_output = s2
+                
+        print "s1: ", s1
+        print "s1_child: ", s1_child
+        print "s2: ", s2
+        print "s2_child: ", s2_child
+
+    print "algs: ", alg0 + "@" + algs
+        
 
 def get_split_ret(sents):
     #
@@ -917,17 +959,22 @@ def _get_split_ret(_str):
     s2 = ""
     s2_child = ""
     #syn_ret = ""
+    algs = ""
     if len(_strs) == 1:
-        return (s1, s1_child, s2, s2_child, _str)
+        return (s1, s1_child, s2, s2_child, _str, algs)
         
-    s1_child = simp_syn_sent(s1)
+    s1_child, alg1 = simp_syn_sent(s1)
     print "S11+S12: ", s1_child
+    print "alg1: ", alg1
     
-    #print "str2: ", _strs[1] 
+    #print "str2: ", _strs[1]
+
+    #import pdb; pdb.set_trace()
     s2 = _strs[1] + ' .'
     print "S2: ", s2
-    s2_child = simp_syn_sent(s2)
+    s2_child, alg2 = simp_syn_sent(s2)
     print "S21+S22: ", s2_child
+    print "alg2: ", alg2
 
     if len(s1_child)>0: # syn_ret1
         if len(s2_child)>0: # syn_ret2
@@ -946,13 +993,14 @@ def _get_split_ret(_str):
 
     print "Syntactic result: ", syn_ret
 
-    return (s1, s1_child, s2, s2_child, syn_ret)
+    algs = alg1 + "@" + alg2
+
+    return (s1, s1_child, s2, s2_child, syn_ret, algs)
 
 # Main test
 def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/"
 
-   
     #filename = dir + "dataset/coinco/coinco.xml"
     #store_filename = dir + "dataset/coinco/coinco_lemmas.txt"
 
@@ -984,7 +1032,7 @@ def main():
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
-    sent_file = dir + "tests/sent_mturk_l5_.md"
+    sent_file = dir + "tests/sent_mturk_l6_.md"
     gt_file = dir + "dataset/simplify_testset_0817.xlsx"
 
     # generate the output
@@ -1001,8 +1049,8 @@ def main():
     #filename = dir + "utils/testset_gt_appos.md"
 
     #filename = dir + "utils/testset/sent_mturk_l4_.md"
-    gt = read_xlsx_file(gt_file, 1)
-    _info = cal_mturk_sent(sent_file, gt)
+    #gt = read_xlsx_file(gt_file, 1, 2)
+    #_info = cal_mturk_sent(sent_file, gt)
     
 
     """
@@ -1033,6 +1081,21 @@ def main():
     print "#sentence with Syntactic simplification: ", info[1]
     """
 
+    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
+    entries = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
+    entries = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
+    entries = "Despite almost daily reports of missing property , he was able to evade capture until 15 February , when a man named Wimbow , who had been pursuing him with a partner for days , found him in an area of thick brush called Liberty Plains and shot him ."
+    entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
+    entries = "With the high Gulf pressures - a ship reported a pressure of 1015 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16 ."
+    entries = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
+    entries = "He was born at Plessiel , a hamlet of Drucat near Abbeville , to a long-established family of Picardy , the great-nephew of the painter Eustache Le Sueur ."
+    entries = "The Man in the High Castle occurs in an alternate universe United States ruled by the victorious Axis powers ."
+    entries = "With the high Gulf pressures - a ship reported a pressure of 1015 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16."
+    #entries = "Peter likes the work"
+    entries = "Much of the water carried by these streams is diverted ."
+    
+    split_sent(entries)
 
 if __name__ == '__main__':
      main()

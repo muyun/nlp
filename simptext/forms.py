@@ -21,6 +21,8 @@ class EntryForm(Form):
     text=TextField('input', [validators.Length(min=4, max=25)])
     #words=StringField('password', [validators.Length(min=4, max=25)])
     #password= PasswordField('password',[validators.DataRequired()])
+    wordinput = TextField("wordinput")
+    wordlevel = SelectField('The level', choices = [(1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')])
     submit = SubmitField('Submit')
 
 # The function is used in setting
@@ -29,9 +31,9 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 class SelectForm(Form):
-    wordinput = TextField("wordinput")
+    #wordinput = TextField("wordinput")
     #wordlist = RadioField('The wordlist', choices= [('0','The Level')])
-    wordlevel = SelectField('The level', choices = [(1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')])
+    #wordlevel = SelectField('The level', choices = [(1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')])
     algs = MultiCheckboxField('The Algorithm', choices = [(1,'punct'), 
     	                                       (2,'coordi'), 
     	                                       (3,'subordi'), 

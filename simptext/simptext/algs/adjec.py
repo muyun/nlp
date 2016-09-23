@@ -20,7 +20,7 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #from  nltk.parse.stanford import StanfordParser
 #eng_parser = StanfordParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-#from alg import base
+#from algs import base
 import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
@@ -55,7 +55,6 @@ def simp_adjec_sent(tokens, node_list):
                 cop_ind = nd[4]['cop'][0]
 
     # cop
-
 
     strs = ""
     #split_ind = 0
@@ -233,8 +232,9 @@ def main():
     sent = "The apple, which Peter ate, was red."
     sent = "Peter, whom I know, came."
 
-    #sent = "Peter, to whom I talked, came."
-    sent = "The books, most of which I read, are interesting."
+    sent = "Peter, to whom I talked, came."
+    #sent = "The books, most of which I read, are interesting."
+    sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
 
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))

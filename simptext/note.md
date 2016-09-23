@@ -26,16 +26,29 @@
 
 
 #### example 
- *  Peter is studying at Stony Brook University .
-
-  The companies -> not "organization"
-
- *  She is a teacher serving as a volunteer .
+ *  Peter, my friend, ate an apple .
 
 
+#### install
+pip install openpyxl --upgrade
 
+zhaowenlong@zhaowenlongs-MacBook:~/workspace/proj/dev.nlp/simptext/simptext$ python evaluate.py
+#num_negative:  262
+#num_false_positive:  0
+#num_true_positive:  32
+#num_false_negative:  186
+#num_true_negative:  76
+#num_positive:  32
+#_num_output:  294
 
-
+zhaowenlong@zhaowenlongs-MacBook:~/workspace/proj/dev.nlp/simptext/simptext$ python evaluate.py
+#num_negative:  284
+#num_false_positive:  0
+#num_true_positive:  10
+#num_false_negative:  208
+#num_true_negative:  76
+#num_positive:  10
+#_num_output:  294
 
 
 #### questions

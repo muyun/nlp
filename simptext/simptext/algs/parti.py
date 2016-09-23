@@ -21,6 +21,7 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #from  nltk.parse.stanford import StanfordParser
 #eng_parser = StanfordParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+#from algs import base
 import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
@@ -72,7 +73,6 @@ def simp_parti_sent(tokens, node_list):
                 if nsubj_ind == _nd[0]:
                      nsubj_dict = _nd[4]
                      break
-
 
             #import pdb; pdb.set_trace()
             if ('acl' in nsubj_dict.keys()):
@@ -162,6 +162,8 @@ def main():
     sent = "Peter, also called Pete, came."
 
     sent = "The MTR was immediately popular with residents of Hong Kong ; as a result , subsequent lines have been built to cover more territory . There are continual debates regarding how and where to expand the MTR network ."
+
+    sent = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
 
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))

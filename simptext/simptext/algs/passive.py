@@ -15,6 +15,7 @@ from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
 import base
+#from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -89,7 +90,7 @@ def simp_passive_sent(tokens, node_list):
                 else:
                     subj = tokens[nmod_ind]
 
-            strs = subj + " " + root + " " + tokens[nsubjpass_ind]
+            strs = subj + " " + root + " " + tokens[nsubjpass_ind] + " . "
             """
                 #[NOTICE]: remove the ',' after the nsubj
                 if tokens[nsubj_ind + 1] in PUNCTUATION:
@@ -161,7 +162,9 @@ def simp_syn_sent_(sent):
 def main():
 
     sent = "Peter was hit by a bus."
+    #sent = "Food is procured with its suckers  . "
     #print(simp_coordi_sent(sent))
+    #sent = "He was born at Plessiel , a hamlet of Drucat near Abbeville , to a long-established family of Picardy , the great-nephew of the painter Eustache Le Sueur ."
     print(simp_syn_sent_(sent))
 
 

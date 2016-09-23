@@ -36,6 +36,7 @@ word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
 
 @app.route('/')
 def show_entries():
+    form = EntryForm()
     # the the latest text from database
     entries = ""
     m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
@@ -46,21 +47,22 @@ def show_entries():
     print "entries: ", entries
 
     #ret = ""
-    s = db.session.query(db.func.max(models.Setting.id).label("max_id")).one()
-    ret = str(db.session.query(models.Setting).get(s.max_id))
-    print "setting: ", ret
+    #s = db.session.query(db.func.max(models.Setting.id).label("max_id")).one()
+    #ret = str(db.session.query(models.Setting).get(s.max_id))
+    #print "setting: ", ret
 
     words = []
     global word1, word2, word3, word4
     #_txt = str(txt).split('\'')
-    se = ret.split('@')
-    wordlist = str(se[0])
-    wordlevel = str(se[1])
-    algs = str(se[2])
+    se = str(txt).split('@')
+    entries = str(se[0])
+    wordlist = str(se[1])
+    wordlevel = str(se[2])
+    #algs = str(se[2])
 
     print "wordlist: ", wordlist
     print "wordlevel: ", wordlevel
-    print "algs: ", algs
+    #print "algs: ", algs
     
     if len(wordlist) > 0:
     	for w in wordlist.split(','):
@@ -96,11 +98,11 @@ def show_entries():
     if len(entries) > 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
-        _syn_ret = dt_sent.simp_syn_sent(entries)
+        _syn_ret, alg1 = dt_sent.simp_syn_sent(entries)
         #BUG here, todo
         if len(_syn_ret) > 0:
             #print "S1"            
-            (s1, s1_child, s2, s2_child, syn_ret) = dt_sent._get_split_ret(_syn_ret)
+            (s1, s1_child, s2, s2_child, syn_ret, algs) = dt_sent._get_split_ret(_syn_ret)
             
             if len(syn_ret) > 0: # there is the child - 3 layers
                 #outputs = utils.wordcal.check_word_(syn_ret, words)
@@ -126,7 +128,7 @@ def show_entries():
     print "s2_child_output: ", s2_child_output
     print "s_outputs: ", s_outputs
 
-    return render_template('show_entries.html', entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
+    return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
 
 
 # this view let the user add new entries if they are logged in
@@ -137,12 +139,14 @@ def add_entry():
 
     txt = request.form['input']
     print "input: ", txt
+    words = request.form['wordinput']
+    wordlevel = request.form['wordlevel']
     #wordlist = ""
     #_wordlist = request.form['words']
     #print "wordlist: ", _wordlist
     #print 'txt: ', txt
     #print "wordlist: ", wordlist
-    db.session.add(models.Entry(txt))
+    db.session.add(models.Entry(txt, words, wordlevel))
     db.session.commit()
 
     flash('New entry was successfully posted')
@@ -191,12 +195,14 @@ def setting():
         #wordlist = form['words']
         #edblist = form['edblist']
         #algs = form['algs']
-        words = form.wordinput.data
-        wordlevel = form.wordlevel.data
+        #words = form.wordinput.data
+        words = ""
+        #wordlevel = form.wordlevel.data
+        wordlevel = ""
         algs = ' '.join(str(e) for e in form.algs.data)
-        print "wordinput: ", words
+        #print "wordinput: ", words
         #print "wordlist: ", form.wordlist.data
-        print "wordlevel: ", wordlevel
+        #print "wordlevel: ", wordlevel
         print "algs: ", algs
 
         db.session.add(models.Setting(words, wordlevel, algs))

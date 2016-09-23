@@ -14,6 +14,7 @@ from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
 import base
+#from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 COMMA = ','
@@ -46,6 +47,9 @@ def simp_adverb_sent(tokens, node_list):
             nsubj_ind = 0
             if ('nsubj' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubj'][0]
+
+            if ('nsubjpass' in nd[4].keys()):
+                nsubj_ind = nd[4]['nsubjpass'][0]
                 
             advcl_dict = {}
             advcl_tag = ""
@@ -59,7 +63,8 @@ def simp_adverb_sent(tokens, node_list):
                          advcl_dict = _nd[4]
                          advcl_tag = _nd[2]
                          break
-                     
+
+                #import pdb; pdb.set_trace()
                 verb = 'be'
                 # TODO
                 if advcl_tag == 'VBN':
@@ -77,15 +82,27 @@ def simp_adverb_sent(tokens, node_list):
                 _str1 = tokens[:(split_ind)]
                 if _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
-                str1 = nsubj + ' '.join(_str1)
-                        #print "1st sent: ", str1
+
+                str1 = ""
+                if advcl_tag == 'VBN':
+                    str1 = nsubj + ' '.join(_str1)
+                if advcl_tag == 'VBG':
+                    str1 = ' '.join(_str1)
+                #print "1st sent: ", str1
 
                         # upper the 1st char in 2nd sent
                     #tokens[nsubj_ind] = base.upper_first_char(tokens[nsubj_ind])
-                _str2 = tokens[root_ind:]
+                _str2 = ""
+                if split_ind < nsubj_ind:
+                    #_str2 = tokens[split_ind+1:] 
+                    _str2 = tokens[root_ind:]
+                #_str2 = tokens[root_ind:]
                         #w = _w + ' '
-                str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
-                        #print "2nd sent: ", str2
+                    str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
+                else:
+                    str2 = base.upper_first_char(tokens[split_ind+1]) + " " + ' '.join(tokens[split_ind+2:])
+                    
+                #print "2nd sent: ", str2
 
                 strs = str1 + ' . ' + str2
 
@@ -103,7 +120,8 @@ def simp_adverb_sent(tokens, node_list):
                          xcomp_dict = _nd[4]
                          xcomp_tag = _nd[2]
                          break
-                     
+
+                #import pdb; pdb.set_trace()
                 verb = 'be'
                 # TODO
                 if xcomp_tag == 'VBN':
@@ -120,19 +138,33 @@ def simp_adverb_sent(tokens, node_list):
                 _str1 = tokens[:(split_ind)]
                 if _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
-                str1 = nsubj + ' '.join(_str1)
-                        #print "1st sent: ", str1
+
+                str1 = ""
+                if xcomp_tag == 'VBN':
+                    str1 = nsubj + ' '.join(_str1)
+                    
+                if xcomp_tag == 'VBG':
+                    str1 = ' '.join(_str1)
+                #print "1st sent: ", str1
 
                         # upper the 1st char in 2nd sent
                     #tokens[nsubj_ind] = base.upper_first_char(tokens[nsubj_ind])
-                #_str2 = tokens[root_ind:]
-                _str2 = tokens[split_ind+1:]
-                        #w = _w + ' '
-                #str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
-                str2 = "That" + " " + ' '.join(_str2)
-                        #print "2nd sent: ", str2
 
-                strs = str1 + ' . ' + str2 + ' .'
+
+                #import pdb; pdb.set_trace()
+                _str2 = ""
+                if nsubj_ind < split_ind:
+                    #_str2 = tokens[split_ind+1:]
+                    _str2 = tokens[root_ind:]
+                #_str2 = tokens[split_ind+1:]
+                        #w = _w + ' '
+                    str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
+                else:
+                    str2 = base.upper_first_char(tokens[split_ind+1]) + " " + ' '.join(tokens[split_ind+2:])
+                #str2 = "That" + " " + ' '.join(_str2)
+                #print "2nd sent: ", str2
+
+                strs = str1 + ' . ' + str2 + ' . '
 
                 return strs
  
@@ -183,10 +215,13 @@ def simp_syn_sent_(sent):
 def main():
     #  clauses
     sent = "Needing money, I begged my parents."
-    sent = "Peter came suprising everyone"
+    sent = "Peter came, suprising everyone"
     
-    #sent = "Refreshed, Peter stood up."
+    sent = "Refreshed, Peter stood up."
 
+    sent = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    sent = "Despite almost daily reports of missing property , he was able to evade capture until 15 February , when a man named Wimbow , who had been pursuing him with a partner for days , found him in an area of thick brush called Liberty Plains and shot him ."
+    #sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 
