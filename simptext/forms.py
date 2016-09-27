@@ -22,7 +22,7 @@ class EntryForm(Form):
     #words=StringField('password', [validators.Length(min=4, max=25)])
     #password= PasswordField('password',[validators.DataRequired()])
     wordinput = TextField("wordinput")
-    wordlevel = SelectField('The level', choices = [(1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')])
+    wordlevel = SelectField('The level', choices = [(0, 'level 0'), (1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')])
     submit = SubmitField('Submit')
 
 # The function is used in setting
@@ -34,14 +34,12 @@ class SelectForm(Form):
     #wordinput = TextField("wordinput")
     #wordlist = RadioField('The wordlist', choices= [('0','The Level')])
     #wordlevel = SelectField('The level', choices = [(1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')])
-    algs = MultiCheckboxField('The Algorithm', choices = [(1,'punct'), 
-    	                                       (2,'coordi'), 
-    	                                       (3,'subordi'), 
-    	                                       (4,'adverb'), 
-    	                                       (5,'parti'), 
-    	                                       (6,'adjec'), 
-    	                                       (7,'appos'), 
-    	                                       (8,'passive'), 
-    	                                       (9,'paratax')])
+    algs = MultiCheckboxField('The Types', choices = [(1,'Coordination'), 
+    	                                       (2,'Subordination'), 
+    	                                       (3,'Adverbial clauses'), 
+    	                                       (4,'Participial phrases'), 
+    	                                       (5,'Relative clauses'), 
+    	                                       (6,'Appositive phrases'), 
+    	                                       (7,'Passive voice')])
 
     submit =SubmitField("Submit")

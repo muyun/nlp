@@ -141,9 +141,11 @@ def simp_subordi_sent(tokens, node_list):
 
                 # if dict2, the subordinated clause goes second
                 if (marker in dict2.keys()):
+
+                    #import pdb; pdb.set_trace()
                     _w = dict2[marker]
                     tokens[mark_ind] = ''
-                    tokens[mark_ind+1] = base.upper_first_char(tokens[mark_ind+1])
+                    #tokens[mark_ind+1] = base.upper_first_char(tokens[mark_ind+1])
 
                     #TODO add it before the nsubj
                     if nsubj_ind != 0:
@@ -151,15 +153,23 @@ def simp_subordi_sent(tokens, node_list):
                         if _str1[-1] in PUNCTUATION:
                             _str1[-1] = ''
 
-                        str1 = ' '.join(_str1)
-                    #print "1st sent: ", str1
+                        #str1 = ' '.join(_str1)
+                        #print "1st sent: ", str1
 
                         _str2 = tokens[nsubj_ind:]
+                        if _str2[-1] in PUNCTUATION:
+                            _str2[-1] = ''
+
+                        if (marker == 'before'):
+                            (_str1, _str2) = (_str2, _str1)
+
+                        str1 = ' '.join(_str1)
+                        print "1st sent: ", str1
                     #w = _w + ' '
                         str2 = _w + ' ' + ' '.join(_str2)
-                    #print "2nd sent: ", str2
+                        print "2nd sent: ", str2
 
-                        strs = str1 + ' . ' + str2
+                        strs = str1 + ' . ' + str2 + ' . '
                     else:
                         pass
 
@@ -217,8 +227,8 @@ def main():
     #  clauses
     sent = "Since he came, I left"
     sent = "Before he came, I left"
-    sent = "I feel angry when provoked"
-    sent = "After eating dinner, he goes home."
+    #sent = "I feel angry when provoked"
+    #sent = "After eating dinner, he goes home."
 
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    

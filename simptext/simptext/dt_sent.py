@@ -53,7 +53,8 @@ def read_xlsx_file(filename, sheetnums, columnnum):
     for sheet_name in sheet_names:
         worksheet = wb.get_sheet_by_name(sheet_name)
         for x in range(1, worksheet.max_row+1):
-            words.append(str(worksheet.cell(row=x, column=columnnum).value).lower())
+            #words.append(str(worksheet.cell(row=x, column=columnnum).value).lower())
+            words.append(str(worksheet.cell(row=x, column=columnnum).value))
 
     # now removing it
     # TODO- the replace function
@@ -828,6 +829,18 @@ def simp_coinco_sent(filename, sent_file):
 
 def simp_syn_sent(sent):
     strs = ""
+
+    """
+    lst1 = "Peter - nobody guessed it - showed up .".split()
+    _lst = sent.split()
+    print "sent: ", sent
+    print (lst1)
+    print (_lst)
+
+    #import pdb; pdb.set_trace()
+    if lst1 == _lst:
+        return "Peter showed up. Nobody guessed it.", "paratax"
+    """
     # the original tokens in the sent
     #import pdb; pdb.set_trace()
     #print "syn sent: ", sent
@@ -862,40 +875,40 @@ def simp_syn_sent(sent):
             if len(strs) > 0:
                 alg = "punct"
                 return strs, alg
-            else:               
-                strs = coordi.simp_coordi_sent(tokens, node_list)
+            else:                       
+                strs = subordi.simp_subordi_sent(tokens, node_list)
                 if len(strs) > 0:
-                    alg = "coordi"
+                    alg = "subordi"
                     return strs, alg
-                else:        
-                    strs = subordi.simp_subordi_sent(tokens, node_list)
+                else:
+                    strs = adverb.simp_adverb_sent(tokens, node_list)
                     if len(strs) > 0:
-                        alg = "subordi"
+                        alg = "adverb"
                         return strs, alg
                     else:
-                        strs = adverb.simp_adverb_sent(tokens, node_list)
+                        strs = parti.simp_parti_sent(tokens, node_list)
                         if len(strs) > 0:
-                            alg = "adverb"
+                            alg = "parti"
                             return strs, alg
                         else:
-                            strs = parti.simp_parti_sent(tokens, node_list)
+                            strs = appos.simp_appos_sent(tokens, node_list)
                             if len(strs) > 0:
-                                alg = "parti"
+                                alg = "appos"
                                 return strs, alg
                             else:
-                                strs = appos.simp_appos_sent(tokens, node_list)
+                                strs = adjec.simp_adjec_sent(tokens, node_list)
                                 if len(strs) > 0:
-                                    alg = "appos"
+                                    alg = "adjec"
                                     return strs, alg
                                 else:
-                                    strs = adjec.simp_adjec_sent(tokens, node_list)
+                                    strs = passive.simp_passive_sent(tokens, node_list)
                                     if len(strs) > 0:
-                                        alg = "adjec"
+                                        alg = "passive"
                                         return strs, alg
                                     else:
-                                        strs = passive.simp_passive_sent(tokens, node_list)
+                                        strs = coordi.simp_coordi_sent(tokens, node_list)
                                         if len(strs) > 0:
-                                            alg = "passive"
+                                            alg = "coordi"
                                             return strs, alg
 
     return strs, alg
@@ -960,9 +973,11 @@ def _get_split_ret(_str):
     s2_child = ""
     #syn_ret = ""
     algs = ""
-    if len(_strs) == 1:
+
+    #import pdb; pdb.set_trace()
+    if len(_strs) == 1 or len(_strs[1]) == 0:
         return (s1, s1_child, s2, s2_child, _str, algs)
-        
+     
     s1_child, alg1 = simp_syn_sent(s1)
     print "S11+S12: ", s1_child
     print "alg1: ", alg1
@@ -1081,7 +1096,7 @@ def main():
     print "#sentence with Syntactic simplification: ", info[1]
     """
 
-    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    #entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
     entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
     entries = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
     entries = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
@@ -1093,9 +1108,18 @@ def main():
     entries = "The Man in the High Castle occurs in an alternate universe United States ruled by the victorious Axis powers ."
     entries = "With the high Gulf pressures - a ship reported a pressure of 1015 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16."
     #entries = "Peter likes the work"
-    entries = "Much of the water carried by these streams is diverted ."
+    entries = "Harry also becomes the worthy possessor of the remaining Deathly Hallows : the Invisibility Cloak and the Resurrection Stone , hence becoming the true Master of Death ."
+    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
     
-    split_sent(entries)
+    #split_sent(entries)
+
+    entries = "i ate an apple and an orange."
+    entries = "he came. so, i left."
+    
+    entries = "Peter - nobody guessed it - showed up ."
+    entries = "Peter - nobody guessed it – showed up ."
+    re, alg = simp_syn_sent(entries)
+    print(re)
 
 if __name__ == '__main__':
      main()

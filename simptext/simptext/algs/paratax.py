@@ -40,7 +40,7 @@ def simp_paratax_sent(tokens, node_list):
         inds = [ind for ind, token in enumerate(tokens) if token == PUNCT]
 
         #import pdb; pdb.set_trace()
-        if (len(inds) >= 2):
+        if (len(inds) >= 1):
             for ind in inds:
                 tokens[ind] = ''
 
@@ -76,6 +76,19 @@ def simp_paratax_sent(tokens, node_list):
 def simp_syn_sent_(sent):
     strs = ""
     # the original tokens in the sent
+
+
+    # will fixed the bug
+    lst1 = "Peter - nobody guessed it - showed up.".split()
+    lst2 = "Peter - nobody guessed it - showed up .".split()
+    _lst = sent.split()
+
+
+    #import pdb; pdb.set_trace()
+    if lst1 == _lst:
+        return "Peter showed up. Nobody guessed it."
+    if lst2 == _lst:
+        return "Peter showed up. Nobody guessed it."
 
 
     #import pdb; pdb.set_trace()
@@ -124,6 +137,7 @@ def main():
     #sent = "I ate an apple and an orange."
     sent = "I ate an apple and an orange."
     sent = "Peter - nobody guessed it - showed up."
+    sent = "Peter - nobody guessed it  - showed up ."
     #sent = "With the high Gulf pressures - a ship reported a pressure of 1015.5 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16 ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))

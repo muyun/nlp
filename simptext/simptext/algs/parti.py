@@ -21,6 +21,8 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #from  nltk.parse.stanford import StanfordParser
 #eng_parser = StanfordParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+from pattern.en import tenses, conjugate
+
 #from algs import base
 import base
 
@@ -94,11 +96,26 @@ def simp_parti_sent(tokens, node_list):
                 #tokens.insert(1, upper_first_char(subj))
 
                 #import pdb; pdb.set_trace()
-                verb = "be"
+                #verb = "be"
+                verb = conjugate("be", tenses(root)[0][0], 3)
                 root_ind = tokens.index(root)
-                _str1 = tokens[acl_ind:root_ind]
+
+                advmod_ind = 0
+                for _nd in node_list[1:]:
+                    if acl_ind == _nd[0]:
+                        acl_dict = _nd[4]
+                        break
+                if ('advmod' in acl_dict.keys()):
+                    advmod_ind = acl_dict['advmod'][0]
+
+                if advmod_ind == 0:
+                    _str1 = tokens[acl_ind:root_ind]
+                else:
+                    _str1 = tokens[advmod_ind:root_ind]
+
                 if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
+
                 str1 = base.upper_first_char(subj) + " " + verb + " "
                 str1 =  str1 + ' '.join(_str1)
                 #print "1st sent: ", str1
@@ -161,9 +178,9 @@ def main():
 
     sent = "Peter, also called Pete, came."
 
-    sent = "The MTR was immediately popular with residents of Hong Kong ; as a result , subsequent lines have been built to cover more territory . There are continual debates regarding how and where to expand the MTR network ."
+    #sent = "The MTR was immediately popular with residents of Hong Kong ; as a result , subsequent lines have been built to cover more territory . There are continual debates regarding how and where to expand the MTR network ."
 
-    sent = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
+    #sent = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
 
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))

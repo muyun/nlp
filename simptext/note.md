@@ -50,6 +50,14 @@ zhaowenlong@zhaowenlongs-MacBook:~/workspace/proj/dev.nlp/simptext/simptext$ pyt
 #num_positive:  10
 #_num_output:  294
 
+>>> #num_negative:  265
+#num_false_positive:  0
+#num_true_positive:  29
+#num_false_negative:  189
+#num_true_negative:  76
+#num_positive:  29
+#_num_output:  294
+
 
 #### questions
 * the database

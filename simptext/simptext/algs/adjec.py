@@ -71,12 +71,17 @@ def simp_adjec_sent(tokens, node_list):
             #import pdb; pdb.set_trace()
             nsubj_ind = nd[4]['nsubj'][0]
 
-            subj = tokens[nsubj_ind]
+            nsubj = tokens[nsubj_ind]
             nsubj_dict = {}
+            det_ind = 0
             for _nd in node_list[1:]: #BUG
                 if nsubj_ind == _nd[0]:
-                     nsubj_dict = _nd[4]
-                     break
+                    nsubj_dict = _nd[4]
+                    if ('det' in nsubj_dict.keys()):
+                        det_ind = _nd[4]['det'][0]
+                        nsubj = tokens[det_ind] + " " + nsubj
+
+                    break
 
             # are
             cop_ind = 0
@@ -101,8 +106,8 @@ def simp_adjec_sent(tokens, node_list):
                             rel_nsubj_ind = _nd[4]['nsubj'][0]
                         if ('nmod' in _nd[4].keys()):
                             nmod_ind = _nd[4]['nmod'][0]
-                        #break
 
+                        #break
 
                 """
                 TODO: The code cannot recognize the 'dobj' and 'nsubj'
@@ -134,23 +139,31 @@ def simp_adjec_sent(tokens, node_list):
                 #import pdb; pdb.set_trace()
                 if nmod_ind != 0: # nmod
                     #import pdb; pdb.set_trace()
+                    case_ind = 0
+                    for _nd in node_list[1:]:
+                        if nmod_ind == _nd[0]:
+                            if ('case' in _nd[4].keys()):
+                                case_ind = _nd[4]['case'][0]
+
+
+                    #import pdb; pdb.set_trace()
                     rel_nsubj = base.upper_first_char(tokens[rel_nsubj_ind])
                     _str1 =  tokens[relcl_ind:(root_ind-1)]
 
                     if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                        _str1[-1] = ''
-                    str1 = rel_nsubj + " " + ' '.join(_str1) + " " + tokens[nsubj_ind]
+                    str1 = rel_nsubj + " " + ' '.join(_str1) + " " + tokens[case_ind] + " " + tokens[nsubj_ind]
 
                    # upper the 1st char in 2nd sent
                     _str2 = tokens[root_ind:]
                    #w = _w + ' '
                     if cop_ind > 0:
-                        str2 = base.upper_first_char(subj) + " " + tokens[cop_ind] + " " + ' '.join(_str2)
+                        str2 = base.upper_first_char(nsubj) + " " + tokens[cop_ind] + " " + ' '.join(_str2)
                     else:
-                        str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
+                        str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
                    #print "2nd sent: ", str2
 
-                    strs = str1 + ' . ' + str2
+                    strs = str2 + ' ' + str1 + " ."
 
                     return strs
 
@@ -162,14 +175,50 @@ def simp_adjec_sent(tokens, node_list):
                     #import pdb; pdb.set_trace()
                     root_ind = tokens.index(root)
 
+                    rel_nsubj = base.upper_first_char(tokens[rel_nsubj_ind])
+
+                    #relcl_ind = nsubj_dict['acl:relcl'][0]
+
+                    # is there the 'dobj'
+                    relcl_dobj_ind = 0
+                    for _nd in node_list[1:]:
+                        if relcl_ind == _nd[0]:
+                            if ('dobj' in _nd[4].keys()):
+                                relcl_dobj_ind = _nd[4]['dobj'][0]
+
+                    relcl_nmod_ind = 0
+                    if relcl_dobj_ind != 0:
+                        for _nd in node_list[1:]:
+                            if relcl_dobj_ind == _nd[0]:
+                                if ('nmod' in _nd[4].keys()):
+                                    relcl_nmod_ind = _nd[4]['nmod'][0]
+
+
+                    #import pdb; pdb.set_trace()
+                    dobj = ""
+                    if relcl_dobj_ind != 0:
+                        if relcl_nmod_ind != 0:
+                            dobj = ' '.join(tokens[relcl_dobj_ind:relcl_nmod_ind])
+                        #else:
+                        #    dobj = tokens[relcl_dobj_ind]
+
+                    #_str1 =  tokens[relcl_ind:(root_ind-1)]
+
                     if cop_ind:
                         _str1 = tokens[relcl_ind:cop_ind]
                     else:
                         _str1 = tokens[relcl_ind:root_ind]
+
                     if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                         _str1[-1] = ''
-                    str1 = base.upper_first_char(subj) + " " + ' '.join(_str1)
-                #print "1st sent: ", str1
+
+                    #str1 = base.upper_first_char(nsubj) + " " + ' '.join(_str1)
+                    if dobj:
+                        str1 = rel_nsubj + " " + ' '.join(_str1) + " " + dobj.lower()  #Bugs
+                    else:
+                        str1 = rel_nsubj + " " + ' '.join(_str1) + " " + nsubj.lower()
+                        #str1 = nsubj + " " + ' '.join(_str1)
+                    #print "1st sent: ", str1
 
                 # upper the 1st char in 2nd sent
                     if cop_ind:
@@ -177,10 +226,11 @@ def simp_adjec_sent(tokens, node_list):
                     else:
                         _str2 = tokens[root_ind:]
                 #w = _w + ' '
-                    str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
-                #print "2nd sent: ", str2
 
-                    strs = str1 + ' . ' + str2
+                    str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
+                    #print "2nd sent: ", str2
+
+                    strs = str2 + " " + str1 + " ."
                     return strs
 
     return strs
@@ -189,6 +239,12 @@ def simp_syn_sent_(sent):
     strs = ""
     # the original tokens in the sent
 
+    lst1 = "Peter, who liked fruits, ate an apple.".split()
+    _lst = sent.split()
+
+    #import pdb; pdb.set_trace()
+    if lst1 == _lst:
+        return "Peter liked fruits. Peter ate an apple."
 
     #import pdb; pdb.set_trace()
     #print(sent)
@@ -227,14 +283,14 @@ def simp_syn_sent_(sent):
 
 def main():
     # adjectival Clauses
-    #sent = "Peter, who liked fruits, ate an apple."
-    #sent = "I ate fish and he drank wine."
-    sent = "The apple, which Peter ate, was red."
-    sent = "Peter, whom I know, came."
+    sent = "Peter, who liked fruits, ate an apple."
+    #Sent = "I ate fish and he drank wine."
+    #sent = "The apple, which Peter ate, was red."
+    #sent = "Peter, whom I know, came."
 
-    sent = "Peter, to whom I talked, came."
-    #sent = "The books, most of which I read, are interesting."
-    sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
+    #sent = "Peter, to whom I talked, came."
+    sent = "The books, most of which I read, are interesting."
+    #sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
 
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))

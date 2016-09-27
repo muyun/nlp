@@ -43,9 +43,11 @@ def _Stem(sub_sent,edblist):
 	#words = nltk.word_tokenize(sub_sent)
 	words = StanfordTokenizer().tokenize(str(sub_sent))
 	tokens = st.tag(words)
-	#print "tokens: " tokens
+	print "tokens: ", tokens
+        print "sub_sent: ", sub_sent
 	#tokens = "nltk.pos_tag(words)
 
+ 	"""
         result = list(eng_parser.raw_parse(sub_sent))[0]
         node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
         for node in result.nodes.items():
@@ -63,21 +65,29 @@ def _Stem(sub_sent,edblist):
                         nsubj_ind = nd[4]['nsubj'][0]
                         
         org_taggers = words[nsubj_ind-1]
+        """
+        nsubj_ind = 1
+        if len(words) >0:
+                nsubj_taggers = words[nsubj_ind-1]
+        else:
+                nsubj_taggers = ""
         
 	word_list = []
 	word_pre = []
 	pos = ['NNP','NNPS','POS',',','.','\'','$','WRB','MD','SYM','TO','WP','WDT',':','CD','DT','EX', 'PRP','PRP$']
 	v_pos = ['VBD','VBG','VBN','VBP','VBZ']	
 	n_pos = ['NNS']
+        n_tag =['NN', 'NNS', 'NNP', 'NNPS']
 
         #import pdb; pdb.set_trace()
+        _taggers =[]
 	for e in tokens:
 		if e[1] not in pos:
 			temp = e[0].lower()
 			if e[1] in v_pos:
 				word_list.append(lmtzr.lemmatize(temp,'v'))
 				word_pre.append(lmtzr.lemmatize(temp,'v'))
-			elif (e[1] in n_pos) and (e[0] != org_taggers):
+			elif (e[1] in n_pos) and (e[0] != nsubj_taggers):
 				word_list.append(lmtzr.lemmatize(temp))
 				word_pre.append(lmtzr.lemmatize(temp))
 			else:
@@ -85,9 +95,12 @@ def _Stem(sub_sent,edblist):
 				word_pre.append(temp)
 		else:
 			word_pre.append(e[0])
-			
+
+                if e[1] in n_tag:
+                        _taggers.append(e[0])
+                        
 	sub_words = []
-	print word_pre
+	#Print word_pre
 
         #import pdb; pdb.set_trace()
 	for w in word_list:
@@ -96,20 +109,25 @@ def _Stem(sub_sent,edblist):
 			sub_words.append(w.strip())
 
         # get the person name based on StanfordNERTagger
+        
+        #import pdb; pdb.set_trace()
+        taggers = []
+        if nsubj_taggers in _taggers:
+                taggers.append(nsubj_taggers)
+                
         person_taggers = []
-        for token, title in eng_tagger.tag(words):
-                if title == 'PERSON':
-                        person_taggers.append(token)
-
-        """
         org_taggers = []
         for token, title in eng_tagger.tag(words):
-                if title == 'ORGANIZATION':
-                        org_taggers.append(token)
-        """
-                         
+                if token in taggers:
+                        if title == 'PERSON':
+                                person_taggers.append(token)
+                        elif title == 'ORGANIZATION':
+                                org_taggers.append(token)
+                        else:
+                                org_taggers.append(token)
+                                              
 	#import pdb; pdb.set_trace()
-	return sub_words, word_pre, person_taggers, org_taggers.lower()
+	return sub_words, word_pre, person_taggers, org_taggers
 
 def Initial(fin): #load EDB_List
 	flist = open(fin,'r')
@@ -169,27 +187,28 @@ def _interface(sentence,edblist):
 	for word in word_pre:
 	        tokens = {}
                 if word in person_taggers: # is a person, subject?
-                        #import pdb; pdb.set_trace()
-                        if isplural(word): # plural
-                                tokens[word] = [word, "they"]
+                        if  isplural(word): # plural
+                                tokens[word] = [word, "They"]
                         else:
-                                tokens[word] = [word, "he", "she"]
-                elif word in org_taggers: # is a person, subject?
-                        #import pdb; pdb.set_trace()
-                        if isplural(word): # plural
-                                tokens[word] = [word, "they"]
+                                tokens[word] = [word, "He", "She"]
+
+                elif word in org_taggers:
+                        if  isplural(word):
+                                tokens[word] = [word, "They"]
                         else:
-                                tokens[word] = [word, "it"]                    
-	        else:
-		        if word not in target_words:
-			        token_list.append(word)               
-		        else:
-			        r_sent = []
+                                tokens[word] = [word, "It"]
+
+                else:
+                        if word not in target_words:
+                                token_list.append(word)
+                        else:
+                                r_sent = []
 			        candidates = Generate_candidates_topN(word,sentence,19,edblist)
 			        for i in range(len(candidates)):
 				        r_sent.append(candidates[i] + "@" + sentence.replace(word,candidates[i]))
 			        sub_top10 = kenlm_topn(r_sent,9,sentence)
-			        sub_top10.insert(0,word)
+			        if word not in sub_top10:
+			        	sub_top10.insert(0,word)
 			        tokens[word] = sub_top10
                                 
                 if tokens: token_list.append(tokens)

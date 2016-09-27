@@ -77,30 +77,26 @@ $(function() {
     $('#undo-6').remove();
   }); 
 
+  var selectedItem = sessionStorage.getItem("SelectedItem");  
+  $('#wordlevel').val(selectedItem);
+
+  $('#wordlevel').change(function() { 
+    var dropVal = $(this).val();
+    sessionStorage.setItem("SelectedItem", dropVal);
+  });
+
 });
 
 </script>
 
 {% if session.logged_in %}
-    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
-      
+    <form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry>
       <dl>
         <dt>Input:
         <dd><textarea name=input rows=4 cols=60></textarea> 
         <br/>
-        <br/>
-        <dt>The wordlist:
-        <dd><textarea name=wordinput rows=1 cols=35></textarea>
-        <br/>
-        <br/>
-        <dt>{{ form.wordlevel.label }}  
-        <dd> {{ form.wordlevel }}
-        <br/>
-        <br/>
         <dd><input type=submit value=Simplify>
       </dl>
-
-    </form>
 
 <ul class="entries" id="entry">
   {% if entries %}
@@ -108,6 +104,15 @@ $(function() {
      <li>
      {{ entries }}
      </li>
+
+     <!--
+     {% if wordlist %}
+     <li><h2>The wordlist:</h2>
+     <li>
+     {{ wordlist }}
+     </li>   
+     {% endif %}
+     -->
 
   <li><h2>Output:<h2></li>
   {% set counter = ['1'] %}
@@ -283,6 +288,17 @@ $(function() {
     {% endif %}
 {% endif %}
 
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+      <dl>
+        <dt>The wordlist:
+        <dd><textarea name=wordinput rows=1 cols=35></textarea>
+        <dt>{{ form.wordlevel.label }}  
+        <dd> {{ form.wordlevel }}       
+      </dl>
+    </form>
 
   {% else %}
      <li><em>No output here so far</em>

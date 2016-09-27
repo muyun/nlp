@@ -124,7 +124,7 @@ def print_mturk_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences
 
 
-def check_partial_sent_similar(sent1, sent2, threshold=0.5):
+def check_partial_sent_similar(sent1, sent2, threshold=0.66):
     """ check whether the two sents are the similar """
     pos_1 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent1)))
     pos_2 = map(get_wordnet_pos, nltk.pos_tag(StanfordTokenizer().tokenize(sent2)))
@@ -182,6 +182,7 @@ def is_similar(sent1, sent2):
 
             #import pdb; pdb.set_trace()
             if check_partial_sent_similar(_str1_, _str2_):
+                """
                 if not check_partial_sent_similar(_str1, _str2_): # not similar
                     if not check_partial_sent_similar(_str1_, _str2): # not similar
                         return True
@@ -189,6 +190,8 @@ def is_similar(sent1, sent2):
                         return False
                 else:
                     return False
+                """
+                return True
             else:
                 return False
 
@@ -224,7 +227,7 @@ def cal_mturk_sent(filename, gt):
         line = line.strip('\n')
 
         #import pdb; pdb.set_trace()
-        if "OUTPUT" not in line :
+        if ("OUTPUT" not in line) and ("ALGS" not in line):
             match = re.search(r'--+', line)
             if match:
                 pass
@@ -234,10 +237,10 @@ def cal_mturk_sent(filename, gt):
             #print "Input: ", line
 
         #import pdb; pdb.set_trace()
-        elif ("ALGS" in line):
-            algs_flag = line.split(':')[0]
-            algs = line.split(':')[1].strip()
-        else: #
+        #elif ("ALGS" in line):
+        #    algs_flag = line.split(':')[0]
+        #    algs = line.split(':')[1].strip()
+        elif ("OUTPUT" in line): #
             #print "gt-out: ", gt[num]
             #print "out: ", line
             #len_output = len(re.findall("\w+", line))
@@ -276,22 +279,29 @@ def cal_mturk_sent(filename, gt):
                 else:
                     num_true_negative = num_true_negative + 1
 
-
             output[num] = [_input,
                          gt[num],
                          ot,
                          _sp,
-                        _gen,
-                        algs]
+                        _gen]
+
+        elif ("ALGS" in line):
+            algs_flag = line.split(':')[0]
+            algs = line.split(':')[1].strip()
+
+            output[num].append(algs)
 
             #import pdb; pdb.set_trace()
             with codecs.open('mturk_sent_l8.csv', 'a', encoding='utf-8') as outfile:
                 wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
                 wr.writerow(output[num])
 
-            num = num + 1
+            Num = num + 1
             if num == 294:
                 break
+
+        else:
+            pass
 
     #import pdb; pdb.set_trace()
             #match = re.search(r'(^(#OUTPUT):(\w*))', line)
@@ -306,6 +316,92 @@ def cal_mturk_sent(filename, gt):
     return num_negative, num_positive
 
 
+def cal_base_sent(bs, md, filename):
+    num_sentences = 0
+    num_splitted_sentences = 0
+    #data = json.load(open(datafile))
+    docs = OrderedDict() # store the info - docs[sentence] = [id,...]
+
+    #soup = BeautifulSoup(open(filename), "lxml")
+
+    # number of sentences, based on the 'sent' tag
+    #sentences = soup.find_all("instance")
+    #num_sentences = len(sentences)
+
+    #p = re.compile(r'<.*?>')
+    #import pdb; pdb.set_trace()
+    output = OrderedDict()
+    #f = open(filename, 'rU')
+    num = 0
+    res = ""
+    #algs = ""
+    #for line in f:
+    #line = line.strip('\n')
+    for se in bs[1:]:
+        #import pdb; pdb.set_trace()
+        #num_sentences = num_sentences + 1
+        num = num + 1
+            #print(sentence)
+            #sent = str(p.sub('', str(sentence)))
+            #se = re.sub(r'^”|”$', '', sent)
+            #se = sentence.context.get_text()
+            #sent = str(BeautifulSoup(sentence).text)
+            #obj = line.split("\t")
+            #se = re.sub(r'^"|"$', '', obj[0])
+        print(se)
+            # write the sentence
+            #res = ""
+            #res = punct.simp_syn_sent_(se)
+            #res = coordi.simp_syn_sent_(se)
+            #res = subordi.simp_syn_sent_(str(se))
+            #res = adverb.simp_syn_sent_(str(se))
+            #res = parti.simp_syn_sent_(str(se))
+            #res = adjec.simp_syn_sent_(str(se))
+            #res = appos.simp_syn_sent_(str(se))
+            #res = passive.simp_syn_sent_(str(se))
+            #res = paratax.simp_syn_sent_(str(se))
+            #res = alg.simp_passive_sent(str(re))
+        alg = ""
+        alg0 = ""
+        _res, alg0 = dt_sent.simp_syn_sent(str(se))
+        #if len(_res) > 0:
+        #    (s1, s1_child, s2, s2_child, res, alg) = dt_sent._get_split_ret(_res)
+            #print "res: ", res
+        #else:
+        #    res = _res
+
+        res = _res
+        print "res: ", _res
+        print "alg0: ", alg0
+            #import pdb; pdb.set_trace()
+        #output[se] = res
+            #import pdb; pdb.set_trace()
+
+        algs = ""
+        if len(alg0) > 0:
+            algs = alg0 + "@" + alg
+
+        #import pdb; pdb.set_trace()
+        output[num] = [se,
+                       md[num],
+                       res,
+                       algs]
+
+            #import pdb; pdb.set_trace()
+        with codecs.open(filename, 'a', encoding='utf-8') as outfile:
+            wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
+            wr.writerow(output[num])
+
+            """
+            num = num + 1
+            if num == 200:
+                break
+            """
+
+    return num_sentences, num_splitted_sentences
+
+
+
 def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/"
     # print the inter data in the syntactic simplification
@@ -314,7 +410,7 @@ def main():
     sent_file = dir + "tests/sent_mturk_l8_.md"
     gt_file = dir + "dataset/simplify_testset_0814.xlsx"
 
-    _info = print_mturk_sent(filename, sent_file)
+    #_info = print_mturk_sent(filename, sent_file)
     #print "Type: Paratax Clauses:"
     #print "#sentence in mturk: ", _info[0]
     #print "#sentence with Syntactic simplification: ", _info[1]
@@ -336,6 +432,16 @@ def main():
     #filename = dir + "utils/testset/sent_mturk_l4_.md"
     #gt = dt_sent.read_xlsx_file(gt_file, 1, 2)
     #_info = cal_mturk_sent(sent_file, gt)
+
+
+    # base
+    base_file = dir + "dataset/syntactic_simplification.xlsx"
+    filename = dir + "dataset/simp_syn_.csv"
+
+    bs = dt_sent.read_xlsx_file(base_file, 1, 1)
+    md = dt_sent.read_xlsx_file(base_file, 1, 2)
+
+    info = cal_base_sent(bs, md, filename)
 
 
 if __name__ == '__main__':

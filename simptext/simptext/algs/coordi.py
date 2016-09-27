@@ -12,7 +12,7 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-#from alg import base
+#from algs import base
 import base
 #from algs import base
 
@@ -141,6 +141,7 @@ def simp_coordi_sent(tokens, node_list):
 
             nsubj = " "
             nsubj_ind = 0
+            cop_ind = 0
             FLAG = 0
 
             # one more cc?
@@ -151,6 +152,7 @@ def simp_coordi_sent(tokens, node_list):
             conj_ind = nd[4]['conj'][0]
             conj_nsubj_ind = 0
             conj_nsubj = ""
+            
             for _nd in node_list[1:]:
                 if conj_ind == _nd[0]: # the first cc
                     if ('nsubj' in _nd[4].keys()):
@@ -182,6 +184,12 @@ def simp_coordi_sent(tokens, node_list):
             if ('nsubj' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubj'][0]
                 nsubj =  base.upper_first_char(tokens[nsubj_ind]) + nsubj
+                
+                #cop_ind = 0
+                if ('cop' in nd[4].keys()):
+                    cop_ind = nd[4]['cop'][0]
+                #nsubj = base.upper_first_char(tokens[nsubj_ind]) + tokens[cop_ind]
+                
 
             if ('nsubjpass' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubjpass'][0]
@@ -222,7 +230,10 @@ def simp_coordi_sent(tokens, node_list):
             """       
             
             if not FLAG:
-                str2 = nsubj + " ".join(tokens[(cc_ind + 1):])
+                if cop_ind: # "is"
+                    str2 = nsubj +  tokens[cop_ind] + " " + " ".join(tokens[(cc_ind + 1):])
+                else:
+                    str2 = nsubj + " ".join(tokens[(cc_ind + 1):])
             else:
                 str2 = conj_nsubj + " " + " ".join(tokens[(conj_nsubj_ind + 1):])
                 
@@ -272,12 +283,13 @@ def simp_coordi_sent(tokens, node_list):
             str1 = " ".join(tokens[:(dobj_ind+1)])
             str2 = " ".join(tokens[:(root_ind+1)] + tokens[cc_ind+1:])
 
+            """
             if str1:
                 return strs
             if str2:
-                return strs 
-            else:  
-                strs = str1 + " . " + str2
+                return strs
+            """ 
+            strs = str1 + " . " + str2
 
             return strs
 
@@ -397,7 +409,11 @@ def main():
     sent = "The boys, my friends, like it."
     sent = "Peter, my friend, likes it."
     sent = "The storm never approached land during its lifespan , and no damage or casualties were reported ."
+    sent = "I ate an apple and an orange."
+    sent = "Mary ate a pineapple and John ate an orange."
     #sent = "I am a student and he is a teacher ."
+    #sent = "He is an actor and a musician."
+    sent = "I ate fish and he drank wine."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

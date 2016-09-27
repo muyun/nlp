@@ -60,18 +60,27 @@ def show_entries():
     wordlevel = str(se[2])
     #algs = str(se[2])
 
-    print "wordlist: ", wordlist
+    #print "wordlist: ", wordlist
     print "wordlevel: ", wordlevel
     #print "algs: ", algs
     
     if len(wordlist) > 0:
+        _words = []
     	for w in wordlist.split(','):
     		w = w.strip()
-    		words.append(w)
-        #words = wordlist.split(',')
-        #print "words: ", words
-            #print "words-tye: ", type(words)
-            #wordlevel = 0
+    		_words.append(w)
+
+        if int(wordlevel) == 0:
+            words = _words
+        else:
+            if int(wordlevel) == 1:
+                words = list(words) + list(word1)
+            if int(wordlevel) == 2:
+                words = list(words) + list(word2)
+            if int(wordlevel) == 3:
+                words = list(words) + list(word3)   
+            if int(wordlevel) == 4:
+                words = list(words) + list(word4)
     else:
     	if int(wordlevel) == 1:
     		words = word1
@@ -110,13 +119,13 @@ def show_entries():
 
                 if len(s1_child) > 0:
                     s1_output = wordcal.check_word(s1, words)
-                    s1_child_output = wordcal.check_word(s1_child, words)
+                    #s1_child_output = wordcal.check_word(s1_child, words)
                 else:
                     s1_output = wordcal.check_word(s1, words)
 
                 if len(s2_child) > 0: 
                     s2_output = wordcal.check_word(s2, words) 
-                    s2_child_output = wordcal.check_word(s2_child, words) 
+                    #s2_child_output = wordcal.check_word(s2_child, words) 
                 else:
                     s2_output = wordcal.check_word(s2, words)
         
@@ -128,7 +137,7 @@ def show_entries():
     print "s2_child_output: ", s2_child_output
     print "s_outputs: ", s_outputs
 
-    return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
+    return render_template('show_entries.html', form=form, wordlist=wordlist, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
 
 
 # this view let the user add new entries if they are logged in

@@ -17,6 +17,8 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #from algs import base
 import base
 
+from pattern.en import tenses, conjugate
+
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
 def simp_appos_sent(tokens, node_list):
@@ -73,7 +75,8 @@ def simp_appos_sent(tokens, node_list):
                 #import pdb; pdb.set_trace()
                 appos_ind = nsubj_dict['appos'][0]
 
-                verb = "is"
+                #verb = "is"
+                verb = conjugate("be", tenses(root)[0][0], 3)
                 #verb = base.update_vb_conjugation(verb, root)
 
                 subj = base.upper_first_char(tokens[nsubj_ind])
@@ -166,8 +169,9 @@ def main():
     #sent = "I ate an apple and an orange."
     sent = "I ate an apple and an orange."
     sent = "Peter, my son, ate an apple."
-    sent = "Peter, my friend, likes it."
-    sent = "Boys, my friends, like it."
+    sent = "Peter, my son, eats an apple."
+    #sent = "Peter, my friend, likes it."
+    #sent = "Boys, my friends, like it."
     #sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
     #TODO: the tense of the output
     print(simp_syn_sent_(sent))

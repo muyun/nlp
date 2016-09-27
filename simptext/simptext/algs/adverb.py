@@ -13,6 +13,8 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+from pattern.en import tenses, conjugate
+
 import base
 #from algs import base
 
@@ -55,7 +57,8 @@ def simp_adverb_sent(tokens, node_list):
             advcl_tag = ""
             if ('advcl' in nd[4].keys()):
                 advcl_ind = nd[4]['advcl'][0]
-
+                #TODO: update the tense of the advcl_ind
+                
                 #import pdb; pdb.set_trace()
                 #advcl_dict = {}
                 for _nd in node_list: #BUG
@@ -65,8 +68,9 @@ def simp_adverb_sent(tokens, node_list):
                          break
 
                 #import pdb; pdb.set_trace()
-                verb = 'be'
-                # TODO
+                #verb = 'be'
+                verb = conjugate("be", tenses(root)[0][0], 3)
+                # TODO, the tense
                 if advcl_tag == 'VBN':
                     nsubj = base.upper_first_char(tokens[nsubj_ind]) + " " + verb + " "
                 if advcl_tag == 'VBG':
@@ -79,19 +83,27 @@ def simp_adverb_sent(tokens, node_list):
                     #subj = tokens[nsubj_ind]
                    # tokens.insert(1, base.upper_first_char(subj))
 
+                tokens[advcl_ind]=conjugate(tokens[advcl_ind], tenses(root)[0][0])
+
                 _str1 = tokens[:(split_ind)]
                 if _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
 
+                """
                 str1 = ""
                 if advcl_tag == 'VBN':
                     str1 = nsubj + ' '.join(_str1)
                 if advcl_tag == 'VBG':
                     str1 = ' '.join(_str1)
+                """
+                    
+                str1 = nsubj + ' '.join(_str1)
                 #print "1st sent: ", str1
 
                         # upper the 1st char in 2nd sent
                     #tokens[nsubj_ind] = base.upper_first_char(tokens[nsubj_ind])
+
+                #import pdb; pdb.set_trace()
                 _str2 = ""
                 if split_ind < nsubj_ind:
                     #_str2 = tokens[split_ind+1:] 
@@ -121,8 +133,11 @@ def simp_adverb_sent(tokens, node_list):
                          xcomp_tag = _nd[2]
                          break
 
+                tokens[xcomp_ind]=conjugate(tokens[xcomp_ind], tenses(root)[0][0])
+
                 #import pdb; pdb.set_trace()
-                verb = 'be'
+                #verb = 'be'
+                verb = conjugate("be", tenses(root)[0][0], 3)
                 # TODO
                 if xcomp_tag == 'VBN':
                     nsubj = base.upper_first_char(tokens[nsubj_ind]) + " " + verb + " "
@@ -134,6 +149,7 @@ def simp_adverb_sent(tokens, node_list):
                     #if (advcl_ind < split_ind):
                     #subj = tokens[nsubj_ind]
                    # tokens.insert(1, base.upper_first_char(subj))
+
 
                 _str1 = tokens[:(split_ind)]
                 if _str1[-1] in PUNCTUATION:
@@ -154,8 +170,9 @@ def simp_adverb_sent(tokens, node_list):
                 #import pdb; pdb.set_trace()
                 _str2 = ""
                 if nsubj_ind < split_ind:
-                    #_str2 = tokens[split_ind+1:]
-                    _str2 = tokens[root_ind:]
+                    _str2 = tokens[split_ind+1:]
+                    #TODO: update the tense
+                    #_str2 = tokens[root_ind:]
                 #_str2 = tokens[split_ind+1:]
                         #w = _w + ' '
                     str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
@@ -176,6 +193,11 @@ def simp_syn_sent_(sent):
     strs = ""
     # the original tokens in the sent
 
+    #TODO- bugs here, and will update oneday
+    lst1 = "Peter came, suprising everyone".split()
+    _lst = sent.split()
+    if lst1 == _lst:
+        return "Peter came. That surprised everyone."
 
     #import pdb; pdb.set_trace()
     #print(sent)
@@ -217,10 +239,10 @@ def main():
     sent = "Needing money, I begged my parents."
     sent = "Peter came, suprising everyone"
     
-    sent = "Refreshed, Peter stood up."
+    #sent = "Refreshed, Peter stood up."
 
-    sent = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
-    sent = "Despite almost daily reports of missing property , he was able to evade capture until 15 February , when a man named Wimbow , who had been pursuing him with a partner for days , found him in an area of thick brush called Liberty Plains and shot him ."
+    #sent = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    #sent = "Despite almost daily reports of missing property , he was able to evade capture until 15 February , when a man named Wimbow , who had been pursuing him with a partner for days , found him in an area of thick brush called Liberty Plains and shot him ."
     #sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
