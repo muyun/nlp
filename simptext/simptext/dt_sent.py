@@ -1118,8 +1118,10 @@ def main():
     
     entries = "Peter - nobody guessed it - showed up ."
     entries = "Peter - nobody guessed it – showed up ."
+    entries = "John Nash, a mathematician, lectured at Princeton."
     re, alg = simp_syn_sent(entries)
     print(re)
+    print(alg)
 
 if __name__ == '__main__':
      main()

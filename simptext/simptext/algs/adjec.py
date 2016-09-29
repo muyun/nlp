@@ -36,7 +36,7 @@ def simp_adjec_sent(tokens, node_list):
     root = result.root['word']
 
     #w = result.tree()
-    #print "parse_tree:", w
+    #print "parse_tree:",
 
     #TODO: use the tree structure, check again
     node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
@@ -238,14 +238,14 @@ def simp_adjec_sent(tokens, node_list):
 def simp_syn_sent_(sent):
     strs = ""
     # the original tokens in the sent
-
+    """
     lst1 = "Peter, who liked fruits, ate an apple.".split()
     _lst = sent.split()
 
     #import pdb; pdb.set_trace()
     if lst1 == _lst:
         return "Peter liked fruits. Peter ate an apple."
-
+    """
     #import pdb; pdb.set_trace()
     #print(sent)
     #import pdb; pdb.set_trace()
@@ -289,7 +289,7 @@ def main():
     #sent = "Peter, whom I know, came."
 
     #sent = "Peter, to whom I talked, came."
-    sent = "The books, most of which I read, are interesting."
+    #sent = "The books, most of which I read, are interesting."
     #sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
 
     #print(simp_coordi_sent(sent))

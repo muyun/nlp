@@ -60,7 +60,7 @@ def show_entries():
     wordlevel = str(se[2])
     #algs = str(se[2])
 
-    #print "wordlist: ", wordlist
+    print "wordlist: ", wordlist
     print "wordlevel: ", wordlevel
     #print "algs: ", algs
     
@@ -74,13 +74,15 @@ def show_entries():
             words = _words
         else:
             if int(wordlevel) == 1:
-                words = list(words) + list(word1)
+                words = list(_words) + list(word1)
+
             if int(wordlevel) == 2:
-                words = list(words) + list(word2)
+                words = list(_words) + list(word2)
             if int(wordlevel) == 3:
-                words = list(words) + list(word3)   
+                words = list(_words) + list(word3)   
             if int(wordlevel) == 4:
-                words = list(words) + list(word4)
+                words = list(_words) + list(word4)
+                #print "words4: ", words
     else:
     	if int(wordlevel) == 1:
     		words = word1
@@ -91,6 +93,7 @@ def show_entries():
     	if int(wordlevel) == 4:
     		words = word4	
     
+    #print "words: ", words
     #print "words: ", words
     # TODO: update the ALGs
     #outputs = entries

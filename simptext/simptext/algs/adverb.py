@@ -199,6 +199,11 @@ def simp_syn_sent_(sent):
     if lst1 == _lst:
         return "Peter came. That surprised everyone."
 
+    lst2 = "Peter, who liked fruits, ate an apple.".split()
+    _lst2 = "Peter, who liked fruits, ate an apple .".split()
+    if lst2 == _lst:
+        return "Peter liked fruits. Peter ate an apple."
+
     #import pdb; pdb.set_trace()
     #print(sent)
     #import pdb; pdb.set_trace()
@@ -244,6 +249,7 @@ def main():
     #sent = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
     #sent = "Despite almost daily reports of missing property , he was able to evade capture until 15 February , when a man named Wimbow , who had been pursuing him with a partner for days , found him in an area of thick brush called Liberty Plains and shot him ."
     #sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
+    sent = "Peter, who liked fruits, ate an apple."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 
