@@ -1119,9 +1119,11 @@ def main():
     entries = "Peter - nobody guessed it - showed up ."
     entries = "Peter - nobody guessed it – showed up ."
     entries = "John Nash, a mathematician, lectured at Princeton."
+    #entries = "Nash was  a mathematician  ."
     re, alg = simp_syn_sent(entries)
-    print(re)
-    print(alg)
+    #_get_split_ret(entries)
+    #print(re)
+    #print(alg)
 
 if __name__ == '__main__':
      main()

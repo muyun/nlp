@@ -31,6 +31,12 @@ verb_map = {
     "3rd singular present": "3rd"
 }
 
+def isplural(w):
+        word = w.lower()
+        lemma = lmtzr.lemmatize(word, 'n')
+        plural = True if word is not lemma else False
+        return plural
+
 def upper_first_char(w):
     if len(w) > 1:
         return w[0].upper() + w[1:] 

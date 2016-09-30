@@ -14,6 +14,9 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+from nltk.tag import StanfordNERTagger
+eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
+
 #from algs import base
 import base
 
@@ -72,10 +75,14 @@ def simp_subordi_sent(tokens, node_list):
             
             nsubj_ind = 0
             nsubj_word = ""
+            nsubj_compound_list=[]
             if ('nsubj' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubj'][0]
                 for _nd in node_list[1:]:
                     if nsubj_ind == _nd[0]:
+                        nsubj_dict = _nd[4]
+                        if ('compound' in nsubj_dict.keys()):
+                             nsubj_compound_list = nsubj_dict['compound']
                         nsubj_word = _nd[1]
                         break
 

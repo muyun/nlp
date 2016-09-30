@@ -13,6 +13,9 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+from nltk.tag import StanfordNERTagger
+eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
+
 #The girls, on the city, like it .import base
 #from algs import base
 import base
@@ -48,7 +51,6 @@ def simp_appos_sent(tokens, node_list):
             root=nd[1]
 
     strs = ""
-
     #split_ind = 0
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
@@ -63,11 +65,34 @@ def simp_appos_sent(tokens, node_list):
             #import pdb; pdb.set_trace()
             nsubj_ind = nd[4]['nsubj'][0]
             nsubj_dict = {}
+            nsubj_compound_list = []
             for _nd in node_list: #BUG
                 if nsubj_ind == _nd[0]:
                      nsubj_dict = _nd[4]
+                     if ('compound' in nsubj_dict.keys()):
+                         nsubj_compound_list = nsubj_dict['compound']
                      break
 
+            # get the nsubj
+            nsubj = ""
+
+            #import pdb; pdb.set_trace()
+            for i in nsubj_compound_list:
+                nsubj = nsubj + " " + tokens[i]
+            nsubj = nsubj + " " + tokens[nsubj_ind]
+            nsubj = nsubj[0].upper() + nsubj[1:] + " "
+
+            person_taggers = []
+            org_taggers = []
+            # replace the nsubj with "he/she"
+            for token, title in eng_tagger.tag(tokens):
+                if token in nsubj:
+                    if title == 'PERSON':
+                        person_taggers.append(token)
+                    elif title == 'ORGANIZATION':
+                        org_taggers.append(token)
+                    else:
+                        org_taggers.append(token)
 
             #import pdb; pdb.set_trace()
             if ('appos' in nsubj_dict.keys()):
@@ -79,7 +104,7 @@ def simp_appos_sent(tokens, node_list):
                 verb = conjugate("be", tenses(root)[0][0], 3)
                 #verb = base.update_vb_conjugation(verb, root)
 
-                subj = base.upper_first_char(tokens[nsubj_ind])
+                #nsubj = base.upper_first_char(tokens[nsubj_ind])
 
                 #[NOTICE]: remove the ',' after the nsubj
                 if tokens[nsubj_ind + 1] in PUNCTUATION:
@@ -94,30 +119,51 @@ def simp_appos_sent(tokens, node_list):
                     split_ind = tokens.index(',')
 
                 if tokens[root_ind] > split_ind:
-                    _str1 = tokens[nsubj_ind:split_ind]
+                    _str1 = tokens[nsubj_ind+1:split_ind]
                     tokens[split_ind] = ''
 
                     if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                         _str1[-1] = ''
-                    str1 =  ' '.join(_str1)
+                    str1 = nsubj  + ' '.join(_str1)
 
                     _str2 = tokens[split_ind:]
-                    str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
+                    if len(person_taggers) > 0:
+                        str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
+
+                    elif len(org_taggers) > 0:
+                        if base.isplural(org_taggers.split()[-1]):
+                            str2 = "They" + " " + ' '.join(_str2)
+                        else:
+                            str2 = "It" + " " + ' '.join(_str2)
+                    else:
+                        str2 = nsubj + ' '.join(_str2)
+
                 else:
-                    _str1 = tokens[nsubj_ind:root_ind]
+                    _str1 = tokens[nsubj_ind+1:root_ind]
 
                     if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                         _str1[-1] = ''
-                    str1 =  ' '.join(_str1)
+                    str1 = nsubj  + ' '.join(_str1)
                     #print "1st sent: ", str1
 
                     # upper the 1st char in 2nd sent
                     _str2 = tokens[root_ind:]
+                    if len(person_taggers) > 0:
+                        str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
+
+                    elif len(org_taggers) > 0:
+                        if base.isplural(org_taggers.split()[-1]):
+                            str2 = "They" + " " + ' '.join(_str2)
+                        else:
+                            str2 = "It" + " " + ' '.join(_str2)
+                    else:
+                        str2 = nsubj + ' '.join(_str2)
                     #w = _w + ' '
-                    str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
+                    #str2 = nsubj  + ' '.join(_str2)
                     #print "2nd sent: ", str2
 
                 strs = str1 + ' . ' + str2
+
                 return strs
 
     return strs
@@ -174,6 +220,8 @@ def main():
     #sent = "Boys, my friends, like it."
     #sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
     #TODO: the tense of the output
+    sent = "John Nash, a mathematician, lectured at Princeton."
+    #sent = "Robert Downey Jr. , a mathematician, lectured at Princeton."
     print(simp_syn_sent_(sent))
 
 

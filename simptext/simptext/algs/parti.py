@@ -21,6 +21,9 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #from  nltk.parse.stanford import StanfordParser
 #eng_parser = StanfordParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+from nltk.tag import StanfordNERTagger
+eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
+
 from pattern.en import tenses, conjugate
 
 #from algs import base
@@ -71,9 +74,12 @@ def simp_parti_sent(tokens, node_list):
             #import pdb; pdb.set_trace()
             nsubj_ind = nd[4]['nsubj'][0]
             nsubj_dict = {}
+            nsubj_compound_list = []
             for _nd in node_list: #BUG
                 if nsubj_ind == _nd[0]:
                      nsubj_dict = _nd[4]
+                     if ('compound' in nsubj_dict.keys()):
+                         nsubj_compound_list = nsubj_dict['compound']
                      break
 
             #import pdb; pdb.set_trace()
@@ -92,8 +98,26 @@ def simp_parti_sent(tokens, node_list):
                         break
                 """
 
-                subj = tokens[nsubj_ind]
+                #subj = tokens[nsubj_ind]
+                #import pdb; pdb.set_trace()
+                nsubj = ""
+                for i in nsubj_compound_list:
+                    nsubj = nsubj + " " + tokens[i]
+                nsubj = nsubj + " " + tokens[nsubj_ind]
+                nsubj = nsubj[0].upper() + nsubj[1:] + " "
                 #tokens.insert(1, upper_first_char(subj))
+
+                person_taggers = []
+                org_taggers = []
+            # replace the nsubj with "he/she"
+                for token, title in eng_tagger.tag(tokens):
+                    if token in nsubj:
+                        if title == 'PERSON':
+                            person_taggers.append(token)
+                        elif title == 'ORGANIZATION':
+                            org_taggers.append(token)
+                        else:
+                            org_taggers.append(token)
 
                 #import pdb; pdb.set_trace()
                 #verb = "be"
@@ -116,14 +140,25 @@ def simp_parti_sent(tokens, node_list):
                 if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
 
-                str1 = base.upper_first_char(subj) + " " + verb + " "
+                #str1 = base.upper_first_char(nsubj) + " " + verb + " "
+                str1 = nsubj + " " + verb + " "
                 str1 =  str1 + ' '.join(_str1)
                 #print "1st sent: ", str1
 
                 # upper the 1st char in 2nd sent
                 _str2 = tokens[root_ind:]
+                if len(person_taggers) > 0:
+                    str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
+
+                elif len(org_taggers) > 0:
+                    if base.isplural(org_taggers.split()[-1]):
+                        str2 = "They" + " " + ' '.join(_str2)
+                    else:
+                        str2 = "It" + " " + ' '.join(_str2)
+                else:
+                    str2 = nsubj + ' '.join(_str2)
                 #w = _w + ' '
-                str2 = base.upper_first_char(subj) + " " + ' '.join(_str2)
+                #str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
 
                 strs = str1 + ' . ' + str2
@@ -182,6 +217,7 @@ def main():
 
     #sent = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
 
+    sent = "John Nash, running down the street, tripped."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

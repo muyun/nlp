@@ -19,6 +19,8 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 
 #from  nltk.parse.stanford import StanfordParser
 #eng_parser = StanfordParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
+from nltk.tag import StanfordNERTagger
+eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
 #from algs import base
 import base
@@ -70,8 +72,35 @@ def simp_adjec_sent(tokens, node_list):
 
             #import pdb; pdb.set_trace()
             nsubj_ind = nd[4]['nsubj'][0]
+            nsubj_compound_list = []
+            for _nd in node_list: #BUG
+                if nsubj_ind == _nd[0]:
+                     nsubj_dict = _nd[4]
+                     if ('compound' in nsubj_dict.keys()):
+                         nsubj_compound_list = nsubj_dict['compound']
+                     break
 
-            nsubj = tokens[nsubj_ind]
+            #nsubj = tokens[nsubj_ind]
+            # get the nsubj
+            nsubj = ""
+            #import pdb; pdb.set_trace()
+            for i in nsubj_compound_list:
+                nsubj = nsubj + " " + tokens[i]
+            nsubj = nsubj + " " + tokens[nsubj_ind]
+            nsubj = nsubj[0].upper() + nsubj[1:] + " "
+
+            person_taggers = []
+            org_taggers = []
+            # replace the nsubj with "he/she"
+            for token, title in eng_tagger.tag(tokens):
+                if token in nsubj:
+                    if title == 'PERSON':
+                        person_taggers.append(token)
+                    elif title == 'ORGANIZATION':
+                        org_taggers.append(token)
+                    else:
+                        org_taggers.append(token)
+
             nsubj_dict = {}
             det_ind = 0
             for _nd in node_list[1:]: #BUG
@@ -158,9 +187,11 @@ def simp_adjec_sent(tokens, node_list):
                     _str2 = tokens[root_ind:]
                    #w = _w + ' '
                     if cop_ind > 0:
-                        str2 = base.upper_first_char(nsubj) + " " + tokens[cop_ind] + " " + ' '.join(_str2)
+                        #str2 = base.upper_first_char(nsubj) + " " + tokens[cop_ind] + " " + ' '.join(_str2)
+                        str2 = nsubj + " " + tokens[cop_ind] + " " + ' '.join(_str2)
                     else:
-                        str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
+                        #str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
+                        str2 = nsubj + " " + ' '.join(_str2)
                    #print "2nd sent: ", str2
 
                     strs = str2 + ' ' + str1 + " ."
@@ -285,7 +316,7 @@ def main():
     # adjectival Clauses
     sent = "Peter, who liked fruits, ate an apple."
     #Sent = "I ate fish and he drank wine."
-    #sent = "The apple, which Peter ate, was red."
+    sent = "The apple, which Peter ate, was red."
     #sent = "Peter, whom I know, came."
 
     #sent = "Peter, to whom I talked, came."

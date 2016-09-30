@@ -43,8 +43,8 @@ def _Stem(sub_sent,edblist):
 	#words = nltk.word_tokenize(sub_sent)
 	words = StanfordTokenizer().tokenize(str(sub_sent))
 	tokens = st.tag(words)
-	print "tokens: ", tokens
-        print "sub_sent: ", sub_sent
+	#print "tokens: ", tokens
+        #print "sub_sent: ", sub_sent
 	#tokens = "nltk.pos_tag(words)
 
  	"""
@@ -67,7 +67,7 @@ def _Stem(sub_sent,edblist):
         org_taggers = words[nsubj_ind-1]
         """
         nsubj_ind = 1
-        if len(words) >0:
+        if len(words) > 0:
                 nsubj_taggers = words[nsubj_ind-1]
         else:
                 nsubj_taggers = ""
@@ -80,7 +80,7 @@ def _Stem(sub_sent,edblist):
         n_tag =['NN', 'NNS', 'NNP', 'NNPS']
 
         #import pdb; pdb.set_trace()
-        _taggers =[]
+        _taggers = []
 	for e in tokens:
 		if e[1] not in pos:
 			temp = e[0].lower()
@@ -115,6 +115,7 @@ def _Stem(sub_sent,edblist):
         if nsubj_taggers in _taggers:
                 taggers.append(nsubj_taggers)
                 
+        """
         person_taggers = []
         org_taggers = []
         for token, title in eng_tagger.tag(words):
@@ -125,9 +126,9 @@ def _Stem(sub_sent,edblist):
                                 org_taggers.append(token)
                         else:
                                 org_taggers.append(token)
-                                              
+        """                                     
 	#import pdb; pdb.set_trace()
-	return sub_words, word_pre, person_taggers, org_taggers
+	return sub_words, word_pre, taggers
 
 def Initial(fin): #load EDB_List
 	flist = open(fin,'r')
@@ -145,7 +146,7 @@ def Generate_candidates_topN(target_word,sent,N,edblist):
 	tsum = 0
 	temp = []
 	for e in result:
-		if tsum == N : break
+		if tsum == N: break
 		if e[0] in edblist:
 			temp.append(e[0])
 			tsum = tsum + 1
@@ -180,23 +181,14 @@ def _process_args():
     return parser.parse_args(sys.argv[1:])
 
 def _interface(sentence,edblist):
-	target_words, word_pre, person_taggers, org_taggers =  _Stem(sentence,edblist)
+	target_words, word_pre, taggers =  _Stem(sentence,edblist)
 	token_list =[]
  
         #import pdb; pdb.set_trace()
 	for word in word_pre:
 	        tokens = {}
-                if word in person_taggers: # is a person, subject?
-                        if  isplural(word): # plural
-                                tokens[word] = [word, "They"]
-                        else:
-                                tokens[word] = [word, "He", "She"]
-
-                elif word in org_taggers:
-                        if  isplural(word):
-                                tokens[word] = [word, "They"]
-                        else:
-                                tokens[word] = [word, "It"]
+                if word == "He": # is a person, subject?
+                        tokens[word] = ["He", "She"]
 
                 else:
                         if word not in target_words:
