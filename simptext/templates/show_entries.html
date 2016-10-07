@@ -77,11 +77,32 @@ $(function() {
     $('#undo-6').remove();
   }); 
 
+  document.getElementById("wordinput").value = localStorage.getItem("words");
+  $('#wordinput').change(function() { 
+    var words = document.getElementById("wordinput").value;
+    //console.log(words)
+    //if (words == "") {
+    //    alert("Please enter words in first!");
+    //    return false;
+    //}
+    //if (words != "") {
+    localStorage.setItem("words", words);
+    //alert("Your words has been saved!");
+    //}
+    location.reload();
+    //return false;
+    //return true;
+  });
+
+
   var selectedItem = sessionStorage.getItem("SelectedItem");  
   $('#wordlevel').val(selectedItem);
+  console.log(selectedItem)
+  //sessionStorage.setItem("SelectedItem", "4");
 
   $('#wordlevel').change(function() { 
     var dropVal = $(this).val();
+    //console.log(dropVal)
     sessionStorage.setItem("SelectedItem", dropVal);
   });
 
@@ -90,7 +111,7 @@ $(function() {
 </script>
 
 {% if session.logged_in %}
-    <form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry>
+    <form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry ">
       <dl>
         <dt>Input:
         <dd><textarea name=input rows=4 cols=60></textarea> 
@@ -294,7 +315,10 @@ $(function() {
     <br/>
       <dl>
         <dt>The wordlist:
+        <input type="text" name="wordinput" id="wordinput" value=""/>
+        <!--
         <dd><textarea name=wordinput rows=1 cols=35></textarea>
+        -->
         <dt>{{ form.wordlevel.label }}  
         <dd> {{ form.wordlevel }}       
       </dl>

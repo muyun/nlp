@@ -11,7 +11,8 @@
 
 """
 
-import sys, re, codecs
+import os, sys, re, codecs
+sys.path.insert(0, os.path.abspath('..'))
 
 from bs4 import BeautifulSoup
 
@@ -44,6 +45,8 @@ def read_xlsx_file(filename, sheetnums, columnnum):
 
     #import pdb; pdb.set_trace()
     sheet_names = wb.get_sheet_names()[0:sheetnums]
+
+    #import pdb; pdb.set_trace()
     #sheet1 = wb.get_sheet_by_name('level 1')
     # sheet2 = wb.get_sheet_by_name('level 2')
     #sheet = wb.get_sheet_by_name(sheets_names)
@@ -901,15 +904,17 @@ def simp_syn_sent(sent):
                                     alg = "adjec"
                                     return strs, alg
                                 else:
-                                    strs = passive.simp_passive_sent(tokens, node_list)
+                                    strs = coordi.simp_coordi_sent(tokens, node_list)
                                     if len(strs) > 0:
-                                        alg = "passive"
+                                        alg = "coordi"
                                         return strs, alg
+                                    """
                                     else:
-                                        strs = coordi.simp_coordi_sent(tokens, node_list)
+                                        strs = passive.simp_passive_sent(tokens, node_list)
                                         if len(strs) > 0:
-                                            alg = "coordi"
+                                            alg = "passive"
                                             return strs, alg
+                                    """
 
     return strs, alg
 
@@ -1120,8 +1125,31 @@ def main():
     entries = "Peter - nobody guessed it – showed up ."
     entries = "John Nash, a mathematician, lectured at Princeton."
     #entries = "Nash was  a mathematician  ."
+    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    entries = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
+    entries = "Harry also becomes the worthy possessor of the remaining Deathly Hallows : the Invisibility Cloak and the Resurrection Stone , hence becoming the true Master of Death ."
+    entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
+    #entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    entries ="By 1960 he had developed the short story into a screenplay , and envisaged it as containing a suitable role for Monroe ."
+    entries = "Brief additional internal links are generally tolerated when used to facilitate communication or to provide general information , but undesirable if seen as canvassing for some purpose ."
+    entries = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
+    entries = "The Pennines constitute the main watershed in northern England , dividing the eastern and western parts of the country ."
+    entries = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
+    entries = "At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake ."
+    #entries = "Specialized English operates in the civil society sector , and the developers aspire to make programs for a variety of public service purposes , subject to resources being available ."
+    entries = "Realising that the gang could not elude the police forever , Moondyne Joe formulated a plan to escape the colony by traveling overland to the colony of South Australia ."
+    entries = "Southeastern Oklahoma , also known by its official tourism designation , Kiamichi Country , encompasses the southeastern quarter of the state of Oklahoma ."
+    entries = "Radames affirms that Aida is the person he will marry , and Aida convinces him to flee to the desert with her ."
+    entries = "The latter means basic or radical change ; whereas reform may be no more than fine tuning , or at most redressing serious wrongs without altering the fundamentals of the system ."
+    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
+    entries = "foods left unused too long will often acquire substantial amounts of bacterial colonies and become dangerous to eat , leading to food poisoning ."
+    entries = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
     re, alg = simp_syn_sent(entries)
-    #_get_split_ret(entries)
+    print(alg)
+    if len(re) > 0:
+        info = _get_split_ret(re)
     #print(re)
     #print(alg)
 

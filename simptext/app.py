@@ -122,13 +122,13 @@ def show_entries():
 
                 if len(s1_child) > 0:
                     s1_output = wordcal.check_word(s1, words)
-                    #s1_child_output = wordcal.check_word(s1_child, words)
+                    s1_child_output = wordcal.check_word(s1_child, words)
                 else:
                     s1_output = wordcal.check_word(s1, words)
 
                 if len(s2_child) > 0: 
                     s2_output = wordcal.check_word(s2, words) 
-                    #s2_child_output = wordcal.check_word(s2_child, words) 
+                    s2_child_output = wordcal.check_word(s2_child, words) 
                 else:
                     s2_output = wordcal.check_word(s2, words)
         

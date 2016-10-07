@@ -173,7 +173,13 @@ def simp_coordi_sent(tokens, node_list):
                         
                     if ('nsubjpass' in _nd[4].keys()):
                         conj_nsubj_ind = _nd[4]['nsubjpass'][0]
-                        conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind])
+                        neg_id = 0
+                        for nnd in node_list[1:]:
+                            if conj_nsubj_ind == nnd[0]:
+                                if ('neg' in nnd[4].keys()):
+                                    neg_id = nnd[4]['neg'][0]
+                        conj_nsubj = tokens[neg_id] + " " + tokens[conj_nsubj_ind]
+                        conj_nsubj = base.upper_first_char(conj_nsubj)
                         FLAG = 1
                         
                         #break
@@ -192,20 +198,34 @@ def simp_coordi_sent(tokens, node_list):
                 nsubj_ind = nd[4]['nsubj'][0]
                 nsubj_dict = {}
                 nsubj_compound_list = []
-                for _nd in node_list: #BUG
+                amod_list = []
+                det_ind = 0
+                for _nd in node_list[1:]: #BUG
                     if nsubj_ind == _nd[0]:
                         nsubj_dict = _nd[4]
+                        if ('amod' in nsubj_dict.keys()):
+                            amod_list = nsubj_dict['amod']
                         if ('compound' in nsubj_dict.keys()):
                             nsubj_compound_list = nsubj_dict['compound']
-                        break
+                        if ('det' in nsubj_dict.keys()):
+                            det_ind = nsubj_dict['det'][0]
+                        #break
 
+
+                #import pdb; pdb.set_trace()
+                for j in amod_list:
+                    nsubj = nsubj + " " + tokens[j]
                 for i in nsubj_compound_list:
                     nsubj = nsubj + " " + tokens[i]
-                nsubj = nsubj + " " + tokens[nsubj_ind]
+                if det_ind > 0:
+                    nsubj = tokens[det_ind] + " " + nsubj + " " + tokens[nsubj_ind]
+                else:
+                    nsubj = nsubj + " " + tokens[nsubj_ind]
                 nsubj = nsubj[0].upper() + nsubj[1:] + " "
                 
                 #nsubj =  base.upper_first_char(tokens[nsubj_ind]) + nsubj
-                
+
+                #import pdb; pdb.set_trace()
                 #cop_ind = 0
                 if ('cop' in nd[4].keys()):
                     cop_ind = nd[4]['cop'][0]
@@ -222,7 +242,7 @@ def simp_coordi_sent(tokens, node_list):
             org_taggers = []
             # replace the nsubj with "he/she"
             for token, title in eng_tagger.tag(tokens):
-                if token in nsubj:
+                if token.lower() in nsubj.lower().split():
                     if title == 'PERSON':
                         person_taggers.append(token)
                     elif title == 'ORGANIZATION':
@@ -259,8 +279,10 @@ def simp_coordi_sent(tokens, node_list):
                 if FLAG:
                     #str2 =  nsubj + " ".join(tokens[(cc_ind+1):another_cc_ind]) + " . " + _str2
                     str2 =  conj_nsubj + " ".join(tokens[(conj_nsubj_ind+1):another_cc_ind]) + " . " + _str2
-            """       
-            
+            """
+
+            #import pdb; pdb.set_trace()
+            str2 = ""
             if not FLAG:
                 #_str2 = tokens[cc_ind+1:]
                 if cop_ind: # "is"
@@ -272,7 +294,7 @@ def simp_coordi_sent(tokens, node_list):
                     str2 = "He" + " " + _str2  # 'he' will be replaced with 'he/she'
 
                 elif len(org_taggers) > 0:
-                    if base.isplural(org_taggers.split()[-1]):
+                    if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
                         str2 = "They" + " " + _str2
                     else:
                         str2 = "It" + " " + _str2
@@ -463,6 +485,10 @@ def main():
     #sent = "John Nash is a mathematician and Mary  lectured at Princeton."
     #sent = "Nash was  a mathematician  ."
     #sent = "John Nash, a mathematician, lectured at Princeton."
+    sent = "The companies produces fishes and import them to the other countries."
+    sent = "The storm never approached land during its lifespan , and no damage or casualties were reported ."
+    sent = "Brief additional internal links are generally tolerated when used to facilitate communication or to provide general information , but undesirable if seen as canvassing for some purpose ."
+    sent = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

@@ -13,10 +13,13 @@ from nltk.tokenize import StanfordTokenizer
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
+from nltk.tag import StanfordNERTagger
+eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
+
 from pattern.en import tenses, conjugate
 
-import base
-#from algs import base
+#import base
+from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 COMMA = ','
@@ -47,12 +50,72 @@ def simp_adverb_sent(tokens, node_list):
             #import pdb; pdb.set_trace()
             nsubj = ""
             nsubj_ind = 0
+            det_ind = 0
             if ('nsubj' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubj'][0]
 
+                nsubj_dict = {}
+                nsubj_compound_list = []
+                amod_list = []
+                det_ind = 0
+                #import pdb; pdb.set_trace()
+                for _nd in node_list:
+                    #import pdb; pdb.set_trace()
+                    if (nsubj_ind == _nd[0]):
+                        #import pdb; pdb.set_trace()
+                        nsubj_dict = _nd[4]
+                        if ('amod' in nsubj_dict.keys()):
+                            amod_list = nsubj_dict['amod']
+                        if ('compound' in nsubj_dict.keys()):
+                            nsubj_compound_list = nsubj_dict['compound']
+                        if ('det' in nsubj_dict.keys()):
+                            det_ind = nsubj_dict['det'][0]
+                    #break
+
+                #nsubj = tokens[det_ind] + " " + tokens[nsubj_ind]
+                for j in amod_list:
+                    nsubj = nsubj + " " + tokens[j]
+                for i in nsubj_compound_list:
+                    nsubj = nsubj + " " + tokens[i]
+                if det_ind > 0:
+                    nsubj = tokens[det_ind] + " " + nsubj + " " + tokens[nsubj_ind]
+                else:
+                    nsubj = nsubj + " " + tokens[nsubj_ind]
+
+                nsubj = nsubj[0].upper() + nsubj[1:] + " "
+                
+                #cop_ind = 0
+                if ('cop' in nd[4].keys()):
+                    cop_ind = nd[4]['cop'][0]
+                #import pdb; pdb.set_trace()
+                
             if ('nsubjpass' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubjpass'][0]
-                
+                for _nd in node_list:
+                    #import pdb; pdb.set_trace()
+                    if (nsubj_ind == _nd[0]):
+                        #import pdb; pdb.set_trace()
+                        if ('det' in _nd[4].keys()):
+                            det_ind = _nd[4]['det'][0]
+                            
+                nsubj = tokens[det_ind] + " " + tokens[nsubj_ind]
+
+            person_taggers = []
+            org_taggers = []
+            #import pdb; pdb.set_trace()
+            # replace the nsubj with "he/she"
+            for token, title in eng_tagger.tag(tokens):
+                if token.lower() in nsubj.lower().split():
+                    if token == 'the' or token == 'The': 
+                        continue
+                    if title == 'PERSON':
+                        person_taggers.append(token)
+                    elif title == 'ORGANIZATION':
+                        org_taggers.append(token)
+                    else:
+                        org_taggers.append(token)
+
+            #import pdb; pdb.set_trace()
             advcl_dict = {}
             advcl_tag = ""
             if ('advcl' in nd[4].keys()):
@@ -68,13 +131,18 @@ def simp_adverb_sent(tokens, node_list):
                          break
 
                 #import pdb; pdb.set_trace()
-                #verb = 'be'
-                verb = conjugate("be", tenses(root)[0][0], 3)
+                verb = 'be'
+                #import pdb; pdb.set_trace()
+                if len(tenses(root)) > 0:
+                    verb = conjugate(verb, tenses(root)[0][0], 3)
+                
                 # TODO, the tense
                 if advcl_tag == 'VBN':
-                    nsubj = base.upper_first_char(tokens[nsubj_ind]) + " " + verb + " "
+                    if len(nsubj)>0:
+                        nsubj = nsubj[0].upper() + nsubj[1:] + " " + verb + " "
                 if advcl_tag == 'VBG':
-                    nsubj = base.upper_first_char(tokens[nsubj_ind]) + " "
+                    if len(nsubj)>0:
+                        nsubj = nsubj[0].upper() + nsubj[1:] + " "
 
                 #ASSUME ',' is the splitting tag    
                 split_ind = tokens.index(COMMA)
@@ -83,7 +151,8 @@ def simp_adverb_sent(tokens, node_list):
                     #subj = tokens[nsubj_ind]
                    # tokens.insert(1, base.upper_first_char(subj))
 
-                tokens[advcl_ind]=conjugate(tokens[advcl_ind], tenses(root)[0][0])
+                if len(tenses(root))>0:
+                    tokens[advcl_ind]=conjugate(tokens[advcl_ind], tenses(root)[0][0])
 
                 _str1 = tokens[:(split_ind)]
                 if _str1[-1] in PUNCTUATION:
@@ -96,8 +165,15 @@ def simp_adverb_sent(tokens, node_list):
                 if advcl_tag == 'VBG':
                     str1 = ' '.join(_str1)
                 """
-                    
-                str1 = nsubj + ' '.join(_str1)
+
+                #import pdb; pdb.set_trace()
+                _str1_ = ' '.join(_str1)
+                nsubj = ' '.join(nsubj.split())
+                str1 = ""
+                if nsubj.lower() in _str1_.lower():
+                    str1 = _str1_
+                else:
+                    str1 = nsubj + _str1_
                 #print "1st sent: ", str1
 
                         # upper the 1st char in 2nd sent
@@ -108,15 +184,49 @@ def simp_adverb_sent(tokens, node_list):
                 if split_ind < nsubj_ind:
                     #_str2 = tokens[split_ind+1:] 
                     _str2 = tokens[root_ind:]
+                    if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
+                        _str2 = tokens[split_ind+2:]
                 #_str2 = tokens[root_ind:]
                         #w = _w + ' '
-                    str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
+                    
+                    if len(nsubj)>0:
+                        #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
+                        if len(person_taggers) > 0:
+                            str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
+                        elif len(org_taggers) > 0:
+                            if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
+                                str2 = "They" + " " + ' '.join(_str2)
+                            else:
+                                str2 = "It" + " " + ' '.join(_str2)
+                        else:
+                            pass
+                    else:
+                        str2 = ' '.join(_str2)
                 else:
-                    str2 = base.upper_first_char(tokens[split_ind+1]) + " " + ' '.join(tokens[split_ind+2:])
+                    _str2 = tokens[split_ind+1:]
+                    if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
+                        _str2 = tokens[split_ind+2:]
+                        
+                    if len(nsubj)>0:
+                        #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(tokens[split_ind+1:])
+                        if len(person_taggers) > 0:
+                            str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
+                        elif len(org_taggers) > 0:
+                            if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
+                                str2 = "They" + " " + ' '.join(_str2)
+                            else:
+                                str2 = "It" + " " + ' '.join(_str2)
+                        else:
+                            pass
+                    else:
+                        str2 = ' '.join(tokens[split_ind+2:])
                     
                 #print "2nd sent: ", str2
 
-                strs = str1 + ' . ' + str2
+                if str1:
+                    strs = str1 + ' . ' + str2
+                else:
+                    strs = str2
 
                 return strs    
 
@@ -133,59 +243,91 @@ def simp_adverb_sent(tokens, node_list):
                          xcomp_tag = _nd[2]
                          break
 
-                tokens[xcomp_ind]=conjugate(tokens[xcomp_ind], tenses(root)[0][0])
+                #if len(tenses(root)) > 0:
+                #    tokens[xcomp_ind]=conjugate(tokens[xcomp_ind], tenses(root)[0][0])
 
                 #import pdb; pdb.set_trace()
-                #verb = 'be'
-                verb = conjugate("be", tenses(root)[0][0], 3)
+                verb = 'be'
+
+                #import pdb; pdb.set_trace()
+                if len(tenses(root))>0:
+                    verb = conjugate("be", tenses(root)[0][0], 3)
                 # TODO
                 if xcomp_tag == 'VBN':
-                    nsubj = base.upper_first_char(tokens[nsubj_ind]) + " " + verb + " "
+                    nsubj = nsubj[0].upper() + nsubj[1:] + " " + verb + " "
                 if xcomp_tag == 'VBG':
-                    nsubj = base.upper_first_char(tokens[nsubj_ind]) + " "
+                    nsubj = nsubj[0].upper() + nsubj[1:] + " "
 
                 split_ind = tokens.index(COMMA)
                     #nsubj_ind = nd[4]['nsubj'][0]
                     #if (advcl_ind < split_ind):
                     #subj = tokens[nsubj_ind]
-                   # tokens.insert(1, base.upper_first_char(subj))
-
+                   # tokens.insert(1, base.upper_first_char(subj)) 
 
                 _str1 = tokens[:(split_ind)]
                 if _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
 
                 str1 = ""
+
+                #import pdb; pdb.set_trace()
+                nsubj = ' '.join(nsubj.split())
+                _str1_ = ' '.join(_str1)
                 if xcomp_tag == 'VBN':
-                    str1 = nsubj + ' '.join(_str1)
-                    
+                    if nsubj.lower() in _str1_.lower():
+                        str1 = _str1_
+                    else:
+                        str1 = nsubj + _str1_
                 if xcomp_tag == 'VBG':
-                    str1 = ' '.join(_str1)
+                    if nsubj.lower() in _str1_.lower():
+                        str1 = _str1_
+                    else:
+                        str1 = nsubj + _str1_
+                    #str1 = ' '.join(_str1)
                 #print "1st sent: ", str1
 
                         # upper the 1st char in 2nd sent
                     #tokens[nsubj_ind] = base.upper_first_char(tokens[nsubj_ind])
 
-
                 #import pdb; pdb.set_trace()
                 _str2 = ""
                 if nsubj_ind < split_ind:
                     _str2 = tokens[split_ind+1:]
+                    if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
+                        _str2 = tokens[split_ind+2:]
                     #TODO: update the tense
                     #_str2 = tokens[root_ind:]
                 #_str2 = tokens[split_ind+1:]
                         #w = _w + ' '
-                    str2 = base.upper_first_char(tokens[nsubj_ind]) + " " + ' '.join(_str2)
+                    if len(nsubj)>0:
+                        #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
+                        if len(person_taggers) > 0:
+                            str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
+                        elif len(org_taggers) > 0:
+                            if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
+                                str2 = "They" + " " + ' '.join(_str2)
+                            else:
+                                str2 = "It" + " " + ' '.join(_str2)
+                        else:
+                            pass
+                    else:
+                        str2 = ' '.join(_str2)
+                    #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
                 else:
-                    str2 = base.upper_first_char(tokens[split_ind+1]) + " " + ' '.join(tokens[split_ind+2:])
+                    str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(tokens[split_ind+2:])
                 #str2 = "That" + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
 
-                strs = str1 + ' . ' + str2 + ' . '
+                if str1:
+                    if str2:
+                        strs = str1 + ' . ' + str2 + ' . '
+                    else:
+                        strs = str1 + ' . '
+                else:
+                    strs = str2 + ' . '
 
                 return strs
  
-
     return strs
 
 
@@ -250,6 +392,13 @@ def main():
     #sent = "Despite almost daily reports of missing property , he was able to evade capture until 15 February , when a man named Wimbow , who had been pursuing him with a partner for days , found him in an area of thick brush called Liberty Plains and shot him ."
     #sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
     sent = "Peter, who liked fruits, ate an apple."
+    
+    sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
+    sent = "The Pennines constitute the main watershed in northern England , dividing the eastern and western parts of the country ."
+    sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
+    sent = "At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake ."
+    sent = "Realising that the gang could not elude the police forever , Moondyne Joe formulated a plan to escape the colony by traveling overland to the colony of South Australia ."
+    sent = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

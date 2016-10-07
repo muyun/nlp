@@ -131,7 +131,7 @@ def simp_appos_sent(tokens, node_list):
                         str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
 
                     elif len(org_taggers) > 0:
-                        if base.isplural(org_taggers.split()[-1]):
+                        if base.isplural(org_taggers[-1]):
                             str2 = "They" + " " + ' '.join(_str2)
                         else:
                             str2 = "It" + " " + ' '.join(_str2)
