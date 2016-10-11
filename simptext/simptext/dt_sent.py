@@ -1142,10 +1142,7 @@ def main():
     entries = "Radames affirms that Aida is the person he will marry , and Aida convinces him to flee to the desert with her ."
     entries = "The latter means basic or radical change ; whereas reform may be no more than fine tuning , or at most redressing serious wrongs without altering the fundamentals of the system ."
     entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
-    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
-    entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
-    entries = "foods left unused too long will often acquire substantial amounts of bacterial colonies and become dangerous to eat , leading to food poisoning ."
-    entries = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
+    
     re, alg = simp_syn_sent(entries)
     print(alg)
     if len(re) > 0:

@@ -3,7 +3,12 @@
    print the split rate
 
 """
-import sys, re, codecs, csv
+import sys
+import re
+import codecs
+import csv
+import string
+
 from collections import OrderedDict
 
 import nltk.corpus
@@ -14,7 +19,6 @@ from nltk.corpus import wordnet
 import dt_sent
 #import wordcal
 
-import string
 import difflib
 
 # the English stopwords and extend with punctuation
@@ -202,6 +206,17 @@ def is_similar(sent1, sent2):
         return False
 
 
+def all_same(sent1, sent2):
+    tokens1 = StanfordTokenizer().tokenize(sent1.lower())
+    tokens2 = StanfordTokenizer().tokenize(sent2.lower())
+
+    #import pdb; pdb.set_trace()
+    if tokens1 == tokens2:
+        return True
+    else:
+        return False
+
+
 def cal_mturk_sent(filename, gt):
     f = open(filename, 'rU')
     _num_output = 0
@@ -215,7 +230,7 @@ def cal_mturk_sent(filename, gt):
     _num_false_negative = 0
     _num_true_positive = 0
     num_positive = 0
-    num = 0
+    num = 1
     len_input = 0
     len_output = 0
     _input = ""
@@ -223,6 +238,8 @@ def cal_mturk_sent(filename, gt):
     _gen = ""
     algs = ""
     output = OrderedDict()
+
+    #import pdb; pdb.set_trace()
     for line in f:
         line = line.strip('\n')
 
@@ -233,7 +250,7 @@ def cal_mturk_sent(filename, gt):
                 pass
             else:
                 _input = line
-                len_input = len(re.findall("\w+", line))
+                #len_input = len(re.findall("\w+", line))
             #print "Input: ", line
 
         #import pdb; pdb.set_trace()
@@ -260,7 +277,7 @@ def cal_mturk_sent(filename, gt):
 
             # have the output (complex sentence), consider is as positive
             # increase the standard -> is it similar with the Glod one?
-            if ot and is_similar(ot, gt[num]):
+            if ot and all_same(ot, gt[num]):
                 num_positive = num_positive + 1
                 _sp = ['Y'] # based on similar standard
                 #_gen = ['Y']
@@ -291,12 +308,15 @@ def cal_mturk_sent(filename, gt):
 
             output[num].append(algs)
 
+            print "Input:", _input
+            print "gt:", gt[num]
+            print "ot:", ot
             #import pdb; pdb.set_trace()
-            with codecs.open('mturk_sent_l8.csv', 'a', encoding='utf-8') as outfile:
+            with codecs.open('mturk_sent_l16.csv', 'a', encoding='utf-8') as outfile:
                 wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
                 wr.writerow(output[num])
 
-            Num = num + 1
+            num = num + 1
             if num == 294:
                 break
 
@@ -305,6 +325,7 @@ def cal_mturk_sent(filename, gt):
 
     #import pdb; pdb.set_trace()
             #match = re.search(r'(^(#OUTPUT):(\w*))', line)
+
     print "#num_negative: ", num_negative
     print "#num_false_positive: ", num_false_positive
     print "#num_true_positive: ", num_true_positive
@@ -418,10 +439,14 @@ def main():
     sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India , and situated on the banks of river Ghaghra ."
     sent1 = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India . Faizabad situated on the banks of river Ghaghra ."
     sent2 = "Faizabad is the headquarters of Faizabad District. Faizabad is a municipal board in the state of Uttar Pradesh , India , and Faizabad situated on the banks of river Ghaghra "
-    #print (check_partial_sent_similar(sent1, sent2, 0.5))
-    #print(check_partial_set_sent_similar(sent1, sent2))
-    #print (check_partial_sent_similar(sent1, sent2))
-    #print(is_similar(sent1, sent2))
+
+    # base
+    base_file = dir + "dataset/syntactic_simplification.xlsx"
+    filename = dir + "dataset/simp_syn_l16_.csv"
+
+    #bs = dt_sent.read_xlsx_file(base_file, 1, 1)
+    #md = dt_sent.read_xlsx_file(base_file, 1, 2)
+    #info = cal_base_sent(bs, md, filename)
 
     # recall and precision
     #filename = dir + "utils/testset_groundtruth.md"
@@ -431,16 +456,10 @@ def main():
 
     #filename = dir + "utils/testset/sent_mturk_l4_.md"
     #gt = dt_sent.read_xlsx_file(gt_file, 1, 2)
-    #_info = cal_mturk_sent(sent_file, gt)
-
-
-    # base
-    base_file = dir + "dataset/syntactic_simplification.xlsx"
-    filename = dir + "dataset/simp_syn_13_.csv"
-
-    bs = dt_sent.read_xlsx_file(base_file, 1, 1)
     md = dt_sent.read_xlsx_file(base_file, 1, 2)
-    info = cal_base_sent(bs, md, filename)
+
+    #import pdb; pdb.set_trace()
+    _info = cal_mturk_sent(sent_file, md)
 
 
 if __name__ == '__main__':

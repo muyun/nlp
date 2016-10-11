@@ -16,7 +16,9 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 from nltk.tag import StanfordNERTagger
 eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
-from pattern.en import tenses, conjugate
+from pattern.text.en import tenses, conjugate
+#import inspect
+#print 'inspect.getfile(pattern.en) is:', inspect.getfile(pattern)
 
 #import base
 from algs import base
@@ -27,6 +29,8 @@ COMMA = ','
 def simp_adverb_sent(tokens, node_list):
     strs = ""
 
+
+    import pdb; pdb.set_trace()
     if COMMA not in tokens:
         return strs
 
@@ -120,6 +124,9 @@ def simp_adverb_sent(tokens, node_list):
             advcl_tag = ""
             if ('advcl' in nd[4].keys()):
                 advcl_ind = nd[4]['advcl'][0]
+                if len(tenses(root))>0:
+                    tokens[advcl_ind] = conjugate(tokens[advcl_ind], tenses(root)[0][0], 3)
+
                 #TODO: update the tense of the advcl_ind
                 
                 #import pdb; pdb.set_trace()
@@ -234,6 +241,8 @@ def simp_adverb_sent(tokens, node_list):
             xcomp_ind = 0 
             if ('xcomp' in nd[4].keys()):
                 xcomp_ind = nd[4]['xcomp'][0]
+                if len(tenses(root))>0:
+                    tokens[xcomp_ind] = conjugate(tokens[xcomp_ind], tenses(root)[0][0], 3)
 
                 #import pdb; pdb.set_trace()
                 #advcl_dict = {}
@@ -248,7 +257,6 @@ def simp_adverb_sent(tokens, node_list):
 
                 #import pdb; pdb.set_trace()
                 verb = 'be'
-
                 #import pdb; pdb.set_trace()
                 if len(tenses(root))>0:
                     verb = conjugate("be", tenses(root)[0][0], 3)
@@ -336,6 +344,7 @@ def simp_syn_sent_(sent):
     # the original tokens in the sent
 
     #TODO- bugs here, and will update oneday
+    """
     lst1 = "Peter came, suprising everyone".split()
     _lst = sent.split()
     if lst1 == _lst:
@@ -345,7 +354,7 @@ def simp_syn_sent_(sent):
     _lst2 = "Peter, who liked fruits, ate an apple .".split()
     if lst2 == _lst:
         return "Peter liked fruits. Peter ate an apple."
-
+    """
     #import pdb; pdb.set_trace()
     #print(sent)
     #import pdb; pdb.set_trace()
@@ -399,6 +408,9 @@ def main():
     sent = "At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake ."
     sent = "Realising that the gang could not elude the police forever , Moondyne Joe formulated a plan to escape the colony by traveling overland to the colony of South Australia ."
     sent = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
+    sent = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    sent = "Foods left unused too long will often acquire substantial amounts of bacterial colonies and become dangerous to eat , leading to food poisoning ."
+   
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 
