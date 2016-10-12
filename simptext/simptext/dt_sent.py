@@ -1142,6 +1142,8 @@ def main():
     entries = "Radames affirms that Aida is the person he will marry , and Aida convinces him to flee to the desert with her ."
     entries = "The latter means basic or radical change ; whereas reform may be no more than fine tuning , or at most redressing serious wrongs without altering the fundamentals of the system ."
     entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
+    entries = "Later describing the experience as a `` nightmare , '' she was able to phone Joe DiMaggio from the clinic , who immediately traveled from Florida to New York to facilitate her transfer to the Columbia Presbyterian Medical Center , where she remained for three weeks ."
+    
     
     re, alg = simp_syn_sent(entries)
     print(alg)

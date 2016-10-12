@@ -312,7 +312,7 @@ def cal_mturk_sent(filename, gt):
             print "gt:", gt[num]
             print "ot:", ot
             #import pdb; pdb.set_trace()
-            with codecs.open('mturk_sent_l16.csv', 'a', encoding='utf-8') as outfile:
+            with codecs.open('mturk_sent_l17.csv', 'a', encoding='utf-8') as outfile:
                 wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
                 wr.writerow(output[num])
 
@@ -428,7 +428,7 @@ def main():
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
-    sent_file = dir + "tests/sent_mturk_l16_.md"
+    sent_file = dir + "tests/sent_mturk_l17_.md"
     gt_file = dir + "dataset/simplify_testset_0814.xlsx"
 
     #_info = print_mturk_sent(filename, sent_file)
@@ -442,7 +442,7 @@ def main():
 
     # base
     base_file = dir + "dataset/syntactic_simplification.xlsx"
-    filename = dir + "dataset/simp_syn_l16_.csv"
+    filename = dir + "dataset/simp_syn_l17_.csv"
 
     #bs = dt_sent.read_xlsx_file(base_file, 1, 1)
     #md = dt_sent.read_xlsx_file(base_file, 1, 2)

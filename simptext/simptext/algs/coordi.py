@@ -161,7 +161,6 @@ def simp_coordi_sent(tokens, node_list):
             for _nd in node_list[1:]:
                 if conj_ind == _nd[0]: # the first cc
                     if ('nsubj' in _nd[4].keys()):
-
                         #import pdb; pdb.set_trace()
                         # another subj :THE ASSUME
                         #nsubj_ind = conj_ind - 1
@@ -231,13 +230,24 @@ def simp_coordi_sent(tokens, node_list):
                     cop_ind = nd[4]['cop'][0]
                 #nsubj = base.upper_first_char(tokens[nsubj_ind]) + tokens[cop_ind]
 
+
+            #import pdb; pdb.set_trace()
+            auxpass_ind = 0
             if ('nsubjpass' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubjpass'][0]
-                nsubj = base.upper_first_char(tokens[nsubj_ind]) + nsubj
+                for _nd in node_list:
+                    if root_ind == _nd[0] and  ('auxpass' in _nd[4].keys()):
+                            auxpass_ind = nd[4]['auxpass'][0]
+                            
+            if auxpass_ind > 0:              
+                nsubj = base.upper_first_char(tokens[nsubj_ind]) + " " + tokens[auxpass_ind] + " " + nsubj
+            
 
+            #import pdb; pdb.set_trace()
             #print "cc_node: ", nd[4]['cc']
             cc_ind = nd[4]['cc'][0]
 
+            """
             person_taggers = []
             org_taggers = []
             # replace the nsubj with "he/she"
@@ -249,7 +259,7 @@ def simp_coordi_sent(tokens, node_list):
                         org_taggers.append(token)
                     else:
                         org_taggers.append(token)
-
+            """
             # 1st str1
             # remove the conjunction word
 
@@ -265,7 +275,10 @@ def simp_coordi_sent(tokens, node_list):
             else:# we can add ' . ' as the end of the 1st sentence
                 tokens[cc_ind] = '.'
 
-            str1 = nsubj + " ".join(tokens[(nsubj_ind+1):(cc_ind+1)])
+            if auxpass_ind > 0:
+                str1 = nsubj + " ".join(tokens[(auxpass_ind+1):(cc_ind+1)])
+            else:
+                str1 = nsubj + " ".join(tokens[(nsubj_ind+1):(cc_ind+1)])
 
             #NOTICE: We can consider the next word after the conjunction as the first word of 2nd sentence
             # str2
@@ -289,7 +302,8 @@ def simp_coordi_sent(tokens, node_list):
                     _str2 = tokens[cop_ind] + " " + " ".join(tokens[cc_ind+1:])
                 else:
                     _str2 = " ".join(tokens[cc_ind+1:])
-                    
+
+                """
                 if len(person_taggers) > 0:
                     str2 = "He" + " " + _str2  # 'he' will be replaced with 'he/she'
 
@@ -300,7 +314,10 @@ def simp_coordi_sent(tokens, node_list):
                         str2 = "It" + " " + _str2
                 else:
                     pass
-
+                """
+                nsubj = base.replace_nsubj(tokens, nsubj)
+                str2 = nsubj + _str2
+                
             else:
                 str2 = conj_nsubj + " " + " ".join(tokens[(conj_nsubj_ind + 1):])
                 

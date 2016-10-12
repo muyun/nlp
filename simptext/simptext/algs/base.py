@@ -3,6 +3,7 @@
    utils.base
    ~~~~~~~~~~
    base common function
+   define some linguistics rules
 """
 from itertools import chain
 from collections import defaultdict
@@ -10,6 +11,8 @@ from collections import defaultdict
 from nltk.stem.wordnet import WordNetLemmatizer
 lmtzr = WordNetLemmatizer()
 
+from nltk.tag import StanfordNERTagger
+eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
 """
 from nltk.parse.stanford import StanfordDependencyParser
@@ -70,6 +73,49 @@ def get_triples(node):
             yield triple
     """
 
+
+def replace_nsubj(tokens, nsubj):
+    """ update the subj of the sentence """
+    person_taggers = []
+    org_taggers = []
+    for token, title in eng_tagger.tag(tokens):
+        if token.lower() in nsubj.lower().split():
+            if token == 'the' or token == 'The': 
+                    continue
+            if title == 'PERSON':
+                    person_taggers.append(token)
+            elif title == 'ORGANIZATION':
+                    org_taggers.append(token)
+            else:
+                    org_taggers.append(token)
+
+    nsubj2 = ""
+    if len(nsubj)>0:
+        if (('it' not in nsubj.lower()) or ('they' not in nsubj.lower())):
+            nsubj2 = nsubj
+        else:
+            if len(person_taggers) > 0:
+                nsubj2 = "He"   # 'he' will be replaced with 'he/she'
+            elif len(org_taggers) > 0:
+                if isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
+                    str2 = "They" 
+                else:
+                    str2 = "It"
+            else:
+                pass
+        
+    return nsubj2 + " "
+
+
+def include_aux(node_list, root_ind, nsubj):
+    """ update the nsubj"""
+    auxpass_ind = 0
+    for nd in node_list:
+        if root_ind == nd[0]:
+            if ('auxpass' in nd[4].keys()):
+                    auxpass_ind = nd[4]['auxpass'][0]
+    return nsubj     
+        
 
 def update_vb_conjugation(v, v1):
     """ update the verb conjugation of v based on v1's tense """

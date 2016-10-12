@@ -16,12 +16,12 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 from nltk.tag import StanfordNERTagger
 eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
-from pattern.text.en import tenses, conjugate
+from pattern.en import tenses, conjugate
 #import inspect
 #print 'inspect.getfile(pattern.en) is:', inspect.getfile(pattern)
 
-#import base
-from algs import base
+import base
+#from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 COMMA = ','
@@ -29,8 +29,7 @@ COMMA = ','
 def simp_adverb_sent(tokens, node_list):
     strs = ""
 
-
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     if COMMA not in tokens:
         return strs
 
@@ -104,6 +103,7 @@ def simp_adverb_sent(tokens, node_list):
                             
                 nsubj = tokens[det_ind] + " " + tokens[nsubj_ind]
 
+            """
             person_taggers = []
             org_taggers = []
             #import pdb; pdb.set_trace()
@@ -118,7 +118,7 @@ def simp_adverb_sent(tokens, node_list):
                         org_taggers.append(token)
                     else:
                         org_taggers.append(token)
-
+            """
             #import pdb; pdb.set_trace()
             advcl_dict = {}
             advcl_tag = ""
@@ -195,25 +195,29 @@ def simp_adverb_sent(tokens, node_list):
                         _str2 = tokens[split_ind+2:]
                 #_str2 = tokens[root_ind:]
                         #w = _w + ' '
-                    
+                    """
                     if len(nsubj)>0:
-                        #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
-                        if len(person_taggers) > 0:
-                            str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
-                        elif len(org_taggers) > 0:
-                            if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
-                                str2 = "They" + " " + ' '.join(_str2)
-                            else:
-                                str2 = "It" + " " + ' '.join(_str2)
+                        if (('it' not in nsubj.lower()) or ('They' not in nsubj.lower())):
+                            str2 = nsubj + " " + ' '.join(_str2)
                         else:
-                            pass
+                        #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
+                            if len(person_taggers) > 0:
+                                str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
+                            elif len(org_taggers) > 0:
+                                if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
+                                    str2 = "They" + " " + ' '.join(_str2)
+                                else:
+                                    str2 = "It" + " " + ' '.join(_str2)
                     else:
                         str2 = ' '.join(_str2)
+                    """
+                    nsubj = base.replace_nsubj(tokens, nsubj)
+                    str2 = nsubj + ' '.join(_str2)
                 else:
                     _str2 = tokens[split_ind+1:]
                     if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
                         _str2 = tokens[split_ind+2:]
-                        
+                    """  
                     if len(nsubj)>0:
                         #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(tokens[split_ind+1:])
                         if len(person_taggers) > 0:
@@ -225,8 +229,12 @@ def simp_adverb_sent(tokens, node_list):
                                 str2 = "It" + " " + ' '.join(_str2)
                         else:
                             pass
+                    
                     else:
                         str2 = ' '.join(tokens[split_ind+2:])
+                    """
+                    nsubj = base.replace_nsubj(tokens, nsubj)
+                    str2 = nsubj + ' '.join(_str2)
                     
                 #print "2nd sent: ", str2
 
@@ -297,7 +305,7 @@ def simp_adverb_sent(tokens, node_list):
                         # upper the 1st char in 2nd sent
                     #tokens[nsubj_ind] = base.upper_first_char(tokens[nsubj_ind])
 
-                #import pdb; pdb.set_trace()
+                import pdb; pdb.set_trace()
                 _str2 = ""
                 if nsubj_ind < split_ind:
                     _str2 = tokens[split_ind+1:]
@@ -307,22 +315,29 @@ def simp_adverb_sent(tokens, node_list):
                     #_str2 = tokens[root_ind:]
                 #_str2 = tokens[split_ind+1:]
                         #w = _w + ' '
+                    """
                     if len(nsubj)>0:
-                        #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
-                        if len(person_taggers) > 0:
-                            str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
-                        elif len(org_taggers) > 0:
-                            if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
-                                str2 = "They" + " " + ' '.join(_str2)
-                            else:
-                                str2 = "It" + " " + ' '.join(_str2)
+                        if (('it' not in nsubj.lower()) or ('they' not in nsubj.lower())):
+                            str2 = nsubj + " " + ' '.join(_str2)
                         else:
-                            pass
+                        #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
+                            if len(person_taggers) > 0:
+                                str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
+                            elif len(org_taggers) > 0:
+                                if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
+                                    str2 = "They" + " " + ' '.join(_str2)
+                                else:
+                                    str2 = "It" + " " + ' '.join(_str2)
+
                     else:
                         str2 = ' '.join(_str2)
-                    #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
+                    """
+                     #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
+                    nsubj = base.replace_nsubj(tokens, nsubj)
+                    str2 = nsubj + ' '.join(_str2)
+                   
                 else:
-                    str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(tokens[split_ind+2:])
+                    str2 = base.upper_first_char(nsubj) + " " + ' '.join(tokens[split_ind+2:])
                 #str2 = "That" + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
 
@@ -343,18 +358,6 @@ def simp_syn_sent_(sent):
     strs = ""
     # the original tokens in the sent
 
-    #TODO- bugs here, and will update oneday
-    """
-    lst1 = "Peter came, suprising everyone".split()
-    _lst = sent.split()
-    if lst1 == _lst:
-        return "Peter came. That surprised everyone."
-
-    lst2 = "Peter, who liked fruits, ate an apple.".split()
-    _lst2 = "Peter, who liked fruits, ate an apple .".split()
-    if lst2 == _lst:
-        return "Peter liked fruits. Peter ate an apple."
-    """
     #import pdb; pdb.set_trace()
     #print(sent)
     #import pdb; pdb.set_trace()
@@ -410,6 +413,9 @@ def main():
     sent = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
     sent = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
     sent = "Foods left unused too long will often acquire substantial amounts of bacterial colonies and become dangerous to eat , leading to food poisoning ."
+    sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
+    #sent = "Refreshed, Peter stood up."
+    sent = "The Pennines constitute the main watershed in northern England , dividing the eastern and western parts of the country ."
    
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
