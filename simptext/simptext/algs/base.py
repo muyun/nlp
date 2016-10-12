@@ -76,6 +76,8 @@ def get_triples(node):
 
 def replace_nsubj(tokens, nsubj):
     """ update the subj of the sentence """
+
+    #import pdb; pdb.set_trace()
     person_taggers = []
     org_taggers = []
     for token, title in eng_tagger.tag(tokens):
@@ -90,17 +92,18 @@ def replace_nsubj(tokens, nsubj):
                     org_taggers.append(token)
 
     nsubj2 = ""
+    #import pdb; pdb.set_trace()
     if len(nsubj)>0:
-        if (('it' not in nsubj.lower()) or ('they' not in nsubj.lower())):
+        if (('it' in nsubj.lower()) or ('they' in nsubj.lower())):
             nsubj2 = nsubj
         else:
             if len(person_taggers) > 0:
                 nsubj2 = "He"   # 'he' will be replaced with 'he/she'
             elif len(org_taggers) > 0:
                 if isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
-                    str2 = "They" 
+                    nsubj2 = "They" 
                 else:
-                    str2 = "It"
+                    nsubj2 = "It"
             else:
                 pass
         
@@ -117,16 +120,6 @@ def include_aux(node_list, root_ind, nsubj):
     return nsubj     
         
 
-def update_vb_conjugation(v, v1):
-    """ update the verb conjugation of v based on v1's tense """
-
-    #import pdb; pdb.set_trace()
-    _v1 = ""
-    _v1 = en_nb.verb.tense(v1)
-    _v = en_nb.verb.present(v, person=verb_map[_v1])
-
-    return _v
-  
 
 def main():
         sent = "Integra-A Hotel  Co. said its planned rights offering to raise about $9 million was declared effective and the company will begin mailing materials to shareholders at the end of this week."

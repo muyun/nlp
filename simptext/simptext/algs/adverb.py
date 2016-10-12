@@ -20,8 +20,8 @@ from pattern.en import tenses, conjugate
 #import inspect
 #print 'inspect.getfile(pattern.en) is:', inspect.getfile(pattern)
 
-#import base
-from algs import base
+import base
+#from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 COMMA = ','
@@ -127,7 +127,7 @@ def simp_adverb_sent(tokens, node_list):
 
                 #import pdb; pdb.set_trace()
                 if len(tenses(root))>0:
-                    tokens[advcl_ind] = conjugate(tokens[advcl_ind], tenses(root)[1][0], 3)
+                    tokens[advcl_ind] = conjugate(tokens[advcl_ind], tenses(root)[0][0], 3)
 
                 #TODO: update the tense of the advcl_ind
                 

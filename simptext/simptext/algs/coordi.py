@@ -239,8 +239,8 @@ def simp_coordi_sent(tokens, node_list):
                     if root_ind == _nd[0] and  ('auxpass' in _nd[4].keys()):
                             auxpass_ind = nd[4]['auxpass'][0]
                             
-            if auxpass_ind > 0:              
-                nsubj = base.upper_first_char(tokens[nsubj_ind]) + " " + tokens[auxpass_ind] + " " + nsubj
+           
+            nsubj = base.upper_first_char(tokens[nsubj_ind]) + " "  + nsubj
             
 
             #import pdb; pdb.set_trace()
@@ -293,28 +293,17 @@ def simp_coordi_sent(tokens, node_list):
                     #str2 =  nsubj + " ".join(tokens[(cc_ind+1):another_cc_ind]) + " . " + _str2
                     str2 =  conj_nsubj + " ".join(tokens[(conj_nsubj_ind+1):another_cc_ind]) + " . " + _str2
             """
-
             #import pdb; pdb.set_trace()
             str2 = ""
             if not FLAG:
-                #_str2 = tokens[cc_ind+1:]
+                _str2 = " ".join(tokens[cc_ind+1:])
                 if cop_ind: # "is"
-                    _str2 = tokens[cop_ind] + " " + " ".join(tokens[cc_ind+1:])
-                else:
-                    _str2 = " ".join(tokens[cc_ind+1:])
+                    _str2 = tokens[cop_ind] + " " + _str2
 
-                """
-                if len(person_taggers) > 0:
-                    str2 = "He" + " " + _str2  # 'he' will be replaced with 'he/she'
-
-                elif len(org_taggers) > 0:
-                    if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
-                        str2 = "They" + " " + _str2
-                    else:
-                        str2 = "It" + " " + _str2
-                else:
-                    pass
-                """
+                if auxpass_ind > 0: # "been"
+                    _str2 = tokens[auxpass_ind] + " " + _str2
+                
+                #import pdb; pdb.set_trace()
                 nsubj = base.replace_nsubj(tokens, nsubj)
                 str2 = nsubj + _str2
                 
