@@ -210,7 +210,7 @@ def all_same(sent1, sent2):
     tokens1 = StanfordTokenizer().tokenize(sent1.lower())
     tokens2 = StanfordTokenizer().tokenize(sent2.lower())
 
-    #import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
     if tokens1 == tokens2:
         return True
     else:
@@ -459,7 +459,7 @@ def main():
     md = dt_sent.read_xlsx_file(base_file, 1, 2)
 
     #import pdb; pdb.set_trace()
-    _info = cal_mturk_sent(sent_file, md)
+    #_info = cal_mturk_sent(sent_file, md)
 
 
 if __name__ == '__main__':

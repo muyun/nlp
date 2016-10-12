@@ -20,8 +20,8 @@ from pattern.en import tenses, conjugate
 #import inspect
 #print 'inspect.getfile(pattern.en) is:', inspect.getfile(pattern)
 
-import base
-#from algs import base
+#import base
+from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 COMMA = ','
@@ -124,8 +124,10 @@ def simp_adverb_sent(tokens, node_list):
             advcl_tag = ""
             if ('advcl' in nd[4].keys()):
                 advcl_ind = nd[4]['advcl'][0]
+
+                #import pdb; pdb.set_trace()
                 if len(tenses(root))>0:
-                    tokens[advcl_ind] = conjugate(tokens[advcl_ind], tenses(root)[0][0], 3)
+                    tokens[advcl_ind] = conjugate(tokens[advcl_ind], tenses(root)[1][0], 3)
 
                 #TODO: update the tense of the advcl_ind
                 
@@ -158,8 +160,8 @@ def simp_adverb_sent(tokens, node_list):
                     #subj = tokens[nsubj_ind]
                    # tokens.insert(1, base.upper_first_char(subj))
 
-                if len(tenses(root))>0:
-                    tokens[advcl_ind]=conjugate(tokens[advcl_ind], tenses(root)[0][0])
+                #if len(tenses(root))>0:
+                #    tokens[advcl_ind]=conjugate(tokens[advcl_ind], tenses(root)[0][0])
 
                 _str1 = tokens[:(split_ind)]
                 if _str1[-1] in PUNCTUATION:
@@ -305,7 +307,7 @@ def simp_adverb_sent(tokens, node_list):
                         # upper the 1st char in 2nd sent
                     #tokens[nsubj_ind] = base.upper_first_char(tokens[nsubj_ind])
 
-                import pdb; pdb.set_trace()
+                #import pdb; pdb.set_trace()
                 _str2 = ""
                 if nsubj_ind < split_ind:
                     _str2 = tokens[split_ind+1:]
@@ -415,7 +417,7 @@ def main():
     sent = "Foods left unused too long will often acquire substantial amounts of bacterial colonies and become dangerous to eat , leading to food poisoning ."
     sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
     #sent = "Refreshed, Peter stood up."
-    sent = "The Pennines constitute the main watershed in northern England , dividing the eastern and western parts of the country ."
+    sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
    
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
