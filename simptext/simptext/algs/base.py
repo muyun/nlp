@@ -20,6 +20,8 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 """
 #import en_nb
 
+from pattern.en import  pluralize, singularize
+
 """
 nodes = defaultdict(lambda:  {'address': None,
                                     'word': None,
@@ -37,6 +39,15 @@ root = None
 verb_map = {
     "3rd singular present": "3rd"
 }
+
+
+def _isplural(w):
+        word = w.lower()
+        singula = singularize(word)
+        if singula == word:
+            return False
+        else:
+            return True
 
 def isplural(w):
         word = w.lower()
@@ -100,8 +111,10 @@ def replace_nsubj(tokens, nsubj):
             if len(person_taggers) > 0:
                 nsubj2 = "He"   # 'he' will be replaced with 'he/she'
             elif len(org_taggers) > 0:
-                if isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
-                    nsubj2 = "They" 
+                if _isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
+                    nsubj2 = "They"
+                elif org_taggers[-1].lower() == 'he':
+                    nsubj2 = "He"
                 else:
                     nsubj2 = "It"
             else:
@@ -147,8 +160,6 @@ def main():
             print(row['word'] + ":" + row['address'] )
         
         """
-        
-        v = update_vb_conjugation('be', 'likes')
 
         
 if __name__ == '__main__':

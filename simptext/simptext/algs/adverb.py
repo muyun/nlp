@@ -418,7 +418,7 @@ def main():
     sent = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
     #sent = "Refreshed, Peter stood up."
     sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
-   
+    sent = "Notrium is played from a top-down perspective , giving an overhead view of proceedings ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

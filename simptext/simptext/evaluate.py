@@ -94,18 +94,22 @@ def print_mturk_sent(filename, sent_file):
             #res = alg.simp_passive_sent(str(re))
             alg = ""
             alg0 = ""
+            _res = "" # this is intermediate result
+            res = ""
             _res, alg0 = dt_sent.simp_syn_sent(str(se))
+            print "S1S2:", _res
             if len(_res)>0:
                 (s1, s1_child, s2, s2_child, res, alg) = dt_sent._get_split_ret(_res)
-                print "res: ", res
+                #print "res: ", res
             else:
                 res = _res
-
+            print "res:", _res
+            
             if _res: # the
                 num_splitted_sentences = num_splitted_sentences + 1
 
             #import pdb; pdb.set_trace()
-            output[se] = res
+            #output[se] = res
             #import pdb; pdb.set_trace()
 
             algs = ""
@@ -114,6 +118,7 @@ def print_mturk_sent(filename, sent_file):
 
             with open(sent_file, 'a') as outfile:
                 outfile.write(str(se)+'\n')
+                outfile.write("S1S2: " + _res + '\n')
                 outfile.write("OUTPUT: " + res + '\n')
                 outfile.write("ALGS: " + algs + '\n')
                 #outfile.write('-----------------------\n')
@@ -244,7 +249,7 @@ def cal_mturk_sent(filename, gt):
         line = line.strip('\n')
 
         #import pdb; pdb.set_trace()
-        if ("OUTPUT" not in line) and ("ALGS" not in line):
+        if ("OUTPUT" not in line) and ("ALGS" not in line) and ("S1S2" not in line):
             match = re.search(r'--+', line)
             if match:
                 pass
@@ -257,6 +262,11 @@ def cal_mturk_sent(filename, gt):
         #elif ("ALGS" in line):
         #    algs_flag = line.split(':')[0]
         #    algs = line.split(':')[1].strip()
+                    
+        elif ("S1S2" in line):
+            s = line.split(':')[1].strip()
+            output[num] = [s]
+            
         elif ("OUTPUT" in line): #
             #print "gt-out: ", gt[num]
             #print "out: ", line
@@ -296,11 +306,13 @@ def cal_mturk_sent(filename, gt):
                 else:
                     num_true_negative = num_true_negative + 1
 
-            output[num] = [_input,
+            
+            output[num].extend([_input,
                          gt[num],
                          ot,
                          _sp,
-                        _gen]
+                        _gen])
+
 
         elif ("ALGS" in line):
             algs_flag = line.split(':')[0]
@@ -312,7 +324,7 @@ def cal_mturk_sent(filename, gt):
             print "gt:", gt[num]
             print "ot:", ot
             #import pdb; pdb.set_trace()
-            with codecs.open('mturk_sent_l17.csv', 'a', encoding='utf-8') as outfile:
+            with codecs.open('mturk_sent_l20.csv', 'a', encoding='utf-8') as outfile:
                 wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
                 wr.writerow(output[num])
 
@@ -428,7 +440,7 @@ def main():
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
-    sent_file = dir + "tests/sent_mturk_l18_.md"
+    sent_file = dir + "tests/sent_mturk_l20_.md"
     gt_file = dir + "dataset/simplify_testset_0814.xlsx"
 
     #_info = print_mturk_sent(filename, sent_file)
@@ -442,7 +454,7 @@ def main():
 
     # base
     base_file = dir + "dataset/syntactic_simplification.xlsx"
-    filename = dir + "dataset/simp_syn_l18_.csv"
+    filename = dir + "dataset/simp_syn_l20_.csv"
 
     #bs = dt_sent.read_xlsx_file(base_file, 1, 1)
     #md = dt_sent.read_xlsx_file(base_file, 1, 2)
@@ -459,7 +471,7 @@ def main():
     md = dt_sent.read_xlsx_file(base_file, 1, 2)
 
     #import pdb; pdb.set_trace()
-    _info = cal_mturk_sent(sent_file, md)
+    #_info = cal_mturk_sent(sent_file, md)
 
 
 if __name__ == '__main__':

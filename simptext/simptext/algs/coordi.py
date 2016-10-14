@@ -18,8 +18,8 @@ eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
 
 #from algs import base
-import base
-#from algs import base
+#import base
+from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -166,8 +166,15 @@ def simp_coordi_sent(tokens, node_list):
                         #nsubj_ind = conj_ind - 1
                         conj_nsubj_ind = _nd[4]['nsubj'][0] # get the nsubj of the conj
                         #conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind]) + nsubj
-                        #conj_nsubj = base.upper_first_char(nsubj)
-                        conj_nsubj = base.upper_first_char(tokens[conj_nsubj_ind])
+                        det_ind = 0
+                        for nnd in node_list[1:]:
+                            if conj_nsubj_ind == nnd[0]:
+                                if ('det' in nnd[4].keys()):
+                                    det_ind = nnd[4]['det'][0]
+
+                        #import pdb; pdb.set_trace()
+                        conj_nsubj = tokens[det_ind] + " " + tokens[conj_nsubj_ind]
+                        conj_nsubj = base.upper_first_char(conj_nsubj)
                         FLAG = 1 # use the subj
                         
                     if ('nsubjpass' in _nd[4].keys()):
@@ -177,6 +184,7 @@ def simp_coordi_sent(tokens, node_list):
                             if conj_nsubj_ind == nnd[0]:
                                 if ('neg' in nnd[4].keys()):
                                     neg_id = nnd[4]['neg'][0]
+
                         conj_nsubj = tokens[neg_id] + " " + tokens[conj_nsubj_ind]
                         conj_nsubj = base.upper_first_char(conj_nsubj)
                         FLAG = 1
@@ -238,9 +246,8 @@ def simp_coordi_sent(tokens, node_list):
                 for _nd in node_list:
                     if root_ind == _nd[0] and  ('auxpass' in _nd[4].keys()):
                             auxpass_ind = nd[4]['auxpass'][0]
-                            
-           
-            nsubj = base.upper_first_char(tokens[nsubj_ind]) + " "  + nsubj
+    
+                nsubj = base.upper_first_char(tokens[nsubj_ind]) + " "  + nsubj
             
 
             #import pdb; pdb.set_trace()
@@ -276,7 +283,7 @@ def simp_coordi_sent(tokens, node_list):
                 tokens[cc_ind] = '.'
 
             if auxpass_ind > 0:
-                str1 = nsubj + " ".join(tokens[(auxpass_ind+1):(cc_ind+1)])
+                str1 = nsubj + " ".join(tokens[(auxpass_ind):(cc_ind+1)])
             else:
                 str1 = nsubj + " ".join(tokens[(nsubj_ind+1):(cc_ind+1)])
 
@@ -495,6 +502,14 @@ def main():
     sent = "The storm never approached land during its lifespan , and no damage or casualties were reported ."
     sent = "Brief additional internal links are generally tolerated when used to facilitate communication or to provide general information , but undesirable if seen as canvassing for some purpose ."
     sent = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
+    sent = "Cobra and Tango and Cash did solid business domestically but overseas they did blockbuster business grossing over $ 100 million in foreign markets and over $ 160 million worldwide ."
+    sent = "He was kidnapped and held by the notorious Pirate Peter Easton in Harbour Grace ."
+    sent = "The topic is controversial and others argue that the 8th or 9th century dates are correct ."
+    sent = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
+    sent = "it is located on the River Pedieos and situated almost in the center of the island  . "
+
+    sent = "He was kidnapped and held by the notorious Pirate Peter Easton in Harbour Grace ."
+    
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 
