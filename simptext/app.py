@@ -58,11 +58,11 @@ def show_entries():
     entries = str(se[0])
     wordlist = str(se[1])
     wordlevel = str(se[2])
-    #algs = str(se[2])
+    algs = str(se[3])
 
     print "wordlist: ", wordlist
     print "wordlevel: ", wordlevel
-    #print "algs: ", algs
+    print "algs: ", algs
     
     if len(wordlist) > 0:
         _words = []
@@ -83,7 +83,7 @@ def show_entries():
             if int(wordlevel) == 4:
                 words = list(_words) + list(word4)
                 #print "words4: ", words
-    else:
+    elif len(wordlevel) > 0:
     	if int(wordlevel) == 1:
     		words = word1
         if int(wordlevel) == 2:
@@ -91,7 +91,9 @@ def show_entries():
         if int(wordlevel) == 3:
     		words = word3	
     	if int(wordlevel) == 4:
-    		words = word4	
+    		words = word4
+    else:
+        pass	
     
     #print "words: ", words
     #print "words: ", words
@@ -110,28 +112,34 @@ def show_entries():
     if len(entries) > 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
-        _syn_ret, alg1 = dt_sent.simp_syn_sent(entries)
+        _syn_ret, alg1 = dt_sent.simp_syn_sent(entries, algs)
         #BUG here, todo
         if len(_syn_ret) > 0:
-            #print "S1"            
-            (s1, s1_child, s2, s2_child, syn_ret, algs) = dt_sent._get_split_ret(_syn_ret)
+            #print "S1" 
             
+            (s1, s1_child, s2, s2_child, syn_ret, algs) = dt_sent.get_split_ret(_syn_ret)
+
+            s1_output = wordcal.check_word(s1, words)
+            s2_output = wordcal.check_word(s2, words)
+
+            """
+            (s1, s1_child, s2, s2_child, syn_ret, algs) = dt_sent._get_split_ret(_syn_ret)
             if len(syn_ret) > 0: # there is the child - 3 layers
                 #outputs = utils.wordcal.check_word_(syn_ret, words)
                 #s_outputs = wordcal.check_word(_syn_ret, words)
 
                 if len(s1_child) > 0:
                     s1_output = wordcal.check_word(s1, words)
-                    s1_child_output = wordcal.check_word(s1_child, words)
+                    #s1_child_output = wordcal.check_word(s1_child, words)
                 else:
                     s1_output = wordcal.check_word(s1, words)
 
                 if len(s2_child) > 0: 
                     s2_output = wordcal.check_word(s2, words) 
-                    s2_child_output = wordcal.check_word(s2_child, words) 
+                    #s2_child_output = wordcal.check_word(s2_child, words) 
                 else:
                     s2_output = wordcal.check_word(s2, words)
-        
+            """
         s_outputs = wordcal.check_word(entries, words)          
     
     print "s1_output: ", s1_output
@@ -149,16 +157,26 @@ def add_entry():
     if not session.get('logged_in'):
         abort(401)
 
+    form = EntryForm()
     txt = request.form['input']
     print "input: ", txt
+
+    #form = SelectForm()
     words = request.form['wordinput']
     wordlevel = request.form['wordlevel']
+    #txt = request.form['text']
+    #wordlevel = request.form['wordlevel']
+    #txt = form.input.data
+    #words = form.wordinput.data
+    #wordlevel = form.wordlevel.data
+    
+    algs0 = form.algs.data
+    #print "algs0: ", algs0
+    alg = ' '.join(str(e) for e in algs0)
     #wordlist = ""
     #_wordlist = request.form['words']
-    #print "wordlist: ", _wordlist
-    #print 'txt: ', txt
-    #print "wordlist: ", wordlist
-    db.session.add(models.Entry(txt, words, wordlevel))
+
+    db.session.add(models.Entry(txt, words, wordlevel, alg))
     db.session.commit()
 
     flash('New entry was successfully posted')
@@ -195,6 +213,7 @@ def setting():
         abort(401)
 
     form = SelectForm()
+    #form = EntryForm()
     wordinput = ""
     if request.method == 'POST':
     	"""
@@ -215,7 +234,7 @@ def setting():
         #print "wordinput: ", words
         #print "wordlist: ", form.wordlist.data
         #print "wordlevel: ", wordlevel
-        print "algs: ", algs
+        #print "algs: ", algs
 
         db.session.add(models.Setting(words, wordlevel, algs))
         db.session.commit()

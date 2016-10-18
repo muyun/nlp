@@ -830,7 +830,7 @@ def simp_coinco_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences    
 
 
-def simp_syn_sent(sent):
+def simp_syn_sent(sent, algs=[1,2,3,4,5,6,7]):
     strs = ""
 
     """
@@ -952,18 +952,61 @@ def split_sent(entries):
     print "algs: ", alg0 + "@" + algs
         
 
-def get_split_ret(sents):
+def get_split_ret(_str):
     #
-    ret = ""
-    for sent in sents.split('.'):
-        if len(sent) != 0:
-            print "sent: ", sent
-            _ret = _get_split_ret(str(sent))
-            print "_ret: ", _ret
-            ret = ret + str(_ret)
-            print "ret: ", ret
+    print "S1+S2: ", _str
+    syn_ret = ""
 
-    return ret
+    _strs = _str.split('.')
+
+    s1 = _strs[0] + ' . '
+    print "S1: ", s1
+    s1_child = ""
+    s2 = ""
+    s2_child = ""
+    #syn_ret = ""
+    algs = ""
+
+    #import pdb; pdb.set_trace()
+    if len(_strs) == 1 or len(_strs[1]) == 0:
+        return (s1, s1_child, s2, s2_child, _str, algs)
+    """
+    s1_child, alg1 = simp_syn_sent(s1)
+    print "S11+S12: ", s1_child
+    print "alg1: ", alg1
+    """
+    #print "str2: ", _strs[1]
+
+    #import pdb; pdb.set_trace()
+    s2 = _strs[1] + ' .'
+    print "S2: ", s2
+    """
+    s2_child, alg2 = simp_syn_sent(s2)
+    print "S21+S22: ", s2_child
+    print "alg2: ", alg2
+
+    if len(s1_child)>0: # syn_ret1
+        if len(s2_child)>0: # syn_ret2
+            syn_ret = s1_child + s2_child
+            print "1+2: ", syn_ret
+        else:
+            syn_ret = s1_child + s2 
+            print "1+in+2: ", syn_ret
+    else:
+        if len(s2_child)>0:
+            syn_ret = s1 + s2_child
+            print "in+1+2: ", syn_ret
+        else:
+            syn_ret = _str 
+            print "in+1+in+2: ", syn_ret   
+    
+    print "Syntactic result: ", syn_ret
+    """
+    #algs = alg1 + "@" + alg2
+
+    return (s1, s1_child, s2, s2_child, syn_ret, algs)
+
+
 
 def _get_split_ret(_str):
     print "S1+S2: ", _str

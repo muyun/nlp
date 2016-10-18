@@ -97,7 +97,7 @@ $(function() {
 
   var selectedItem = sessionStorage.getItem("SelectedItem");  
   $('#wordlevel').val(selectedItem);
-  console.log(selectedItem)
+  //console.log(selectedItem)
   //sessionStorage.setItem("SelectedItem", "4");
 
   $('#wordlevel').change(function() { 
@@ -313,15 +313,22 @@ $(function() {
     <br/>
     <br/>
     <br/>
-      <dl>
-        <dt>The wordlist:
-        <input type="text" name="wordinput" id="wordinput" value=""/>
-        <!--
-        <dd><textarea name=wordinput rows=1 cols=35></textarea>
-        -->
-        <dt>{{ form.wordlevel.label }}  
-        <dd> {{ form.wordlevel }}       
-      </dl>
+      <div class ="dropdown">
+        <button class="dropbtn">Setting</button>
+        <dl>
+        <div class="dropdown-content">
+           <dt>The wordlist:
+           <input type="text" name="wordinput" id="wordinput" value=""/>
+           <br/> 
+           <dt>{{ form.wordlevel.label }}  
+           <dd> {{ form.wordlevel }} 
+           <br/> 
+           <br/> 
+           <dt>{{ form.algs.label }}    
+           <dd>{{ form.algs }} 
+        </div>    
+        </dl>
+      </div>
     </form>
 
   {% else %}

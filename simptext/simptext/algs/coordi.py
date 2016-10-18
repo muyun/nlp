@@ -18,8 +18,8 @@ eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
 
 #from algs import base
-#import base
-from algs import base
+import base
+#from algs import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 

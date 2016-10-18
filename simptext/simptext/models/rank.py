@@ -188,11 +188,11 @@ def _interface(sentence,edblist):
 	for word in word_pre:
 	        tokens = {}
                 if word == "He": # is a person, subject?
-                	tokens[word] = [word, "He", "She"]
+                        tokens[word] = [ "He", "She"]
                 elif word == "They":
-                	tokens[word] = [word, "They"]
+                        tokens[word] = [ "They"]
                 elif word == "It":
-                	tokens[word] = [word, "It"]
+                        tokens[word] = [ "It"]
                 else:
                         if word not in target_words:
                                 token_list.append(word)

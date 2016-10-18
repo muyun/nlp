@@ -49,7 +49,13 @@ Cobra and Tango and Cash did solid business domestically .  they did blockbuster
 
 ##### ex3
 
-At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake .  at present it is formed by the aa.  it descends from the rigi and enters the southern extremity of the lake.  At presented it is formed by the Aa  .   it descends from the Rigi .   it  enters the southern extremity of the lake .  At presented it is formed by the Aa . it descends from the Rigi and enters the southern extremity of the lake . ['N'] adverb@@coordi                         
+At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake . 
+
+ at present it is formed by the aa.  it descends from the rigi and enters the southern extremity of the lake.  At presented it is formed by the Aa  .  
+
+  it descends from the Rigi .   it  enters the southern extremity of the lake .  At presented it is formed by the Aa . it descends from the Rigi and enters the southern extremity of the lake . 
+
+  ['N'] adverb@@coordi                         
 ##### ex4
 Notrium is played from a top-down perspective , giving an overhead view of proceedings .  "notrium is played from a top-down perspective.  it gives an overhead view of proceedings.
 " Notrium is played from a top-down perspective . It gave an overhead view of proceedings . . Notrium is played from a top-down perspective . It gave an overhead view of proceedings . . ['N'] adverb@@                    
