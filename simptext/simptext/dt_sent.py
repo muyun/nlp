@@ -834,18 +834,32 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     strs = ""
 
     # define dic of the ALG according to the one in the form
-    dict = {
-        'punct': 1,
-        'coordi': 2,
-        'subordi': 3,
-        'adverb': 4,
-        'parti': 5,
-        'adjec': 6,
-        'appos': 7,
-        'passive': 8,
-        'paratax': 9
-    }
+    algs_lst = [
+        punct.simp_punct_sent,
+        coordi.simp_coordi_sent,
+        subordi.simp_subordi_sent,
+        adverb.simp_adverb_sent,
+        parti.simp_parti_sent,
+        adjec.simp_adjec_sent,
+        appos.simp_appos_sent,
+        passive.simp_passive_sent,
+        paratax.simp_paratax_sent
+    ]
 
+    """
+    # order the ALG for the better performance(precision/recall)
+    _algs_lst_ = [
+        paratax.simp_paratax_sent,
+        #punct.simp_punct_sent,
+        subordi.simp_subordi_sent,
+        adverb.simp_adverb_sent,
+        parti.simp_parti_sent,
+        appos.simp_appos_sent,
+        adjec.simp_adjec_sent,
+        coordi.simp_coordi_sent,
+        passive.simp_passive_sent
+    ]
+    """
     # the original tokens in the sent
     #import pdb; pdb.set_trace()
     #print "syn sent: ", sent
@@ -871,12 +885,103 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     alg = ""
     #import pdb; pdb.set_trace()
     if len(sent) > 0:
+        for ind in _algs:
+            #import pdb; pdb.set_trace()
+            # if the alg in the choices
+            print "_alg: ", algs_lst[ind]
+            if len(strs) > 0:
+                return strs, algs_lst[ind]
+            else:
+                #func = _algs_lst[ind]
+                strs = algs_lst[ind](tokens,node_list)                              
+
+    return strs, alg
+
+
+def _simp_syn_sent(sent, _algs=range(1,10)):
+    strs = ""
+
+    """
+    algs_lst = [
+        #{'punct.simp_punct_sent' :  punct.simp_punct_sent},
+        {'coordi.simp_coordi_sent' : coordi.simp_coordi_sent},
+        {'subordi.simp_subordi_sent' : subordi.simp_subordi_sent},
+        {'adverb.simp_adverb_sent' : adverb.simp_adverb_sent},
+        {'parti.simp_parti_sent' : parti.simp_parti_sent},
+        {'adjec.simp_adjec_sent' : adjec.simp_adjec_sent},
+        {'appos.simp_appos_sent' : appos.simp_appos_sent},
+        {'passive.simp_passive_sent' : passive.simp_passive_sent},
+        {'paratax.simp_paratax.sent' : paratax.simp_paratax_sent}
+    ]
+    
+    _algs_lst = [
+        #punct.simp_punct_sent,
+        coordi.simp_coordi_sent,
+        subordi.simp_subordi_sent,
+        adverb.simp_adverb_sent,
+        parti.simp_parti_sent,
+        adjec.simp_adjec_sent,
+        appos.simp_appos_sent,
+        passive.simp_passive_sent,
+        paratax.simp_paratax_sent
+    ]
+
+    # order the ALG for the better performance(precision/recall)
+    _algs_lst_ = [
+        paratax.simp_paratax_sent,
+        #punct.simp_punct_sent,
+        subordi.simp_subordi_sent,
+        adverb.simp_adverb_sent,
+        parti.simp_parti_sent,
+        appos.simp_appos_sent,
+        adjec.simp_adjec_sent,
+        coordi.simp_coordi_sent,
+        passive.simp_passive_sent
+    ]
+    """
+    # the original tokens in the sent
+    #import pdb; pdb.set_trace()
+    #print "syn sent: ", sent
+    #import pdb; pdb.set_trace()
+    tokens = StanfordTokenizer().tokenize(sent)
+    #tokens = wordpunct_tokenize(strs)
+    tokens.insert(0, '')
+    taggers = eng_tagger.tag(sent.split())
+
+    result = list(eng_parser.raw_parse(sent))[0]
+    root = result.root['word']
+
+    #w = result.tree()
+    #print "parse_tree:", w
+    
+    #TODO: use the tree structure, Check again
+    node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
+    for node in result.nodes.items():
+        node_list.append(base.get_triples(node))
+        #node_list[base.get_triples[0]] = base.get_triples(node)
+
+    alg = ""
+    """
+    #import pdb; pdb.set_trace()
+    if len(sent) > 0:
+        for ind in _algs:
+            #import pdb; pdb.set_trace()
+            # if the alg in the choices
+            print "_alg: ", _algs_lst[ind]
+            if len(strs) > 0:
+                return strs, _algs_lst[ind]
+            else:
+                #func = _algs_lst[ind]
+                strs = _algs_lst[ind](tokens,node_list)
+    """           
+    # Use the robest function for the experiments                  
+    if len(sent) > 0: 
         strs = paratax.simp_paratax_sent(tokens, node_list)
         if len(strs) > 0:
             alg = "paratax"
             return strs, alg
         else:
-            strs = punct.simp_punct_sent(tokens, taggers, node_list)
+            strs = punct.simp_punct_sent(tokens, node_list)
             if len(strs) > 0:
                 alg = "punct"
                 return strs, alg
@@ -914,44 +1019,10 @@ def simp_syn_sent(sent, _algs=range(1,10)):
                                         strs = passive.simp_passive_sent(tokens, node_list)
                                         if len(strs) > 0:
                                             alg = "passive"
-                                            return strs, alg
-                                    
+                                            return strs, alg                           
 
     return strs, alg
-
-
-def split_sent(entries):
-    alg0 = ""
-    _syn_ret, alg0 = simp_syn_sent(entries)
-    #print "alg: ", algs
-        #BUG here, todo
-    if len(_syn_ret) > 0:
-            #print "S1"            
-        (s1, s1_child, s2, s2_child, syn_ret, algs) = _get_split_ret(_syn_ret)
-            
-        if len(syn_ret) > 0: # there is the child - 3 layers
-                #outputs = utils.wordcal.check_word_(syn_ret, words)
-                #s_outputs = wordcal.check_word(_syn_ret, words)
-
-            if len(s1_child) > 0:
-                s1_output = s1
-                s1_child_output = s1_child
-            else:
-                s1_output = s1
-
-            if len(s2_child) > 0: 
-                s2_output = s2
-                s2_child_output = s2_child 
-            else:
-                s2_output = s2
-                
-        print "s1: ", s1
-        print "s1_child: ", s1_child
-        print "s2: ", s2
-        print "s2_child: ", s2_child
-
-    print "algs: ", alg0 + "@" + algs
-        
+     
 
 def get_split_ret(_str):
     #
@@ -1194,7 +1265,8 @@ def main():
 
     #entries = "After the demise of the WHL , however , the Stanley Cup was awarded exclusively to the NHL playoff champion , and the Wales Trophy was given to the regular season champion ."
     entries = "Many parts of Odessa were damaged during its siege and recapture on 10 April 1944 , when the city was finally liberated by the Red Army ."
-    re, alg = simp_syn_sent(entries)
+    entries = "Peter, also called Pete, came."
+    re, alg = _simp_syn_sent(entries)
     print(alg)
     if len(re) > 0:
         print "S1S2:", re

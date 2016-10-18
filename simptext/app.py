@@ -66,7 +66,7 @@ def show_entries():
 
     print "wordlist: ", wordlist
     print "wordlevel: ", wordlevel
-    print "algs: ", _algs
+    print "algs: ", algs
     
     if len(wordlist) > 0:
         _words = []

@@ -96,7 +96,7 @@ def print_mturk_sent(filename, sent_file):
             alg0 = ""
             _res = "" # this is intermediate result
             res = ""
-            _res, alg0 = dt_sent.simp_syn_sent(str(se))
+            _res, alg0 = dt_sent._simp_syn_sent(str(se))
             print "S1S2:", _res
             if len(_res)>0:
                 (s1, s1_child, s2, s2_child, res, alg) = dt_sent._get_split_ret(_res)
@@ -396,7 +396,7 @@ def cal_base_sent(bs, md, filename):
             #res = alg.simp_passive_sent(str(re))
         alg = ""
         alg0 = ""
-        _res, alg0 = dt_sent.simp_syn_sent(str(se))
+        _res, alg0 = dt_sent._simp_syn_sent(str(se))
         #if len(_res) > 0:
         #    (s1, s1_child, s2, s2_child, res, alg) = dt_sent._get_split_ret(_res)
             #print "res: ", res

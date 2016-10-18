@@ -35,7 +35,7 @@ class EntryForm(Form):
                                              (6,'Adjectival Clauses'),
                                              (7,'Appositive phrases'), 
                                              (8,'Passive voice'),
-                                             (9,'Parataxis')])
+                                             (9,'Parataxis')], default=[1,2,3,4,5,6,7,8,9])
 
 
     submit = SubmitField('Submit')

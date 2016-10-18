@@ -16,7 +16,7 @@ eng_tagger = StanfordPOSTagger('english-bidirectional-distsim.tagger')
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
 
-#from pattern.en import tenses, conjugate
+from pattern.en import tenses, conjugate
 
 #from algs import base
 import base
@@ -29,7 +29,7 @@ def check_tag(word, taggers):
             return tagger
     return ""    
 
-def simp_punct_sent(tokens, taggers, node_list):
+def simp_punct_sent(tokens, node_list):
     """
     tokens = StanfordTokenizer().tokenize(sent)
     tokens.insert(0, '')
@@ -65,17 +65,21 @@ def simp_punct_sent(tokens, taggers, node_list):
     #import pdb; pdb.set_trace()
 
     strs = ""
-    pron = "It"
-    verb = "be"
-    #verb = conjugate("be", tenses(root)[0][0], 3)
-
+    # "bugs" here
+    pron = "They"
+    verb = "are"
+    #verb = conjugate(verb, tenses(root)[0][0], 3)
+    taggers = eng_tagger.tag(tokens)
+    
     punct_ind = 0
     punct_set = set(PUNCTUATION).intersection(set(tokens))
+
+    #import pdb; pdb.set_trace()
     if len(punct_set) > 0:
         # the sentence contains the punctuation, split it
         for ind, token in enumerate(tokens):
             if token in PUNCTUATION:
-                tokens[ind] = '. ' # remove the punctuation
+                tokens[ind] = ' . ' # remove the punctuation
                 # if the 2nd sentence is a noun
                 word = tokens[ind+1]
 
@@ -96,7 +100,7 @@ def simp_punct_sent(tokens, taggers, node_list):
         str2 = " ".join(tokens[punct_ind:])
         
         strs = str1  + str2
-
+    
     return strs
 
 def simp_syn_sent_(sent):
@@ -112,7 +116,7 @@ def simp_syn_sent_(sent):
 
     tokens.insert(0, '')
 
-    taggers = eng_tagger.tag(sent.split())
+    #taggers = eng_tagger.tag(sent.split())
     
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
@@ -132,7 +136,7 @@ def simp_syn_sent_(sent):
 
 
     #import pdb; pdb.set_trace()
-    strs = simp_punct_sent(tokens, taggers, node_list)
+    strs = simp_punct_sent(tokens, node_list)
     #strs = simp_subordi_sent(tokens, node_list)
     #strs = simp_advcl_sent(tokens, node_list)
     #strs = simp_parti_sent(tokens, node_list)
@@ -145,10 +149,9 @@ def simp_syn_sent_(sent):
 def main():
     # punctuation clauses
 
-    sent = "I ate fish; he drank wine; we liked swimming"
-    sent = "Peter - nobody guessed it – showed up."
-    #sent = "I have two brothers: they both live in China."
-    #sent = "I have two brothers: Peter and Sam."
+    sent = "I ate fish; he drank wine."
+    sent = "I have two brothers: they both live in China."
+    sent = "I have two brothers: Peter and Sam."
     #sent = "In March 1992 , Linux version 0.95 was the first to be capable of running X. This large version number jump was due to a feeling that a version 1.0 with no major missing pieces was imminent ."
     print(simp_syn_sent_(sent))    
 
