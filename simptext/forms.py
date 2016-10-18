@@ -27,13 +27,16 @@ class EntryForm(Form):
     #password= PasswordField('password',[validators.DataRequired()])
     wordinput = TextField("wordinput")
     wordlevel = SelectField('The level:', choices = [(0, 'level 0'), (1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')], default=4)
-    algs = MultiCheckboxField('The types:', choices = [(1,'Coordination'), 
-                                             (2,'Subordination'), 
-                                             (3,'Adverbial clauses'), 
-                                             (4,'Participial phrases'), 
-                                             (5,'Relative clauses'), 
-                                             (6,'Appositive phrases'), 
-                                             (7,'Passive voice')])
+    algs = MultiCheckboxField('The simplification procedures:', choices = [(1,'Punctuation'), 
+                                             (2, 'Coordination'),
+                                             (3,'Subordinated Clauses'),
+                                             (4,'Adverbial Clauses'), 
+                                             (5,'Participial phrases'),
+                                             (6,'Adjectival Clauses'),
+                                             (7,'Appositive phrases'), 
+                                             (8,'Passive voice'),
+                                             (9,'Parataxis')])
+
 
     submit = SubmitField('Submit')
 

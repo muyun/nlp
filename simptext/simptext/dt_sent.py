@@ -830,20 +830,22 @@ def simp_coinco_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences    
 
 
-def simp_syn_sent(sent, algs=[1,2,3,4,5,6,7]):
+def simp_syn_sent(sent, _algs=range(1,10)):
     strs = ""
 
-    """
-    lst1 = "Peter - nobody guessed it - showed up .".split()
-    _lst = sent.split()
-    print "sent: ", sent
-    print (lst1)
-    print (_lst)
+    # define dic of the ALG according to the one in the form
+    dict = {
+        'punct': 1,
+        'coordi': 2,
+        'subordi': 3,
+        'adverb': 4,
+        'parti': 5,
+        'adjec': 6,
+        'appos': 7,
+        'passive': 8,
+        'paratax': 9
+    }
 
-    #import pdb; pdb.set_trace()
-    if lst1 == _lst:
-        return "Peter showed up. Nobody guessed it.", "paratax"
-    """
     # the original tokens in the sent
     #import pdb; pdb.set_trace()
     #print "syn sent: ", sent
@@ -908,13 +910,12 @@ def simp_syn_sent(sent, algs=[1,2,3,4,5,6,7]):
                                     if len(strs) > 0:
                                         alg = "coordi"
                                         return strs, alg
-                                    """
                                     else:
                                         strs = passive.simp_passive_sent(tokens, node_list)
                                         if len(strs) > 0:
                                             alg = "passive"
                                             return strs, alg
-                                    """
+                                    
 
     return strs, alg
 
