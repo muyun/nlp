@@ -888,12 +888,12 @@ def simp_syn_sent(sent, _algs=range(1,10)):
         for ind in _algs:
             #import pdb; pdb.set_trace()
             # if the alg in the choices
-            print "_alg: ", algs_lst[ind]
+            print "_alg: ", algs_lst[ind-1]
             if len(strs) > 0:
-                return strs, algs_lst[ind]
+                return strs, algs_lst[ind-1]
             else:
                 #func = _algs_lst[ind]
-                strs = algs_lst[ind](tokens,node_list)                              
+                strs = algs_lst[ind-1](tokens,node_list)                              
 
     return strs, alg
 
