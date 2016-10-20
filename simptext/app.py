@@ -58,11 +58,10 @@ def show_entries():
     entries = str(se[0])
     wordlist = str(se[1])
     wordlevel = str(se[2])
-    algs=[]
+    print "se3: ", str(se[3])
+    algs = range(1,10)
     if len(str(se[3])) > 0:
-        algs = [int(i) for i in str(se[3]).split()]
-    else:
-        algs = range(1,10)
+        algs = [int(i) for i in str(se[3]).split()]    
 
     print "wordlist: ", wordlist
     print "wordlevel: ", wordlevel

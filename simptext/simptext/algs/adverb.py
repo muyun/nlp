@@ -419,6 +419,7 @@ def main():
     #sent = "Refreshed, Peter stood up."
     sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
     sent = "Notrium is played from a top-down perspective , giving an overhead view of proceedings ."
+    sent = "Peter came, surprising everyone."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

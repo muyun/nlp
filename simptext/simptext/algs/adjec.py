@@ -140,7 +140,7 @@ def simp_adjec_sent(tokens, node_list):
 
                 """
                 TODO: The code cannot recognize the 'dobj' and 'nsubj'
-                import pdb; pdb.set_trace()
+                #import pdb; pdb.set_trace()
                 if dobj_ind != 0: # the verb is modified by "dobj"
 
                     #import pdb; pdb.set_trace()
@@ -245,9 +245,13 @@ def simp_adjec_sent(tokens, node_list):
 
                     #str1 = base.upper_first_char(nsubj) + " " + ' '.join(_str1)
                     if dobj:
-                        str1 = rel_nsubj + " " + ' '.join(_str1) + " " + dobj.lower()  #Bugs
+                        #str1 = rel_nsubj + " " + ' '.join(_str1) + " " + dobj.lower()
+                        str1 = rel_nsubj + " " + ' '.join(_str1) + " " + dobj.lower() + " " + nsubj.lower() #Bugs
                     else:
-                        str1 = rel_nsubj + " " + ' '.join(_str1) + " " + nsubj.lower()
+                        if rel_nsubj.lower() == 'who':
+                            str1 = nsubj + " " + ' '.join(_str1)
+                        else:
+                            str1 = rel_nsubj + " " + ' '.join(_str1) + " " + nsubj.lower()
                         #str1 = nsubj + " " + ' '.join(_str1)
                     #print "1st sent: ", str1
 
@@ -315,12 +319,12 @@ def simp_syn_sent_(sent):
 def main():
     # adjectival Clauses
     sent = "Peter, who liked fruits, ate an apple."
-    #Sent = "I ate fish and he drank wine."
+    #sent = "I ate fish and he drank wine."
     sent = "The apple, which Peter ate, was red."
-    #sent = "Peter, whom I know, came."
+    sent = "Peter, whom I know, came."
 
-    #sent = "Peter, to whom I talked, came."
-    #sent = "The books, most of which I read, are interesting."
+    sent = "Peter, to whom I talked, came."
+    sent = "The books, most of which I read, are interesting."
     #sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
 
     #print(simp_coordi_sent(sent))

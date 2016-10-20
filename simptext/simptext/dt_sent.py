@@ -902,17 +902,6 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
     strs = ""
 
     """
-    algs_lst = [
-        #{'punct.simp_punct_sent' :  punct.simp_punct_sent},
-        {'coordi.simp_coordi_sent' : coordi.simp_coordi_sent},
-        {'subordi.simp_subordi_sent' : subordi.simp_subordi_sent},
-        {'adverb.simp_adverb_sent' : adverb.simp_adverb_sent},
-        {'parti.simp_parti_sent' : parti.simp_parti_sent},
-        {'adjec.simp_adjec_sent' : adjec.simp_adjec_sent},
-        {'appos.simp_appos_sent' : appos.simp_appos_sent},
-        {'passive.simp_passive_sent' : passive.simp_passive_sent},
-        {'paratax.simp_paratax.sent' : paratax.simp_paratax_sent}
-    ]
     
     _algs_lst = [
         #punct.simp_punct_sent,
@@ -1098,7 +1087,7 @@ def _get_split_ret(_str):
     if len(_strs) == 1 or len(_strs[1]) == 0:
         return (s1, s1_child, s2, s2_child, _str, algs)
      
-    s1_child, alg1 = simp_syn_sent(s1)
+    s1_child, alg1 = _simp_syn_sent(s1)
     print "S11+S12: ", s1_child
     print "alg1: ", alg1
     
@@ -1107,7 +1096,7 @@ def _get_split_ret(_str):
     #import pdb; pdb.set_trace()
     s2 = _strs[1] + ' .'
     print "S2: ", s2
-    s2_child, alg2 = simp_syn_sent(s2)
+    s2_child, alg2 = _simp_syn_sent(s2)
     print "S21+S22: ", s2_child
     print "alg2: ", alg2
 
@@ -1265,7 +1254,7 @@ def main():
 
     #entries = "After the demise of the WHL , however , the Stanley Cup was awarded exclusively to the NHL playoff champion , and the Wales Trophy was given to the regular season champion ."
     entries = "Many parts of Odessa were damaged during its siege and recapture on 10 April 1944 , when the city was finally liberated by the Red Army ."
-    entries = "Peter, also called Pete, came."
+    entries = "Peter came, surprising everyone."
     re, alg = _simp_syn_sent(entries)
     print(alg)
     if len(re) > 0:
