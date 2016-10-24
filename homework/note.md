@@ -6,7 +6,7 @@
 
   * hand-engineered features -> assign label to words 
 
-  * Parsing means associating tree structures to a sentence, given a grammar. 
+  * Parsing means associating tree structures to a sentence, given a grammar.   
      S -> NP VP 
      NP -> DT N | NP PP  
      PP -> PRP NP  

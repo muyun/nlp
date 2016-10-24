@@ -17,8 +17,8 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 from nltk.tag import StanfordNERTagger
 eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
-from algs import base
-#import base
+#from algs import base
+import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
