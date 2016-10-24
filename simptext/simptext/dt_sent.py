@@ -974,7 +974,8 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
             if len(strs) > 0:
                 alg = "punct"
                 return strs, alg
-            else:                       
+            else:    
+                #strs = coordi.simp_coordi_sent(tokens, node_list)                   
                 strs = subordi.simp_subordi_sent(tokens, node_list)
                 if len(strs) > 0:
                     alg = "subordi"
@@ -1000,15 +1001,18 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
                                     alg = "adjec"
                                     return strs, alg
                                 else:
-                                    strs = coordi.simp_coordi_sent(tokens, node_list)
+                                    #strs = subordi.simp_subordi_sent(tokens, node_list)
+                                    strs = strs = coordi.simp_coordi_sent(tokens, node_list)
                                     if len(strs) > 0:
                                         alg = "coordi"
                                         return strs, alg
+                                    """
                                     else:
                                         strs = passive.simp_passive_sent(tokens, node_list)
                                         if len(strs) > 0:
                                             alg = "passive"
-                                            return strs, alg                           
+                                            return strs, alg
+                                    """
 
     return strs, alg
      
@@ -1229,32 +1233,8 @@ def main():
     entries = "Peter - nobody guessed it – showed up ."
     entries = "John Nash, a mathematician, lectured at Princeton."
     #entries = "Nash was  a mathematician  ."
-    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
-    entries = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
-    entries = "Harry also becomes the worthy possessor of the remaining Deathly Hallows : the Invisibility Cloak and the Resurrection Stone , hence becoming the true Master of Death ."
-    entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
-    #entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
-    entries ="By 1960 he had developed the short story into a screenplay , and envisaged it as containing a suitable role for Monroe ."
-    entries = "Brief additional internal links are generally tolerated when used to facilitate communication or to provide general information , but undesirable if seen as canvassing for some purpose ."
-    entries = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
-    entries = "The Pennines constitute the main watershed in northern England , dividing the eastern and western parts of the country ."
-    entries = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
-    entries = "At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake ."
-    #entries = "Specialized English operates in the civil society sector , and the developers aspire to make programs for a variety of public service purposes , subject to resources being available ."
-    entries = "Realising that the gang could not elude the police forever , Moondyne Joe formulated a plan to escape the colony by traveling overland to the colony of South Australia ."
-    entries = "Southeastern Oklahoma , also known by its official tourism designation , Kiamichi Country , encompasses the southeastern quarter of the state of Oklahoma ."
-    entries = "Radames affirms that Aida is the person he will marry , and Aida convinces him to flee to the desert with her ."
-    entries = "The latter means basic or radical change ; whereas reform may be no more than fine tuning , or at most redressing serious wrongs without altering the fundamentals of the system ."
-    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
-    entries = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
-    
-    entries = "Recent archaeological evidence may indicate an Edomite nation as long ago as the 11th century BC , but the topic is controversial and others argue that the 8th or 9th century dates are correct ."
-    entries = "Located on the River Pedieos and situated almost in the center of the island , it is the seat of government as well as the main business center ."
-    #entries = "It was discovered and opened about the same time as Crystal Cave , but was closed by the owners in the 1940s ."
 
-    #entries = "After the demise of the WHL , however , the Stanley Cup was awarded exclusively to the NHL playoff champion , and the Wales Trophy was given to the regular season champion ."
-    entries = "Many parts of Odessa were damaged during its siege and recapture on 10 April 1944 , when the city was finally liberated by the Red Army ."
-    entries = "Peter came, surprising everyone."
+    entries = "Phillip was appointed Governor of New South Wales , the first European colony on the Australian continent , and was the founder of the site which is now the city of Sydney ."
     re, alg = _simp_syn_sent(entries)
     print(alg)
     if len(re) > 0:

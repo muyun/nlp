@@ -269,7 +269,7 @@ def simp_adverb_sent(tokens, node_list):
                 verb = 'be'
                 #import pdb; pdb.set_trace()
                 if len(tenses(root))>0:
-                    verb = conjugate("be", tenses(root)[0][0], 3)
+                    verb = conjugate(verb, tenses(root)[0][0], 3)
                 # TODO
                 if xcomp_tag == 'VBN':
                     nsubj = nsubj[0].upper() + nsubj[1:] + " " + verb + " "
@@ -291,17 +291,18 @@ def simp_adverb_sent(tokens, node_list):
                 #import pdb; pdb.set_trace()
                 nsubj = ' '.join(nsubj.split())
                 _str1_ = ' '.join(_str1)
-                if xcomp_tag == 'VBN':
+                #if xcomp_tag == 'VBN':
+                if nsubj.lower() in _str1_.lower():
+                    str1 = _str1_
+                else:
+                    str1 = nsubj + _str1_
+                """
+                #elif xcomp_tag == 'VBG':
                     if nsubj.lower() in _str1_.lower():
                         str1 = _str1_
                     else:
                         str1 = nsubj + _str1_
-                if xcomp_tag == 'VBG':
-                    if nsubj.lower() in _str1_.lower():
-                        str1 = _str1_
-                    else:
-                        str1 = nsubj + _str1_
-                    #str1 = ' '.join(_str1)
+                """
                 #print "1st sent: ", str1
 
                         # upper the 1st char in 2nd sent
@@ -345,7 +346,7 @@ def simp_adverb_sent(tokens, node_list):
 
                 if str1:
                     if str2:
-                        strs = str1 + ' . ' + str2 + ' . '
+                        strs = str1 + ' . ' + str2 
                     else:
                         strs = str1 + ' . '
                 else:
@@ -398,7 +399,7 @@ def simp_syn_sent_(sent):
 def main():
     #  clauses
     sent = "Needing money, I begged my parents."
-    sent = "Peter came, suprising everyone"
+    
     
     #sent = "Refreshed, Peter stood up."
 
@@ -419,7 +420,8 @@ def main():
     #sent = "Refreshed, Peter stood up."
     sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
     sent = "Notrium is played from a top-down perspective , giving an overhead view of proceedings ."
-    sent = "Peter came, surprising everyone."
+    sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
+    #sent = "Peter came, suprising everyone ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

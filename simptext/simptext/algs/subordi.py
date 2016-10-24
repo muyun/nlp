@@ -17,8 +17,8 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 from nltk.tag import StanfordNERTagger
 eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
-#from algs import base
-import base
+from algs import base
+#import base
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -125,7 +125,6 @@ def simp_subordi_sent(tokens, node_list):
                     #[NOTICE]: we consider 1st ',' to split the sentence, and get the 2nd sentence
 
                     #import pdb; pdb.set_trace()
- 
                     if nsubj_ind != 0:
                         _str1 = tokens[:(nsubj_ind)]
                         if _str1[-1] in PUNCTUATION:
@@ -232,8 +231,10 @@ def simp_syn_sent_(sent):
 
 def main():
     #  clauses
-    sent = "Since he came, I left"
-    sent = "Before he came, I left"
+    #sent = "Since he came, I left"
+    #sent = "Before he came, I left"
+    #sent = "He weakened to a tropical storm while also dumping heavy rain on already-devastated Haiti  ."
+    sent = "John McCain polled 62.5 % in the 2008 Presidential Election while 70.9 % of Utahns opted for George W. Bush in 2004 ."
     #sent = "I feel angry when provoked"
     #sent = "After eating dinner, he goes home."
 

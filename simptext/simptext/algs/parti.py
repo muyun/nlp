@@ -218,6 +218,7 @@ def main():
     #sent = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
 
     sent = "John Nash, running down the street, tripped."
+    sent = "Port Arthur was also the destination for juvenile convicts , receiving many boys , some as young as nine arrested for stealing toys ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

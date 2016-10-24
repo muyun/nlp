@@ -102,6 +102,7 @@ def simp_coordi_sent(tokens, node_list):
     ##### node_list
     e.g. #(4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     """
+    tokens = [item.lower() for item in tokens]
     root = ""
     root_ind = node_list[0][4]['root'][0]
     for nd in node_list:
@@ -282,10 +283,19 @@ def simp_coordi_sent(tokens, node_list):
             else:# we can add ' . ' as the end of the 1st sentence
                 tokens[cc_ind] = '.'
 
+            str1 = ""
             if auxpass_ind > 0:
                 str1 = nsubj + " ".join(tokens[(auxpass_ind):(cc_ind+1)])
+                
             else:
-                str1 = nsubj + " ".join(tokens[(nsubj_ind+1):(cc_ind+1)])
+                _str1 = nsubj + " ".join(tokens[(nsubj_ind+1):(cc_ind+1)])
+                # bugs here
+
+                #import pdb; pdb.set_trace()
+                _nsubj_ind = tokens.index(nsubj.lower().split()[0])
+                if _nsubj_ind >0:
+                    str1 = " ".join(tokens[:_nsubj_ind]) + " " + _str1
+ 
 
             #NOTICE: We can consider the next word after the conjunction as the first word of 2nd sentence
             # str2
@@ -444,6 +454,7 @@ def simp_syn_sent_(sent):
     #import pdb; pdb.set_trace()
     tokens = StanfordTokenizer().tokenize(str(sent))
     tokens.insert(0, '')
+    #tokens = [item.lower() for item in tokens]
 
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
@@ -508,8 +519,11 @@ def main():
     sent = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
     sent = "it is located on the River Pedieos and situated almost in the center of the island  . "
 
-    sent = "He was kidnapped and held by the notorious Pirate Peter Easton in Harbour Grace ."
-    
+    sent = "John McCain polled 62.5 % in the 2008 Presidential Election while 70.9 % of Utahns opted for George W. Bush in 2004 ."
+    sent = "Alexios was able to halt the Byzantine decline and begin the military , financial , and territorial recovery known as the `` Komnenian restoration ."
+    #sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
+
+    sent = "Phillip was appointed Governor of New South Wales , the first European colony on the Australian continent , and was the founder of the site which is now the city of Sydney ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

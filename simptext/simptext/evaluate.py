@@ -215,7 +215,7 @@ def all_same(sent1, sent2):
     tokens1 = StanfordTokenizer().tokenize(sent1.lower())
     tokens2 = StanfordTokenizer().tokenize(sent2.lower())
 
-    #import pdb; pdb.set_trace()
+    import pdb; pdb.set_trace()
     if tokens1 == tokens2:
         return True
     else:
@@ -440,7 +440,7 @@ def main():
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
-    sent_file = dir + "tests/sent_mturk_l21_.md"
+    sent_file = dir + "tests/sent_mturk_l25_.md"
     gt_file = dir + "dataset/simplify_testset_0814.xlsx"
 
     #_info = print_mturk_sent(filename, sent_file)
@@ -454,7 +454,7 @@ def main():
 
     # base
     base_file = dir + "dataset/syntactic_simplification.xlsx"
-    filename = dir + "dataset/simp_syn_l21_.csv"
+    filename = dir + "dataset/simp_syn_l25_.csv"
 
     #bs = dt_sent.read_xlsx_file(base_file, 1, 1)
     #md = dt_sent.read_xlsx_file(base_file, 1, 2)
@@ -471,7 +471,7 @@ def main():
     md = dt_sent.read_xlsx_file(base_file, 1, 2)
 
     #import pdb; pdb.set_trace()
-    _info = cal_mturk_sent(sent_file, md)
+    #_info = cal_mturk_sent(sent_file, md)
 
 
 if __name__ == '__main__':

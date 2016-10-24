@@ -105,7 +105,7 @@ def replace_nsubj(tokens, nsubj):
     nsubj2 = ""
     #import pdb; pdb.set_trace()
     if len(nsubj)>0:
-        if (('it' in nsubj.lower()) or ('they' in nsubj.lower())):
+        if (('it' in nsubj.lower().split()) or ('they' in nsubj.lower().split())):
             nsubj2 = nsubj
         else:
             if len(person_taggers) > 0:
@@ -115,6 +115,8 @@ def replace_nsubj(tokens, nsubj):
                     nsubj2 = "They"
                 elif org_taggers[-1].lower() == 'he':
                     nsubj2 = "He"
+                elif org_taggers[-1].lower() == 'she':
+                    nsubj2 = "She"
                 else:
                     nsubj2 = "It"
             else:
@@ -165,4 +167,3 @@ def main():
 if __name__ == '__main__':
         main()
 
-        
