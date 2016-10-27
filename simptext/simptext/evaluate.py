@@ -215,7 +215,7 @@ def all_same(sent1, sent2):
     tokens1 = StanfordTokenizer().tokenize(sent1.lower())
     tokens2 = StanfordTokenizer().tokenize(sent2.lower())
 
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     if tokens1 == tokens2:
         return True
     else:

@@ -895,7 +895,7 @@ def simp_syn_sent(sent, _algs=range(1,10)):
                 #func = _algs_lst[ind]
                 strs = algs_lst[ind-1](tokens,node_list)                              
 
-    return strs, alg
+    return (strs, alg)
 
 
 def _simp_syn_sent(sent, _algs=range(1,10)):
@@ -1018,60 +1018,18 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
      
 
 def get_split_ret(_str):
-    #
-    print "S1+S2: ", _str
-    syn_ret = ""
-
+    """
+    The function is  used in the demo-show
+    """
     _strs = _str.split('.')
 
     s1 = _strs[0] + ' . '
-    print "S1: ", s1
-    s1_child = ""
     s2 = ""
-    s2_child = ""
-    #syn_ret = ""
-    algs = ""
-
-    #import pdb; pdb.set_trace()
     if len(_strs) == 1 or len(_strs[1]) == 0:
-        return (s1, s1_child, s2, s2_child, _str, algs)
-    """
-    s1_child, alg1 = simp_syn_sent(s1)
-    print "S11+S12: ", s1_child
-    print "alg1: ", alg1
-    """
-    #print "str2: ", _strs[1]
-
-    #import pdb; pdb.set_trace()
+        return (s1,  s2)
     s2 = _strs[1] + ' .'
-    print "S2: ", s2
-    """
-    s2_child, alg2 = simp_syn_sent(s2)
-    print "S21+S22: ", s2_child
-    print "alg2: ", alg2
 
-    if len(s1_child)>0: # syn_ret1
-        if len(s2_child)>0: # syn_ret2
-            syn_ret = s1_child + s2_child
-            print "1+2: ", syn_ret
-        else:
-            syn_ret = s1_child + s2 
-            print "1+in+2: ", syn_ret
-    else:
-        if len(s2_child)>0:
-            syn_ret = s1 + s2_child
-            print "in+1+2: ", syn_ret
-        else:
-            syn_ret = _str 
-            print "in+1+in+2: ", syn_ret   
-    
-    print "Syntactic result: ", syn_ret
-    """
-    #algs = alg1 + "@" + alg2
-
-    return (s1, s1_child, s2, s2_child, syn_ret, algs)
-
-
+    return (s1,  s2)
 
 def _get_split_ret(_str):
     print "S1+S2: ", _str
@@ -1209,23 +1167,7 @@ def main():
     print "#sentence with Syntactic simplification: ", info[1]
     """
 
-    #entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
-    entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
-    entries = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
-    entries = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
-    entries = "Despite almost daily reports of missing property , he was able to evade capture until 15 February , when a man named Wimbow , who had been pursuing him with a partner for days , found him in an area of thick brush called Liberty Plains and shot him ."
-    entries = "Food is procured with its suckers and then crushed using its tough `` beak '' of chitin ."
-    entries = "With the high Gulf pressures - a ship reported a pressure of 1015 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16 ."
-    entries = "Published by Tor Books , it was released on August 15 , 1994 in hardcover , and in paperback on July 15 , 1997 ."
-    entries = "He was born at Plessiel , a hamlet of Drucat near Abbeville , to a long-established family of Picardy , the great-nephew of the painter Eustache Le Sueur ."
-    entries = "The Man in the High Castle occurs in an alternate universe United States ruled by the victorious Axis powers ."
-    entries = "With the high Gulf pressures - a ship reported a pressure of 1015 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16."
-    #entries = "Peter likes the work"
-    entries = "Harry also becomes the worthy possessor of the remaining Deathly Hallows : the Invisibility Cloak and the Resurrection Stone , hence becoming the true Master of Death ."
-    entries = "The storm continued , crossing the Outer Banks of North Carolina , and retained its strength until June 20 when it became extratropical near Newfoundland ."
     
-    #split_sent(entries)
-
     entries = "i ate an apple and an orange."
     entries = "he came. so, i left."
     
@@ -1235,6 +1177,7 @@ def main():
     #entries = "Nash was  a mathematician  ."
 
     entries = "Phillip was appointed Governor of New South Wales , the first European colony on the Australian continent , and was the founder of the site which is now the city of Sydney ."
+    entries = "Peter - nobody guessed it - showed up."
     re, alg = _simp_syn_sent(entries)
     print(alg)
     if len(re) > 0:

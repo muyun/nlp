@@ -11,7 +11,7 @@ from flask import Flask, request, render_template, session, g, redirect, url_for
 
 from flask_sqlalchemy import SQLAlchemy
 
-from forms import SelectForm, EntryForm
+from forms import EntryForm, SelectForm
 
 import json
 
@@ -36,7 +36,8 @@ word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
 
 @app.route('/')
 def show_entries():
-    form = EntryForm()
+    #form = EntryForm()
+    form = SelectForm()
     # the the latest text from database
     entries = ""
     m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
@@ -51,17 +52,21 @@ def show_entries():
     #ret = str(db.session.query(models.Setting).get(s.max_id))
     #print "setting: ", ret
 
+    m = db.session.query(db.func.max(models.Select.id).label("max_id")).one()
+    #txt = str(db.session.query(models.Entry).get(m.max_id))
+    txt = models.Select.query.get(m.max_id)
+
     words = []
     global word1, word2, word3, word4
     #_txt = str(txt).split('\'')
     se = str(txt).split('@')
-    entries = str(se[0])
-    wordlist = str(se[1])
-    wordlevel = str(se[2])
-    print "se3: ", str(se[3])
+    #entries = str(se[0])
+    wordlist = str(se[0])
+    wordlevel = str(se[1])
+    print "se2: ", str(se[2])
     algs = range(1,10)
-    if len(str(se[3])) > 0:
-        algs = [int(i) for i in str(se[3]).split()]    
+    if len(str(se[2])) > 0:
+        algs = [int(i) for i in str(se[2]).split()]    
 
     print "wordlist: ", wordlist
     print "wordlevel: ", wordlevel
@@ -78,7 +83,6 @@ def show_entries():
         else:
             if int(wordlevel) == 1:
                 words = list(_words) + list(word1)
-
             if int(wordlevel) == 2:
                 words = list(_words) + list(word2)
             if int(wordlevel) == 3:
@@ -105,53 +109,29 @@ def show_entries():
     s_outputs = {}
     s1_output = {}
     s2_output = {}
-    s1_child_output = {}
-    s2_child_output = {}
     s1 = ""
     s2 = ""
-    s1_child = ""
-    s2_child = ""
-    
+
     if len(entries) > 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
         _syn_ret, alg1 = dt_sent.simp_syn_sent(entries, algs)
         #BUG here, todo
         if len(_syn_ret) > 0:
-            #print "S1" 
-            
-            (s1, s1_child, s2, s2_child, syn_ret, algs) = dt_sent.get_split_ret(_syn_ret)
+            (s1, s2) = dt_sent.get_split_ret(_syn_ret)
 
             s1_output = wordcal.check_word(s1, words)
             s2_output = wordcal.check_word(s2, words)
 
-            """
-            (s1, s1_child, s2, s2_child, syn_ret, algs) = dt_sent._get_split_ret(_syn_ret)
-            if len(syn_ret) > 0: # there is the child - 3 layers
-                #outputs = utils.wordcal.check_word_(syn_ret, words)
-                #s_outputs = wordcal.check_word(_syn_ret, words)
-
-                if len(s1_child) > 0:
-                    s1_output = wordcal.check_word(s1, words)
-                    #s1_child_output = wordcal.check_word(s1_child, words)
-                else:
-                    s1_output = wordcal.check_word(s1, words)
-
-                if len(s2_child) > 0: 
-                    s2_output = wordcal.check_word(s2, words) 
-                    #s2_child_output = wordcal.check_word(s2_child, words) 
-                else:
-                    s2_output = wordcal.check_word(s2, words)
-            """
         s_outputs = wordcal.check_word(entries, words)          
     
     print "s1_output: ", s1_output
-    print "s1_child_output: ", s1_child_output
     print "s2_output: ", s2_output
-    print "s2_child_output: ", s2_child_output
     print "s_outputs: ", s_outputs
 
-    return render_template('show_entries.html', form=form, wordlist=wordlist, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
+    return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output)
+
+    #return render_template('show_entries.html', form=form, wordlist=wordlist, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
 
 
 # this view let the user add new entries if they are logged in
@@ -162,9 +142,11 @@ def add_entry():
 
     form = EntryForm()
     txt = request.form['input']
+    #txt = form.input.data
     print "input: ", txt
+    db.session.add(models.Entry(txt))
 
-    #form = SelectForm()
+    form = SelectForm()
     words = request.form['wordinput']
     wordlevel = request.form['wordlevel']
     #txt = request.form['text']
@@ -179,7 +161,7 @@ def add_entry():
     #wordlist = ""
     #_wordlist = request.form['words']
 
-    db.session.add(models.Entry(txt, words, wordlevel, alg))
+    db.session.add(models.Select(words, wordlevel, alg))
     db.session.commit()
 
     flash('New entry was successfully posted')

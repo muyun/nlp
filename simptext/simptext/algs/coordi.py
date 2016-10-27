@@ -523,7 +523,7 @@ def main():
     sent = "Alexios was able to halt the Byzantine decline and begin the military , financial , and territorial recovery known as the `` Komnenian restoration ."
     #sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
 
-    sent = "Phillip was appointed Governor of New South Wales , the first European colony on the Australian continent , and was the founder of the site which is now the city of Sydney ."
+    sent = "Hence the establishment and signing of the Charte constitutionnelle franid, the French Constitution otherwise known as La Charte ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

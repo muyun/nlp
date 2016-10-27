@@ -3,49 +3,7 @@
 
 <script type=text/javascript>
 $(function() {
-  //var lastInput = {{ entries | tojson }};
-  //var merge = document.getElementById('merge').innerHTML;
-  document.getElementById('merge-s1').style.visibility = "hidden";
-  document.getElementById('merge-s2').style.visibility = "hidden";
   document.getElementById('merge-s').style.visibility = "hidden";
-
-    //var lastInput = {{ entries | tojson }};
-  //var merge = document.getElementById('merge').innerHTML;
-  //document.getElementById('merge-s1').style.visibility = "hidden";
-  //document.getElementById('merge-s2').style.visibility = "hidden";
-  //document.getElementById('merge-s').style.visibility = "hidden";
-
-
-  $('#undo-2').click(function(){
-    //var _lastSent = document.getElementById("reverse-1").innerHTML;
-    //var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
-    //console.log(lastSent)
-    //var merge2 = lastSent + document.getElementById("reverse-2").innerHTML;
-    //console.log(merge2)
-    //document.getElementById("reverse-1").innerHTML = '';
-    //the 2nd sent is the child of the s1 or s2?
-    var merge2 = document.getElementById('merge-s1').innerHTML;
-    $('#reverse-1').remove();
-    document.getElementById("reverse-2").innerHTML = merge2;
-
-    //document.getElementById('undo-2').style.visibility='hidden';
-    $('#undo-2').remove();
-
-  });
-
-  $('#undo-4').click(function(){
-    //var _lastSent = document.getElementById("reverse-2").innerHTML;
-    //var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
-    //console.log(lastSent)
-    //var merge3 = lastSent + document.getElementById("reverse-3").innerHTML;
-    //document.getElementById("reverse-2").innerHTML = '';
-    
-    var merge3 = document.getElementById('merge-s2').innerHTML; 
-    document.getElementById("reverse-4").innerHTML = merge3;
-
-    //document.getElementById('undo-3').style.visibility='hidden';  
-    $('#undo-3').remove();
-  });
 
   $('#undo-5').click(function(){  // s2 doesn't have the children
     //var _lastSent = document.getElementById("reverse-3").innerHTML;
@@ -60,38 +18,16 @@ $(function() {
     //document.getElementById('undo-4').style.visibility='hidden';
     $('#reverse-1').remove();  // remove s1
     $('#undo-5').remove();
-  }); 
-
-  $('#undo-6').click(function(){  // s2 has the children
-    //var _lastSent = document.getElementById("reverse-3").innerHTML;
-    //var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
-    //console.log(lastSent)
-    //var merge4 = lastSent + document.getElementById("reverse-4").innerHTML;
-
-    var merge4 = document.getElementById('merge-s2').innerHTML; 
-    //console.log(merge4)
-    document.getElementById("reverse-6").innerHTML = merge4;
-
-    //document.getElementById('undo-4').style.visibility='hidden';
-    $('#reverse-5').remove();
-    $('#undo-6').remove();
-  }); 
+  });  
 
   document.getElementById("wordinput").value = localStorage.getItem("words");
   $('#wordinput').change(function() { 
     var words = document.getElementById("wordinput").value;
     //console.log(words)
-    //if (words == "") {
-    //    alert("Please enter words in first!");
-    //    return false;
-    //}
-    //if (words != "") {
     localStorage.setItem("words", words);
     //alert("Your words has been saved!");
     //}
     location.reload();
-    //return false;
-    //return true;
   });
 
 
@@ -107,8 +43,8 @@ $(function() {
   });
 
 });
-
 </script>
+
 
 {% if session.logged_in %}
     <form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry ">
@@ -118,7 +54,6 @@ $(function() {
         <br/>
         <dd><input type=submit value=Simplify>
       </dl>
-
 <ul class="entries" id="entry">
   {% if entries %}
      <li><h2>Input:</h2>
@@ -137,66 +72,27 @@ $(function() {
 
   <li><h2>Output:<h2></li>
   {% set counter = ['1'] %}
-  
-  {% if s1_child_output|length > 0 %} {# there is the child #}
-  <li id="reverse-{{counter|length}}" contenteditable="true" 
-  draggable="true" ondragenter="dragenter(event)" ondragstart="dragstart(event)">
-   {% for item in s1_child_output %}  
-        {% if item is mapping %} {# not change #}
-   
-          {% for key, value in item.iteritems() %}
-            <select>
-              {% for v in value %}
-                 <option value={{ v }} >{{ v |safe}} </option>
-              {% endfor %}
-            </select>
-         
-          {% endfor %}
-
-        {% else %}
-           {{ item |safe }}
-
-           {% if item == "." %}  {# is a sentence? #}
-               
-               {% if counter|length == 2 %}
-                   <input type='button' id="undo-{{counter|length}}" value='Merge'/>
-               {% endif %}
-                
-               {% if counter.append('1') %}
-               {% endif %}
-                 
-               <br></li>    
-                {% if counter|length < 3 %}
-                    
-                    <li id="reverse-{{counter|length}}" contenteditable="true" 
-                    draggable="true" ondragenter="dragenter(event)" ondragstart="dragstart(event)"> 
-                {% endif %} 
-
-           {% endif %}
-              
-        {% endif %}  
-
-   {% endfor %}  
-   </li>
-
-{% else %}  {# no children, but we can make sure that there is S2  #}
+{% if s1_output|length > 0 %} {# there is the child #}
  <li id="reverse-{{counter|length}}" contenteditable="true" 
  draggable="true" ondragenter="dragenter(event)" ondragstart="dragstart(event)">
       {% for item in s1_output %}     
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}
-            <select>
+            {% if value|length == 1 %}
+                <u>{{ key |safe }}</u>
+            {% else %}
+            <select>  
               {% for v in value %}
                  <option value={{ v }} >{{ v |safe}} </option>
-              {% endfor %}
+              {% endfor %}         
             </select>
-         
+            {% endif %}
           {% endfor %}
 
         {% else %}
            {{ item |safe }}
-
+          <!--
            {% if item == "." %}  {# is a sentence? #}
                {% if counter|length == 2 %}
                <input type='button' id="undo-{{counter|length}}" value='Merge'/>
@@ -206,6 +102,7 @@ $(function() {
                {% endif %}
               
            {% endif %}
+          -->
               
         {% endif %}
    {% endfor %} 
@@ -214,68 +111,30 @@ $(function() {
 
 
 {% set cnt = 5 %}
-{% if s2_child_output|length > 0 %} {# there is the child in S2 #}
-  <li id="reverse-{{cnt}}" contenteditable="true" 
-  draggable="true" ondragenter="dragenter(event)" ondragstart="dragstart(event)">
-   {% for item in s2_child_output %}  
-        {% if item is mapping %} {# not change #}
-   
-          {% for key, value in item.iteritems() %}
-            <select>
-              {% for v in value %}
-                 <option value={{ v }} >{{ v |safe}} </option>
-              {% endfor %}
-            </select>
-         
-          {% endfor %}
-
-        {% else %}
-           {{ item |safe }}
-
-           {% if item == "." %}  {# is a sentence? #}
-               
-               {% if cnt|int == 6 %}
-                   <input type='button' id="undo-{{cnt}}" value='Merge'/>
-               {% endif %}
-                
-               {% set cnt = cnt + 1 %}
-                 
-               <br></li>    
-                {% if cnt|int < 7 %}
-                    <li id="reverse-{{cnt}}" contenteditable="true"  
-                    draggable="true" ondragenter="dragenter(event)" ondragstart="dragstart(event)" > 
-                {% endif %} 
-
-           {% endif %}
-              
-        {% endif %}  
-
-   {% endfor %}  
-   </li>
-
-{% else %}  {# no children in S2  #}
+{% if s2_output|length > 0 %}
  <li id="reverse-{{cnt}}" contenteditable="true"  
  draggable="true" ondragenter="dragenter(event)" ondragstart="dragstart(event)">
       {% for item in s2_output %}   
          
         {% if item is mapping %} {# not change #}
    
-          {% for key, value in item.iteritems() %}
+          {% for key, value in item.iteritems() %}     
+            {% if value|length > 1 %}
             <select>
               {% for v in value %}
                  <option value={{ v }} >{{ v |safe}} </option>
               {% endfor %}
             </select>
-         
+            {% else %}
+              <u>{{ key |safe }}</u>
+            {% endif %}
           {% endfor %}
 
         {% else %}
            {{ item |safe }}
 
-           {% if item == "." %}  {# is a sentence? #}
-               
-               <input type='button' id="undo-{{cnt}}" value='Merge'/>
-              
+           {% if item == "." %}  {# is a sentence? #}         
+               <input type='button' id="undo-{{cnt}}" value='Merge'/>            
            {% endif %}
               
         {% endif %}
@@ -313,22 +172,24 @@ $(function() {
     <br/>
     <br/>
     <br/>
-      <div class ="dropdown">
+      
+      <li class ="dropdown"></li>
+        <!--
         <button class="dropbtn">Setting</button>
-        <dl>
-        <div class="dropdown-content">
+        
+        <div id="myDropdown" class="dropdown-content">
+        -->
+        <div>
+           <hr/>
            <dt>The wordlist:
            <input type="text" name="wordinput" id="wordinput" value=""/>
            <br/> 
            <dt>{{ form.wordlevel.label }}  
            <dd> {{ form.wordlevel }} 
            <br/> 
-           <br/> 
            <dt>{{ form.algs.label }}    
            <dd>{{ form.algs }} 
-        </div>    
-        </dl>
-      </div>
+        </div>          
     </form>
 
   {% else %}
@@ -340,7 +201,6 @@ $(function() {
 {% endif %}
 
 {% include 'merge.html' %}
-
 {% include 'footer.html' %}
 
 {% endblock %}

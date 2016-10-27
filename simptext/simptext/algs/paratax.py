@@ -139,7 +139,7 @@ def main():
     sent = "Peter - nobody guessed it - showed up."
     sent = "Peter - nobody guessed it  - showed up ."
     #sent = "With the high Gulf pressures - a ship reported a pressure of 1015.5 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16 ."
-    sent = "In 2001 , UNESCO inscribed the 2,750-year-old city on the World Heritage List as Samarkand - Crossroads of Cultures ."
+    #sent = "In 2001 , UNESCO inscribed the 2,750-year-old city on the World Heritage List as Samarkand - Crossroads of Cultures ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 
