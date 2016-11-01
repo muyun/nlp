@@ -836,14 +836,14 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     # define dic of the ALG according to the one in the form
     algs_lst = [
         punct.simp_punct_sent,
-        coordi.simp_coordi_sent,
         subordi.simp_subordi_sent,
         adverb.simp_adverb_sent,
         parti.simp_parti_sent,
         adjec.simp_adjec_sent,
         appos.simp_appos_sent,
         passive.simp_passive_sent,
-        paratax.simp_paratax_sent
+        paratax.simp_paratax_sent,
+        coordi.simp_coordi_sent
     ]
 
     """
@@ -1176,8 +1176,8 @@ def main():
     entries = "John Nash, a mathematician, lectured at Princeton."
     #entries = "Nash was  a mathematician  ."
 
-    entries = "Phillip was appointed Governor of New South Wales , the first European colony on the Australian continent , and was the founder of the site which is now the city of Sydney ."
-    entries = "Peter - nobody guessed it - showed up."
+    entries = "Polar bear fur consists of a layer of dense underfur and an outer layer of guard hairs , which appear white to tan but are actually transparent ."
+
     re, alg = _simp_syn_sent(entries)
     print(alg)
     if len(re) > 0:

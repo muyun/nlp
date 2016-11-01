@@ -219,22 +219,7 @@ def simp_adverb_sent(tokens, node_list):
                     _str2 = tokens[split_ind+1:]
                     if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
                         _str2 = tokens[split_ind+2:]
-                    """  
-                    if len(nsubj)>0:
-                        #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(tokens[split_ind+1:])
-                        if len(person_taggers) > 0:
-                            str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
-                        elif len(org_taggers) > 0:
-                            if base.isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
-                                str2 = "They" + " " + ' '.join(_str2)
-                            else:
-                                str2 = "It" + " " + ' '.join(_str2)
-                        else:
-                            pass
                     
-                    else:
-                        str2 = ' '.join(tokens[split_ind+2:])
-                    """
                     nsubj = base.replace_nsubj(tokens, nsubj)
                     str2 = nsubj + ' '.join(_str2)
                     
@@ -421,6 +406,7 @@ def main():
     sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
     sent = "Notrium is played from a top-down perspective , giving an overhead view of proceedings ."
     sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
+    sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
     #sent = "Peter came, suprising everyone ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    

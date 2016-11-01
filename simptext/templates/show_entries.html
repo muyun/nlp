@@ -20,40 +20,60 @@ $(function() {
     $('#undo-5').remove();
   });  
 
-  document.getElementById("wordinput").value = localStorage.getItem("words");
+  if (localStorage.getItem("words")) {
+     document.getElementById("wordinput").value = localStorage.getItem("words");
+  }
   $('#wordinput').change(function() { 
     var words = document.getElementById("wordinput").value;
     //console.log(words)
     localStorage.setItem("words", words);
     //alert("Your words has been saved!");
     //}
-    location.reload();
+    //location.reload();
   });
 
-
-  var selectedItem = sessionStorage.getItem("SelectedItem");  
+  var selectedItem = localStorage.getItem("SelectedItem");  
   $('#wordlevel').val(selectedItem);
-  //console.log(selectedItem)
-  //sessionStorage.setItem("SelectedItem", "4");
-
+  //console.log(selectedItem);
+  if (selectedItem == null){
+      var dropVal = "4";
+      localStorage.setItem("SelectedItem", dropVal);
+      //console.log(selectedItem);
+   } else {
   $('#wordlevel').change(function() { 
     var dropVal = $(this).val();
-    //console.log(dropVal)
-    sessionStorage.setItem("SelectedItem", dropVal);
+    localStorage.setItem("SelectedItem", dropVal);
   });
+   }
+
+   $('#algs').change(function() {
+      localStorage.setItem(this.id, this.value);
+   }).val(function() {
+      return localStorage.getItem(this.id)
+   });
 
 });
 </script>
 
+<!--
+<script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+</script>
+-->
 
 {% if session.logged_in %}
-    <form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry ">
+    <form action="{{ url_for('add_entry') }}" autocomplete=off method=post >
       <dl>
         <dt>Input:
         <dd><textarea name=input rows=4 cols=60></textarea> 
         <br/>
         <dd><input type=submit value=Simplify>
       </dl>
+    
 <ul class="entries" id="entry">
   {% if entries %}
      <li><h2>Input:</h2>
@@ -92,17 +112,6 @@ $(function() {
 
         {% else %}
            {{ item |safe }}
-          <!--
-           {% if item == "." %}  {# is a sentence? #}
-               {% if counter|length == 2 %}
-               <input type='button' id="undo-{{counter|length}}" value='Merge'/>
-               {% endif %}
-
-               {% if counter.append('1') %}
-               {% endif %}
-              
-           {% endif %}
-          -->
               
         {% endif %}
    {% endfor %} 
@@ -172,26 +181,24 @@ $(function() {
     <br/>
     <br/>
     <br/>
-      
-      <li class ="dropdown"></li>
-        <!--
-        <button class="dropbtn">Setting</button>
-        
-        <div id="myDropdown" class="dropdown-content">
-        -->
-        <div>
-           <hr/>
+    <!--
+    </form action="{{ url_for('setting') }}" method=post >
+      <div class ="dropdown">        
+        <button onclick="myFunction()" class="dropbtn">Setting</button> 
+    --> 
+        <hr/>
+        <div class="selection">
            <dt>The wordlist:
-           <input type="text" name="wordinput" id="wordinput" value=""/>
+           <input type="text" name=wordinput id=wordinput value=""/>
            <br/> 
            <dt>{{ form.wordlevel.label }}  
            <dd> {{ form.wordlevel }} 
            <br/> 
            <dt>{{ form.algs.label }}    
            <dd>{{ form.algs }} 
-        </div>          
-    </form>
+        </div>
 
+        </form> 
   {% else %}
      <li><em>No output here so far</em>
   {% endif %}

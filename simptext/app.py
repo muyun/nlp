@@ -36,38 +36,38 @@ word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
 
 @app.route('/')
 def show_entries():
-    #form = EntryForm()
-    form = SelectForm()
+    form = EntryForm()
     # the the latest text from database
-    entries = ""
     m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
     #txt = str(db.session.query(models.Entry).get(m.max_id))
-    txt = models.Entry.query.get(m.max_id)
+    etxt = models.Entry.query.get(m.max_id)
+    #se = str(etxt).split('@') 
+    #entries = str(se[0])  
+    #print "entries: ", entries
+    #print "txt: ", str(e[0])
     
-    entries = str(txt)   
-    print "entries: ", entries
-
     #ret = ""
     #s = db.session.query(db.func.max(models.Setting.id).label("max_id")).one()
     #ret = str(db.session.query(models.Setting).get(s.max_id))
     #print "setting: ", ret
 
-    m = db.session.query(db.func.max(models.Select.id).label("max_id")).one()
+    #s = db.session.query(db.func.max(models.Select.id).label("max_id")).one()
     #txt = str(db.session.query(models.Entry).get(m.max_id))
-    txt = models.Select.query.get(m.max_id)
+    #stxt = models.Select.query.get(s.max_id)
 
     words = []
     global word1, word2, word3, word4
     #_txt = str(txt).split('\'')
-    se = str(txt).split('@')
-    #entries = str(se[0])
-    wordlist = str(se[0])
-    wordlevel = str(se[1])
-    print "se2: ", str(se[2])
+    se = str(etxt).split('@')
+    entries = str(se[0])
+    wordlist = str(se[1])
+    wordlevel = str(se[2])
+    print "se2: ", str(se[3])
     algs = range(1,10)
-    if len(str(se[2])) > 0:
-        algs = [int(i) for i in str(se[2]).split()]    
+    if len(str(se[3])) > 0:
+        algs = [int(i) for i in str(se[3]).split()]    
 
+    print "entries: ", entries
     print "wordlist: ", wordlist
     print "wordlevel: ", wordlevel
     print "algs: ", algs
@@ -130,7 +130,6 @@ def show_entries():
     print "s_outputs: ", s_outputs
 
     return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output)
-
     #return render_template('show_entries.html', form=form, wordlist=wordlist, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
 
 
@@ -142,26 +141,32 @@ def add_entry():
 
     form = EntryForm()
     txt = request.form['input']
-    #txt = form.input.data
     print "input: ", txt
-    db.session.add(models.Entry(txt))
-
-    form = SelectForm()
-    words = request.form['wordinput']
-    wordlevel = request.form['wordlevel']
-    #txt = request.form['text']
+    #
+    #words = ""
+    wordinput = request.form['wordinput']
+    #words = form.words.data
+    print "words: ", wordinput
+    #wordlevel = ""
     #wordlevel = request.form['wordlevel']
+    wordlevel = request.form['wordlevel']
+    #wordlevel = form.wordlevel.data
+    print "wordlevel: ", wordlevel
     #txt = form.input.data
     #words = form.wordinput.data
     #wordlevel = form.wordlevel.data
     
-    algs0 = form.algs.data
+    #algs0 = form.algs.data
     #print "algs0: ", algs0
-    alg = ' '.join(str(e) for e in algs0)
+    alg = ' '.join(str(e) for e in form.algs.data)
     #wordlist = ""
     #_wordlist = request.form['words']
+    #txt = form.input.data
+    db.session.add(models.Entry(txt, wordinput, wordlevel, alg))
 
-    db.session.add(models.Select(words, wordlevel, alg))
+    #sform = SelectForm()
+    #txt = request.sform['input']
+    #db.session.add(models.Select(words, wordlevel, alg))
     db.session.commit()
 
     flash('New entry was successfully posted')
@@ -198,35 +203,21 @@ def setting():
         abort(401)
 
     form = SelectForm()
-    #form = EntryForm()
-    wordinput = ""
-    if request.method == 'POST':
-    	"""
-        if form.validate() == False:
-            flash('All fields are required. ')
-            return render_template('setting.html', form = form)
-        else:
-        """
-        #if form.validate_on_submit():
-        #wordlist = form['words']
-        #edblist = form['edblist']
-        #algs = form['algs']
-        #words = form.wordinput.data
-        words = ""
-        #wordlevel = form.wordlevel.data
-        wordlevel = ""
-        algs = ' '.join(str(e) for e in form.algs.data)
-        #print "wordinput: ", words
-        #print "wordlist: ", form.wordlist.data
-        #print "wordlevel: ", wordlevel
-        #print "algs: ", algs
+    words = request.form['words']
+    wordlevel = request.form['wordlevel']
+ 
+    #algs0 = form.algs.data
+    #print "algs0: ", algs0
+    alg = ' '.join(str(e) for e in form.algs.data)
 
-        db.session.add(models.Setting(words, wordlevel, algs))
-        db.session.commit()
-            
-        return redirect(url_for('show_entries'))
+    db.session.add(models.Select(words, wordlevel, alg))
+    db.session.commit()
 
-    return render_template('setting.html', form = form)
+    #flash('New setting was successfully posted')
+         
+    return redirect(url_for('show_entries'))
+
+    #return render_template('setting.html', form = form)
 
 
 if __name__ == '__main__':
