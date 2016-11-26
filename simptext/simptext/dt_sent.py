@@ -31,9 +31,11 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 #from utils.algs import punct, coordi, subordi, adverb, parti, adjec, appos, passive, paratax
 
 #the algs about the syntax
-from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, passive, paratax
+from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, passive, paratax, relcl
 #import algs
 # the models
+
+import time
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -63,7 +65,8 @@ def read_xlsx_file(filename, sheetnums, columnnum):
     # TODO- the replace function
 
     #import pdb; pdb.set_trace()
-    return tuple(words)
+    #return tuple(words)
+    return words
 
 
 def read_xml_file(filename, word):
@@ -832,7 +835,7 @@ def simp_coinco_sent(filename, sent_file):
 
 def simp_syn_sent(sent, _algs=range(1,10)):
     strs = ""
-
+    begin_time = time.time()
     # define dic of the ALG according to the one in the form
     algs_lst = [
         punct.simp_punct_sent,
@@ -872,7 +875,10 @@ def simp_syn_sent(sent, _algs=range(1,10)):
 
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
+    end_time = time.time()
+    print "The time of parser: ", end_time - begin_time
 
+    #import pdb; pdb.set_trace()
     #w = result.tree()
     #print "parse_tree:", w
     
@@ -888,33 +894,29 @@ def simp_syn_sent(sent, _algs=range(1,10)):
         for ind in _algs:
             #import pdb; pdb.set_trace()
             # if the alg in the choices
-            print "_alg: ", algs_lst[ind-1]
             if len(strs) > 0:
+                #print "_strs: ", strs
+                end_time = time.time()
+                print "The time of alg: ", end_time - begin_time
                 return strs, algs_lst[ind-1]
             else:
                 #func = _algs_lst[ind]
-                strs = algs_lst[ind-1](tokens,node_list)                              
+                print "_alg: ", algs_lst[ind-1]
+                strs = algs_lst[ind-1](tokens,node_list)
 
+    #import pdb; pdb.set_trace()
+    end_time = time.time()
+    print "The time of alg: ", end_time - begin_time
+
+    #print "strs: ", strs
     return (strs, alg)
 
 
 def _simp_syn_sent(sent, _algs=range(1,10)):
     strs = ""
-
-    """
     
-    _algs_lst = [
-        #punct.simp_punct_sent,
-        coordi.simp_coordi_sent,
-        subordi.simp_subordi_sent,
-        adverb.simp_adverb_sent,
-        parti.simp_parti_sent,
-        adjec.simp_adjec_sent,
-        appos.simp_appos_sent,
-        passive.simp_passive_sent,
-        paratax.simp_paratax_sent
-    ]
 
+    """ 
     # order the ALG for the better performance(precision/recall)
     _algs_lst_ = [
         paratax.simp_paratax_sent,
@@ -929,7 +931,6 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
     ]
     """
     # the original tokens in the sent
-    #import pdb; pdb.set_trace()
     #print "syn sent: ", sent
     #import pdb; pdb.set_trace()
     tokens = StanfordTokenizer().tokenize(sent)
@@ -1002,17 +1003,22 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
                                     return strs, alg
                                 else:
                                     #strs = subordi.simp_subordi_sent(tokens, node_list)
-                                    strs = strs = coordi.simp_coordi_sent(tokens, node_list)
+                                    strs = coordi.simp_coordi_sent(tokens, node_list)
                                     if len(strs) > 0:
                                         alg = "coordi"
                                         return strs, alg
-                                    """
                                     else:
+                                        """
                                         strs = passive.simp_passive_sent(tokens, node_list)
                                         if len(strs) > 0:
                                             alg = "passive"
                                             return strs, alg
-                                    """
+                                        else:
+                                        """
+                                        strs = relcl.simp_syn_sent_(sent)
+                                        if len(strs) > 0:
+                                            alg= "relcl"
+                                            return strs, alg
 
     return strs, alg
      
@@ -1027,7 +1033,7 @@ def get_split_ret(_str):
     s2 = ""
     if len(_strs) == 1 or len(_strs[1]) == 0:
         return (s1,  s2)
-    s2 = _strs[1] + ' .'
+    s2 = _strs[1] + ' . '
 
     return (s1,  s2)
 
@@ -1176,8 +1182,10 @@ def main():
     entries = "John Nash, a mathematician, lectured at Princeton."
     #entries = "Nash was  a mathematician  ."
 
-    entries = "Polar bear fur consists of a layer of dense underfur and an outer layer of guard hairs , which appear white to tan but are actually transparent ."
-
+    entries = "However , the new king , Louis XVIII , knew that ideas of nationalism and democracy still lingered in his country ; hence the establishment and signing of the Charte constitutionnelle fraise , the French Constitution otherwise known as La Charte ."
+    entries = "She has three older brothers : Aaron , Benjamin , and Nathaniel , the latter of whom is a model and actor ."
+    entries = "However , the new king , Louis XVIII , knew that ideas of nationalism and democracy still lingered in his country ; hence the establishment and signing of the Charte constitutionnelle franiaise , the French Constitution otherwise known as La Charte ."
+    
     re, alg = _simp_syn_sent(entries)
     print(alg)
     if len(re) > 0:
@@ -1186,6 +1194,9 @@ def main():
     else:
         print(re)
         print(alg)
+    
+    #entries = "i ate an apple and an orange."
+    #re = simp_syn_sent(entries)
 
 if __name__ == '__main__':
      main()

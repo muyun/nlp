@@ -32,6 +32,8 @@ def simp_paratax_sent(tokens, node_list):
 
     strs = ""
 
+    #import pdb; pdb.set_trace()
+
     nsubj_ind = 0
     #punct_ind = 0
     if PUNCT in tokens:
@@ -79,17 +81,6 @@ def simp_syn_sent_(sent):
 
 
     # will fixed the bug
-    lst1 = "Peter - nobody guessed it - showed up.".split()
-    lst2 = "Peter - nobody guessed it - showed up .".split()
-    _lst = sent.split()
-
-
-    #import pdb; pdb.set_trace()
-    if lst1 == _lst:
-        return "Peter showed up. Nobody guessed it."
-    if lst2 == _lst:
-        return "Peter showed up. Nobody guessed it."
-
 
     #import pdb; pdb.set_trace()
     #print(sent)

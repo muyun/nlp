@@ -121,7 +121,7 @@ def check_word(strs, words):
 
     tokens = []
     tokens = rank._interface(strs, words)
-    print "tokens:", tokens
+    #print "tokens:", tokens
 
     return tokens
 

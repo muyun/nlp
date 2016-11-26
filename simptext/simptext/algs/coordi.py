@@ -145,7 +145,7 @@ def simp_coordi_sent(tokens, node_list):
             #       or,
             #import pdb; pdb.set_trace()
 
-            nsubj = " "
+            nsubj = ""
             nsubj_ind = 0
             cop_ind = 0
             FLAG = 0
@@ -292,10 +292,12 @@ def simp_coordi_sent(tokens, node_list):
                 # bugs here
 
                 #import pdb; pdb.set_trace()
-                _nsubj_ind = tokens.index(nsubj.lower().split()[0])
-                if _nsubj_ind >0:
-                    str1 = " ".join(tokens[:_nsubj_ind]) + " " + _str1
- 
+                if len(nsubj) > 0:
+                    _nsubj_ind = tokens.index(nsubj.lower().split()[0])
+                    if _nsubj_ind > 0:
+                        str1 = " ".join(tokens[:_nsubj_ind]) + " " + _str1
+                        str1 = str1.strip()
+                        str1 =  str1[0].upper() + str1[1:]      
 
             #NOTICE: We can consider the next word after the conjunction as the first word of 2nd sentence
             # str2
@@ -326,7 +328,9 @@ def simp_coordi_sent(tokens, node_list):
                 
             else:
                 str2 = conj_nsubj + " " + " ".join(tokens[(conj_nsubj_ind + 1):])
-                
+                str2 = str2.strip()
+                str2 =  str2[0].upper() + str2[1:]  
+
             """
             lst = []
             lst.append(row[0][0])
@@ -523,7 +527,9 @@ def main():
     sent = "Alexios was able to halt the Byzantine decline and begin the military , financial , and territorial recovery known as the `` Komnenian restoration ."
     #sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
 
-    sent = "Hence the establishment and signing of the Charte constitutionnelle franid, the French Constitution otherwise known as La Charte ."
+    sent = "Hence the establishment and signing of the Charte constitutionnelle franiaise , the French Constitution otherwise known as La Charte  ."
+    
+    #sent = "Peter was my friend and I was his friend."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

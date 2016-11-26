@@ -46,12 +46,6 @@ $(function() {
   });
    }
 
-   $('#algs').change(function() {
-      localStorage.setItem(this.id, this.value);
-   }).val(function() {
-      return localStorage.getItem(this.id)
-   });
-
 });
 </script>
 
@@ -65,15 +59,6 @@ function myFunction() {
 </script>
 -->
 
-{% if session.logged_in %}
-    <form action="{{ url_for('add_entry') }}" autocomplete=off method=post >
-      <dl>
-        <dt>Input:
-        <dd><textarea name=input rows=4 cols=60></textarea> 
-        <br/>
-        <dd><input type=submit value=Simplify>
-      </dl>
-    
 <ul class="entries" id="entry">
   {% if entries %}
      <li><h2>Input:</h2>
@@ -99,15 +84,12 @@ function myFunction() {
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}
-            {% if value|length == 1 %}
-                <u>{{ key |safe }}</u>
-            {% else %}
             <select>  
               {% for v in value %}
                  <option value={{ v }} >{{ v |safe}} </option>
               {% endfor %}         
             </select>
-            {% endif %}
+
           {% endfor %}
 
         {% else %}
@@ -128,15 +110,12 @@ function myFunction() {
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}     
-            {% if value|length > 1 %}
             <select>
               {% for v in value %}
                  <option value={{ v }} >{{ v |safe}} </option>
               {% endfor %}
             </select>
-            {% else %}
-              <u>{{ key |safe }}</u>
-            {% endif %}
+
           {% endfor %}
 
         {% else %}
@@ -186,7 +165,7 @@ function myFunction() {
       <div class ="dropdown">        
         <button onclick="myFunction()" class="dropbtn">Setting</button> 
     --> 
-        <hr/>
+        
         <div class="selection">
            <dt>The wordlist:
            <input type="text" name=wordinput id=wordinput value=""/>
@@ -194,14 +173,7 @@ function myFunction() {
            <dt>{{ form.wordlevel.label }}  
            <dd> {{ form.wordlevel }} 
            <br/> 
-           <dt>{{ form.algs.label }}    
-           <dd>{{ form.algs }} 
         </div>
-
-        </form> 
-  {% else %}
-     <li><em>No output here so far</em>
-  {% endif %}
 
 </ul>
 

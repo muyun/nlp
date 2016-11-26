@@ -133,7 +133,16 @@ def include_aux(node_list, root_ind, nsubj):
             if ('auxpass' in nd[4].keys()):
                     auxpass_ind = nd[4]['auxpass'][0]
     return nsubj     
+
+
+class Tree:
+    def __init__(self, data):
+        self.data = data
+        self.kids = []
         
+    def add(self, word):
+        self.kids.append(word)
+
 
 
 def main():

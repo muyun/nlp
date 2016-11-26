@@ -291,6 +291,8 @@ def simp_syn_sent_(sent):
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
 
+
+    #import pdb; pdb.set_trace()
     #w = result.tree()
     #print "parse_tree:", w
     #for row in result.triples():
@@ -327,6 +329,7 @@ def main():
     sent = "The books, most of which I read, are interesting."
     #sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
 
+    #sent = "At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

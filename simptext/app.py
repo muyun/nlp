@@ -15,6 +15,8 @@ from forms import EntryForm, SelectForm
 
 import json
 
+import time
+
 app = Flask(__name__)
 app.config.from_object('config.DevelopmentConfig')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -27,16 +29,21 @@ import models
 from simptext import dt_sent, wordcal
 #import simptext
 
+#word_start = time.time()
 word1 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 1, 1)
 word2 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 2, 1)
 word3 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 3, 1)
 word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
+word_end = time.time()
+
+#word_during = word_end - word_start
+#print "word_during: ", word_during
 #words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
 #from nltk.tokenize import StanfordTokenizer
 
-@app.route('/')
+#@app.route('/show_entries')
 def show_entries():
-    form = EntryForm()
+    #form = EntryForm()
     # the the latest text from database
     m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
     #txt = str(db.session.query(models.Entry).get(m.max_id))
@@ -55,6 +62,7 @@ def show_entries():
     #txt = str(db.session.query(models.Entry).get(m.max_id))
     #stxt = models.Select.query.get(s.max_id)
 
+    #import pdb; pdb.set_trace()
     words = []
     global word1, word2, word3, word4
     #_txt = str(txt).split('\'')
@@ -66,6 +74,7 @@ def show_entries():
     algs = range(1,10)
     if len(str(se[3])) > 0:
         algs = [int(i) for i in str(se[3]).split()]    
+    #form.algs.choices =  ''.join(str(e) for e in algs)
 
     print "entries: ", entries
     print "wordlist: ", wordlist
@@ -111,20 +120,25 @@ def show_entries():
     s2_output = {}
     s1 = ""
     s2 = ""
-
+    
     if len(entries) > 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
         _syn_ret, alg1 = dt_sent.simp_syn_sent(entries, algs)
         #BUG here, todo
+        
         if len(_syn_ret) > 0:
             (s1, s2) = dt_sent.get_split_ret(_syn_ret)
 
+            begin_time4 = time.time()
             s1_output = wordcal.check_word(s1, words)
             s2_output = wordcal.check_word(s2, words)
 
-        s_outputs = wordcal.check_word(entries, words)          
-    
+        s_outputs = wordcal.check_word(entries, words)   
+
+        begin_time5 = time.time() - begin_time4
+        print "The time of wordcal function: ", begin_time5
+        
     print "s1_output: ", s1_output
     print "s2_output: ", s2_output
     print "s_outputs: ", s_outputs
@@ -134,7 +148,7 @@ def show_entries():
 
 
 # this view let the user add new entries if they are logged in
-@app.route('/add', methods=['GET','POST'])
+@app.route('/', methods=['GET','POST'])
 def add_entry():
     if not session.get('logged_in'):
         abort(401)
@@ -171,7 +185,7 @@ def add_entry():
 
     flash('New entry was successfully posted')
 
-    #return render_template('show_entries.html', text=text)
+    #return render_template('show_entries.html')
     return redirect(url_for('show_entries'))
 
 
@@ -221,5 +235,5 @@ def setting():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    #app.run(host='144.214.20.231',debug=True)
+    app.run(debug=True, threaded=True)
+    #app.run(host='144.214.20.231',port = 5001,debug=True)
