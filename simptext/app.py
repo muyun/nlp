@@ -5,7 +5,7 @@
  @author wenlong
 """
 import os
-
+from sqlite3 import dbapi2 as sqlite3
 from flask import Flask, request, render_template, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
 
@@ -18,12 +18,21 @@ import json
 import time
 
 app = Flask(__name__)
-app.config.from_object('config.DevelopmentConfig')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+app.config.from_object(__name__)
+#app.config.from_object('config.DevelopmentConfig')
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#db = SQLAlchemy(app)
+# Load default config and override config from an environment variable
+app.config.update(dict(
+    DATABASE=os.path.join(app.root_path, 'simptext.db'),
+    SECRET_KEY='development key',
+    USERNAME='admin',
+    PASSWORD='admin'
+))
+#app.config.from_envvar('simptext_SETTINGS', silent=True)
 
 # this model is the db model
-import models
+#import models
 
 #from algs import simp
 from simptext import dt_sent, wordcal
@@ -34,93 +43,137 @@ word1 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 1, 1)
 word2 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 2, 1)
 word3 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 3, 1)
 word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
-word_end = time.time()
+#word_end = time.time()
 
 #word_during = word_end - word_start
 #print "word_during: ", word_during
 #words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
 #from nltk.tokenize import StanfordTokenizer
 
-#@app.route('/show_entries')
+def connect_db():
+    """Connects to the specific database."""
+    rv = sqlite3.connect(app.config['DATABASE'])
+    rv.row_factory = sqlite3.Row
+    return rv
+
+
+def init_db():
+    """Initializes the database."""
+    db = get_db()
+    with app.open_resource('schema.sql', mode='r') as f:
+        db.cursor().executescript(f.read())
+    db.commit()
+
+@app.cli.command('initdb')
+def initdb_command():
+    """Creates the database tables."""
+    init_db()
+    print('Initialized the database.')
+
+def get_db():
+    """Opens a new database connection if there is none yet for the
+    current application context.
+    """
+    if not hasattr(g, 'sqlite_db'):
+        g.sqlite_db = connect_db()
+    return g.sqlite_db
+
+@app.teardown_appcontext
+def close_db(error):
+    """Closes the database again at the end of the request."""
+    if hasattr(g, 'sqlite_db'):
+        g.sqlite_db.close()
+
+@app.route('/')
 def show_entries():
-    #form = EntryForm()
+    form = EntryForm()
     # the the latest text from database
-    m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
+    #m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
     #txt = str(db.session.query(models.Entry).get(m.max_id))
-    etxt = models.Entry.query.get(m.max_id)
-    #se = str(etxt).split('@') 
-    #entries = str(se[0])  
-    #print "entries: ", entries
-    #print "txt: ", str(e[0])
+    #etxt = db.session.query.get(m.max_id)
+    #etxt = models.Entry.query.get(m.max_id)
+    db = get_db()
+    cur = db.execute('select * from entries WHERE id = (SELECT MAX(id) FROM entries);')
+    etxt = cur.fetchall();
+    if len(etxt) == 0:
+    	entries = ""
+    if len(etxt) > 0:
+        print "etxt: ", etxt[0]
     
-    #ret = ""
-    #s = db.session.query(db.func.max(models.Setting.id).label("max_id")).one()
-    #ret = str(db.session.query(models.Setting).get(s.max_id))
-    #print "setting: ", ret
+        db.execute('delete from entries where id = (SELECT MAX(id) FROM entries);')
+        db.commit()
 
-    #s = db.session.query(db.func.max(models.Select.id).label("max_id")).one()
-    #txt = str(db.session.query(models.Entry).get(m.max_id))
-    #stxt = models.Select.query.get(s.max_id)
-
-    #import pdb; pdb.set_trace()
-    words = []
-    global word1, word2, word3, word4
-    #_txt = str(txt).split('\'')
-    se = str(etxt).split('@')
-    entries = str(se[0])
-    wordlist = str(se[1])
-    wordlevel = str(se[2])
-    print "se2: ", str(se[3])
-    algs = range(1,10)
-    if len(str(se[3])) > 0:
-        algs = [int(i) for i in str(se[3]).split()]    
+        #import pdb; pdb.set_trace()
+        words = []
+        global word1, word2, word3, word4
+        #_txt = str(txt).split('\'')
+        #se = str(etxt[0]).split(',')
+        entries = str(etxt[0][1])
+        wordlist = str(etxt[0][2])
+        wordlevel = str(etxt[0][3])
+        print "se2: ", str(etxt[0][4])
+        algs = range(1,10)
+        if len(str(etxt[0][4])) > 0:
+            algs = [int(i) for i in str(etxt[0][4]).split()]    
     #form.algs.choices =  ''.join(str(e) for e in algs)
 
-    print "entries: ", entries
-    print "wordlist: ", wordlist
-    print "wordlevel: ", wordlevel
-    print "algs: ", algs
+        print "entries: ", entries
+        print "wordlist: ", wordlist
+        print "wordlevel: ", wordlevel
+        print "algs: ", algs
     
-    if len(wordlist) > 0:
-        _words = []
-    	for w in wordlist.split(','):
-    		w = w.strip()
-    		_words.append(w)
+        if len(wordlist) > 0:
+            _words = []
+    	    for w in wordlist.split(','):
+    		    w = w.strip()
+    		    _words.append(w)
 
-        if int(wordlevel) == 0:
-            words = _words
-        else:
-            if int(wordlevel) == 1:
-                words = list(_words) + list(word1)
+            if int(wordlevel) == 0:
+                words = _words
+            else:
+                if int(wordlevel) == 1:
+                    words = list(_words) + list(word1)
+                if int(wordlevel) == 2:
+                    words = list(_words) + list(word2)
+                if int(wordlevel) == 3:
+                    words = list(_words) + list(word3)   
+                if int(wordlevel) == 4:
+                    words = list(_words) + list(word4)
+                    #print "words4: ", words
+        elif len(wordlevel) > 0:
+    	    if int(wordlevel) == 1:
+    		    words = word1
             if int(wordlevel) == 2:
-                words = list(_words) + list(word2)
+    		    words = word2
             if int(wordlevel) == 3:
-                words = list(_words) + list(word3)   
-            if int(wordlevel) == 4:
-                words = list(_words) + list(word4)
-                #print "words4: ", words
-    elif len(wordlevel) > 0:
-    	if int(wordlevel) == 1:
-    		words = word1
-        if int(wordlevel) == 2:
-    		words = word2
-        if int(wordlevel) == 3:
-    		words = word3	
-    	if int(wordlevel) == 4:
-    		words = word4
-    else:
-        pass	
-    
+    		    words = word3	
+    	    if int(wordlevel) == 4:
+    		    words = word4
+        else:
+            pass	
+
     #print "words: ", words
     #print "words: ", words
     # TODO: update the ALGs
     #outputs = entries
+
     s_outputs = {}
     s1_output = {}
     s2_output = {}
     s1 = ""
     s2 = ""
-    
+
+    """
+    if len(entries) == 0:
+    	s1 = str(etxt[0][5])
+    	s2 = str(etxt[0][6])
+    	print "s1: ", s1
+    	print "s2: ", s2
+    	s1_output = wordcal.check_word(s1, words)
+        s2_output = wordcal.check_word(s2, words)
+    """
+        #s_outputs = wordcal.check_word(entries, words)
+       
     if len(entries) > 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
@@ -134,6 +187,7 @@ def show_entries():
             s1_output = wordcal.check_word(s1, words)
             s2_output = wordcal.check_word(s2, words)
 
+        begin_time4 = time.time()
         s_outputs = wordcal.check_word(entries, words)   
 
         begin_time5 = time.time() - begin_time4
@@ -142,27 +196,30 @@ def show_entries():
     print "s1_output: ", s1_output
     print "s2_output: ", s2_output
     print "s_outputs: ", s_outputs
-
+    
     return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output)
     #return render_template('show_entries.html', form=form, wordlist=wordlist, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
-
+    #return render_template('show_entries.html', form=form)
 
 # this view let the user add new entries if they are logged in
-@app.route('/', methods=['GET','POST'])
+@app.route('/add', methods=['GET','POST'])
 def add_entry():
-    if not session.get('logged_in'):
-        abort(401)
+    #if not session.get('logged_in'):
+    #    abort(401)
 
     form = EntryForm()
-    txt = request.form['input']
-    print "input: ", txt
+    inputs = ""
+    inputs = request.form['input']
+    print "input: ", inputs
     #
     #words = ""
+    wordinput = ""
     wordinput = request.form['wordinput']
     #words = form.words.data
     print "words: ", wordinput
     #wordlevel = ""
     #wordlevel = request.form['wordlevel']
+    wordlevel = ""
     wordlevel = request.form['wordlevel']
     #wordlevel = form.wordlevel.data
     print "wordlevel: ", wordlevel
@@ -176,16 +233,20 @@ def add_entry():
     #wordlist = ""
     #_wordlist = request.form['words']
     #txt = form.input.data
-    db.session.add(models.Entry(txt, wordinput, wordlevel, alg))
+    s1 = ""
+    s2 = ""
 
-    #sform = SelectForm()
-    #txt = request.sform['input']
-    #db.session.add(models.Select(words, wordlevel, alg))
-    db.session.commit()
+    #db.session.add(models.Entry(txt, wordinput, wordlevel, alg, s1, s2))
+    #db.session.commit()
+    db = get_db()
+    db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
+               [request.form['input'], request.form['wordinput'], request.form['wordlevel'],
+               alg, s1, s2])
+    db.commit()
 
     flash('New entry was successfully posted')
 
-    #return render_template('show_entries.html')
+    #return render_template('show_entries.html', text=text)
     return redirect(url_for('show_entries'))
 
 
@@ -201,7 +262,8 @@ def login():
         else:
             session['logged_in'] = True
             flash('You were logged in')
-            return redirect(url_for('show_entries'))
+            #return redirect(url_for('show_entries'))
+            return redirect(url_for('add_entry'))
     return render_template('login.html', error=error)
 
 
@@ -209,7 +271,8 @@ def login():
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
-    return redirect(url_for('show_entries'))
+    #return redirect(url_for('show_entries'))
+    return redirect(url_for('login'))
 
 @app.route('/setting', methods=['GET', 'POST'])
 def setting():

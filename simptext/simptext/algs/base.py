@@ -63,7 +63,6 @@ def upper_first_char(w):
     else:
         return ""              
 
-
 def get_triples(node):
     """
     Extract dependency triples of the form:

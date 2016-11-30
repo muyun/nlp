@@ -51,6 +51,22 @@ $(function() {
 
 <!--
 <script>
+jQuery.each(localStorage,function(index,item){
+   if( $("#"+index)[0] )
+   { 
+       if(item == "true")
+         $("#"+index).attr("checked","checked");
+    }
+ });
+
+$('input:checkbox').change(function() {
+    localStorage.setItem($(this).attr("id"),($(this).is(":checked") ? true : false));
+});
+
+</script>
+-->
+<!--
+<script>
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function myFunction() {
@@ -59,6 +75,14 @@ function myFunction() {
 </script>
 -->
 
+    <form action="{{ url_for('add_entry') }}" autocomplete=off method=post >
+      <dl>
+        <dt>Input:
+        <dd><textarea name=input rows=4 cols=60></textarea> 
+        <br/>
+        <dd><input type=submit value=Simplify>
+      </dl>
+    
 <ul class="entries" id="entry">
   {% if entries %}
      <li><h2>Input:</h2>
@@ -156,6 +180,7 @@ function myFunction() {
     {% endif %}
 {% endif %}
 
+{% endif %}
     <br/>
     <br/>
     <br/>
@@ -165,7 +190,7 @@ function myFunction() {
       <div class ="dropdown">        
         <button onclick="myFunction()" class="dropbtn">Setting</button> 
     --> 
-        
+        <hr/>
         <div class="selection">
            <dt>The wordlist:
            <input type="text" name=wordinput id=wordinput value=""/>
@@ -173,11 +198,14 @@ function myFunction() {
            <dt>{{ form.wordlevel.label }}  
            <dd> {{ form.wordlevel }} 
            <br/> 
+           <dt>{{ form.algs.label }}    
+           <dd>{{ form.algs }} 
         </div>
+
+        </form> 
 
 </ul>
 
-{% endif %}
 
 {% include 'merge.html' %}
 {% include 'footer.html' %}

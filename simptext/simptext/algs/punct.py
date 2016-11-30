@@ -21,15 +21,21 @@ from pattern.en import tenses, conjugate
 #from algs import base
 import base
 #PUNCTUATION = (';', ':', ',', '.', '!', '?')
+import time
 
-def check_tag(word, taggers):
+def check_tag(word, node_list):
     """ get the tagger of the word in taggers, or return "" """
+    taggers = []
+    for nd in node_list[1:]:
+        taggers.append((nd[1], nd[2]))
+        
     for w, tagger in taggers:
         if w == word:
             return tagger
     return ""    
 
 def simp_punct_sent(tokens, node_list):
+    start_time = time.time()
     """
     tokens = StanfordTokenizer().tokenize(sent)
     tokens.insert(0, '')
@@ -69,7 +75,12 @@ def simp_punct_sent(tokens, node_list):
     pron = "They"
     verb = "are"
     #verb = conjugate(verb, tenses(root)[0][0], 3)
-    taggers = eng_tagger.tag(tokens)
+    #taggers_start = time.time()
+    #taggers = eng_tagger.tag(tokens)
+    
+    #taggers_end = time.time()
+    #taggers_during = taggers_end - taggers_start
+    #print "The time of taggers_during: ", taggers_during
     
     punct_ind = 0
     punct_set = set(PUNCTUATION).intersection(set(tokens))
@@ -84,7 +95,7 @@ def simp_punct_sent(tokens, node_list):
                 word = tokens[ind+1]
 
                 #import pdb; pdb.set_trace()
-                if 'NN' in check_tag(word, taggers):
+                if 'NN' in check_tag(word, node_list):
                     # a pronoun and verb be added
                     tokens.insert(ind+1, verb)
                     tokens.insert(ind+1, pron)
@@ -94,13 +105,15 @@ def simp_punct_sent(tokens, node_list):
                 
                 #break
 
-
         #import pdb; pdb.set_trace()
         str1 = " ".join(tokens[:punct_ind])
         str2 = " ".join(tokens[punct_ind:])
         
         strs = str1  + str2
-    
+
+    end_time = time.time()
+    during_time = end_time - start_time
+    print "The time of punct function: ", during_time
     return strs
 
 def simp_syn_sent_(sent):
@@ -114,6 +127,8 @@ def simp_syn_sent_(sent):
     tokens = StanfordTokenizer().tokenize(str(sent))
     #tokens = wordpunct_tokenize(str(sent))
 
+
+    #import pdb; pdb.set_trace()
     tokens.insert(0, '')
 
     #taggers = eng_tagger.tag(sent.split())
@@ -149,10 +164,11 @@ def simp_syn_sent_(sent):
 def main():
     # punctuation clauses
 
-    sent = "I ate fish; he drank wine."
-    sent = "I have two brothers: they both live in China."
-    sent = "I have two brothers: Peter and Sam."
-    #sent = "In March 1992 , Linux version 0.95 was the first to be capable of running X. This large version number jump was due to a feeling that a version 1.0 with no major missing pieces was imminent ."
+    sent = "I ate fish; he drank wine; this is a bine; "
+    #sent = "I have two brothers: they both live in China."
+    #sent = "I have two brothers: Peter and Sam."
+    #sent = "In March 1992 , Linux version 0.95 was the first to be capable of running X : This large version number jump was due to a feeling that a version 1.0 with no major missing pieces was imminent ."
+    sent = "This is a test ."
     print(simp_syn_sent_(sent))    
 
         
