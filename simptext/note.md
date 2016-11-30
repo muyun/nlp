@@ -23,8 +23,9 @@
   $ txt = model.Entry('this is a demo')  
   $ db.session.add(txt)  
   $ db.session.commit() 
-  
-  $ sudo pip install pysqlite  
+ 
+* About the sqlite3 
+> $ sudo pip install pysqlite  
   $ sqlite3 simptext.db < schema.sql  
                                  
 
