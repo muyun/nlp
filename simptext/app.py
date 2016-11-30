@@ -244,7 +244,7 @@ def add_entry():
                alg, s1, s2])
     db.commit()
 
-    flash('New entry was successfully posted')
+    #flash('New entry was successfully posted')
 
     #return render_template('show_entries.html', text=text)
     return redirect(url_for('show_entries'))
