@@ -24,8 +24,8 @@
   $ db.session.add(txt)  
   $ db.session.commit() 
   
-  $ sudo pip install pysqlite
-  $ sqlite3 simptext.db < schema.sql
+  $ sudo pip install pysqlite  
+  $ sqlite3 simptext.db < schema.sql  
                                  
 
 #### questions
