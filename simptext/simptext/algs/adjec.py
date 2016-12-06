@@ -24,10 +24,12 @@ eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 
 #from algs import base
 import base
+import time
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
 def simp_adjec_sent(tokens, node_list):
+    start_time = time.time()
     """
     strs = ""
     # the original tokens in the sent
@@ -57,6 +59,9 @@ def simp_adjec_sent(tokens, node_list):
                 cop_ind = nd[4]['cop'][0]
 
     # cop
+    taggers = []
+    for nd in node_list[1:]:
+        taggers.append((nd[1], nd[2]))
 
     strs = ""
     #split_ind = 0
@@ -92,7 +97,7 @@ def simp_adjec_sent(tokens, node_list):
             person_taggers = []
             org_taggers = []
             # replace the nsubj with "he/she"
-            for token, title in eng_tagger.tag(tokens):
+            for token, title in taggers:
                 if token in nsubj:
                     if title == 'PERSON':
                         person_taggers.append(token)
@@ -196,7 +201,7 @@ def simp_adjec_sent(tokens, node_list):
 
                     strs = str2 + ' ' + str1 + " ."
 
-                    return strs
+                    #return strs
 
                 else: # nsubj
                 #subj = tokens[nsubj_ind]
@@ -266,8 +271,11 @@ def simp_adjec_sent(tokens, node_list):
                     #print "2nd sent: ", str2
 
                     strs = str2 + " " + str1 + " ."
-                    return strs
+                    #return strs
 
+    end_time = time.time()
+    during_time = end_time - start_time
+    print "The time of adjec function: ", during_time
     return strs
 
 def simp_syn_sent_(sent):

@@ -838,14 +838,14 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     begin_time = time.time()
     # define dic of the ALG according to the one in the form
     algs_lst = [
-        punct.simp_punct_sent,
+        paratax.simp_paratax_sent,
         subordi.simp_subordi_sent,
         adverb.simp_adverb_sent,
         parti.simp_parti_sent,
         adjec.simp_adjec_sent,
         appos.simp_appos_sent,
         passive.simp_passive_sent,
-        paratax.simp_paratax_sent,
+        punct.simp_punct_sent,
         coordi.simp_coordi_sent
     ]
 
@@ -871,7 +871,7 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     #tokens = wordpunct_tokenize(strs)
     tokens.insert(0, '')
 
-    taggers = eng_tagger.tag(sent.split())
+    #taggers = eng_tagger.tag(sent.split())
 
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
@@ -915,7 +915,6 @@ def simp_syn_sent(sent, _algs=range(1,10)):
 def _simp_syn_sent(sent, _algs=range(1,10)):
     strs = ""
     
-
     """ 
     # order the ALG for the better performance(precision/recall)
     _algs_lst_ = [
@@ -936,7 +935,7 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
     tokens = StanfordTokenizer().tokenize(sent)
     #tokens = wordpunct_tokenize(strs)
     tokens.insert(0, '')
-    taggers = eng_tagger.tag(sent.split())
+    #taggers = eng_tagger.tag(sent.split())
 
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
@@ -1008,17 +1007,16 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
                                         alg = "coordi"
                                         return strs, alg
                                     else:
-                                        """
+                                        
                                         strs = passive.simp_passive_sent(tokens, node_list)
                                         if len(strs) > 0:
                                             alg = "passive"
                                             return strs, alg
                                         else:
-                                        """
-                                        strs = relcl.simp_syn_sent_(sent)
-                                        if len(strs) > 0:
-                                            alg= "relcl"
-                                            return strs, alg
+                                            strs = relcl.simp_syn_sent_(sent)
+                                            if len(strs) > 0:
+                                                alg= "relcl"
+                                                return strs, alg
 
     return strs, alg
      
@@ -1029,6 +1027,7 @@ def get_split_ret(_str):
     """
     _strs = _str.split('.')
 
+    #import pdb; pdb.set_trace()
     s1 = _strs[0] + ' . '
     s2 = ""
     if len(_strs) == 1 or len(_strs[1]) == 0:
@@ -1037,9 +1036,9 @@ def get_split_ret(_str):
 
     return (s1,  s2)
 
-def _get_split_ret(_str):
+def _get_split_ret(_str, _algs):
     print "S1+S2: ", _str
-    syn_ret = ""
+    ret = ""
 
     _strs = _str.split('.')
 
@@ -1053,9 +1052,10 @@ def _get_split_ret(_str):
 
     #import pdb; pdb.set_trace()
     if len(_strs) == 1 or len(_strs[1]) == 0:
-        return (s1, s1_child, s2, s2_child, _str, algs)
+        return s1, s1_child, s2, s2_child, _str, algs
      
-    s1_child, alg1 = _simp_syn_sent(s1)
+    #s1_child, alg1 = _simp_syn_sent(s1)
+    s1_child, alg1 = simp_syn_sent(s1, _algs)
     print "S11+S12: ", s1_child
     print "alg1: ", alg1
     
@@ -1064,30 +1064,31 @@ def _get_split_ret(_str):
     #import pdb; pdb.set_trace()
     s2 = _strs[1] + ' .'
     print "S2: ", s2
-    s2_child, alg2 = _simp_syn_sent(s2)
+    #s2_child, alg2 = _simp_syn_sent(s2)
+    s2_child, alg2 = simp_syn_sent(s2, _algs)
     print "S21+S22: ", s2_child
     print "alg2: ", alg2
 
     if len(s1_child)>0: # syn_ret1
         if len(s2_child)>0: # syn_ret2
-            syn_ret = s1_child + s2_child
-            print "1+2: ", syn_ret
+            ret = s1_child + s2_child
+            print "1+2: ", ret
         else:
-            syn_ret = s1_child + s2 
-            print "1+in+2: ", syn_ret
+            ret = s1_child + s2 
+            print "1+in+2: ", ret
     else:
         if len(s2_child)>0:
-            syn_ret = s1 + s2_child
-            print "in+1+2: ", syn_ret
+            ret = s1 + s2_child
+            print "in+1+2: ", ret
         else:
-            syn_ret = _str 
-            print "in+1+in+2: ", syn_ret   
+            ret = _str 
+            print "in+1+in+2: ", ret   
 
-    print "Syntactic result: ", syn_ret
+    print "Syntactic result: ", ret
 
-    algs = alg1 + "@" + alg2
+    algs = str(alg1) + "@" + str(alg2)
 
-    return (s1, s1_child, s2, s2_child, syn_ret, algs)
+    return s1, s1_child, s2, s2_child, ret, algs
 
 # Main test
 def main():
@@ -1178,22 +1179,23 @@ def main():
     entries = "he came. so, i left."
     
     entries = "Peter - nobody guessed it - showed up ."
-    entries = "Peter - nobody guessed it – showed up ."
     entries = "John Nash, a mathematician, lectured at Princeton."
     #entries = "Nash was  a mathematician  ."
 
     entries = "However , the new king , Louis XVIII , knew that ideas of nationalism and democracy still lingered in his country ; hence the establishment and signing of the Charte constitutionnelle fraise , the French Constitution otherwise known as La Charte ."
     entries = "She has three older brothers : Aaron , Benjamin , and Nathaniel , the latter of whom is a model and actor ."
-    entries = "However , the new king , Louis XVIII , knew that ideas of nationalism and democracy still lingered in his country ; hence the establishment and signing of the Charte constitutionnelle franiaise , the French Constitution otherwise known as La Charte ."
-    
-    re, alg = _simp_syn_sent(entries)
+    entries = "Peter was hit by a bus."
+    re, alg = simp_syn_sent(entries)
+    print(re)
+    """
     print(alg)
     if len(re) > 0:
         print "S1S2:", re
-        info = _get_split_ret(re)
+        #info = _get_split_ret(re)
     else:
         print(re)
         print(alg)
+    """
     
     #entries = "i ate an apple and an orange."
     #re = simp_syn_sent(entries)

@@ -192,9 +192,11 @@ def simp_adverb_sent(tokens, node_list):
                 _str2 = ""
                 if split_ind < nsubj_ind:
                     #_str2 = tokens[split_ind+1:] 
-                    _str2 = tokens[root_ind:]
-                    if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
-                        _str2 = tokens[split_ind+2:]
+                    _strs = tokens[root_ind:]
+                    if ('which' == _strs[0].lower()) or ('who' == _strs[0].lower()):
+                        _strs = tokens[split_ind+2:]
+
+                    _str2 = " ".join(_strs)
                 #_str2 = tokens[root_ind:]
                         #w = _w + ' '
                     """
@@ -213,15 +215,33 @@ def simp_adverb_sent(tokens, node_list):
                     else:
                         str2 = ' '.join(_str2)
                     """
-                    nsubj = base.replace_nsubj(tokens, nsubj)
-                    str2 = nsubj + ' '.join(_str2)
-                else:
-                    _str2 = tokens[split_ind+1:]
-                    if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
-                        _str2 = tokens[split_ind+2:]
+                    nsubj = nsubj.strip()
+                    _nsubj = nsubj[0].upper() + nsubj[1:]
+
+                    if _nsubj == 'I' or _nsubj == 'She' or _nsubj == 'He':
+                        str2 = _nsubj + " " + _str2
+                    else:
+                        sent2 = _nsubj + " " + _str2
                     
-                    nsubj = base.replace_nsubj(tokens, nsubj)
-                    str2 = nsubj + ' '.join(_str2)
+                        nsubj = base.replace_nsubj(sent2, nsubj)
+                        str2 = nsubj + _str2
+                else:
+                    _strs = tokens[split_ind+1:]
+                    if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
+                        _strs = tokens[split_ind+2:]
+
+                    _str2 = " ".join(_strs)
+
+                    nsubj = nsubj.strip()
+                    _nsubj = nsubj[0].upper() + nsubj[1:]
+                    
+                    if _nsubj == 'I' or _nsubj == 'She' or _nsubj == 'He':
+                        str2 = _nsubj + " " + _str2
+                    else:
+                        sent2 = _nsubj + " " + _str2
+                    
+                        nsubj = base.replace_nsubj(sent2, nsubj)
+                        str2 = nsubj + " " + _str2
                     
                 #print "2nd sent: ", str2
 
@@ -296,9 +316,10 @@ def simp_adverb_sent(tokens, node_list):
                 #import pdb; pdb.set_trace()
                 _str2 = ""
                 if nsubj_ind < split_ind:
-                    _str2 = tokens[split_ind+1:]
-                    if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
-                        _str2 = tokens[split_ind+2:]
+                    _strs = tokens[split_ind+1:]
+                    if ('which' == _strs[0].lower()) or ('who' == _strs[0].lower()):
+                        _strs = tokens[split_ind+2:]
+                    _str2 = " ".join(_strs)
                     #TODO: update the tense
                     #_str2 = tokens[root_ind:]
                 #_str2 = tokens[split_ind+1:]
@@ -321,8 +342,15 @@ def simp_adverb_sent(tokens, node_list):
                         str2 = ' '.join(_str2)
                     """
                      #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
-                    nsubj = base.replace_nsubj(tokens, nsubj)
-                    str2 = nsubj + ' '.join(_str2)
+                    nsubj = nsubj.strip()
+                    _nsubj = nsubj[0].upper() + nsubj[1:]
+
+                    if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
+                        str2 = _nsubj + _str2
+                    else:
+                        sent2 = _nsubj + " " + _str2
+                        nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        str2 = nsubj2 + _str2
                    
                 else:
                     str2 = base.upper_first_char(nsubj) + " " + ' '.join(tokens[split_ind+2:])
@@ -408,6 +436,10 @@ def main():
     sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
     sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
     #sent = "Peter came, suprising everyone ."
+    sent = "Needing money, I begged my parents."
+    sent = "Peter came, surprising everyone."
+    sent = "Refreshed, Peter stood up."
+    sent = "Impatient, he stood up."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

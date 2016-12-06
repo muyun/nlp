@@ -23,6 +23,8 @@ w2v_model=gensim.models.Word2Vec.load_word2vec_format('/Users/zhaowenlong/worksp
 lmtzr = WordNetLemmatizer()
 EDB_list=[]
 
+import time
+
 def isplural(w):
         word = w.lower()
         lemma = lmtzr.lemmatize(word, 'n')
@@ -41,8 +43,12 @@ def get_triples(node):
 
 def _Stem(sub_sent,edblist):
 	#words = nltk.word_tokenize(sub_sent)
+	start_time = time.time()
 	words = StanfordTokenizer().tokenize(str(sub_sent))
 	tokens = st.tag(words)
+	end_time = time.time()
+        during_time = end_time - start_time
+        print "The time of tag function in rank: ", during_time
 	#print "tokens: ", tokens
         #print "sub_sent: ", sub_sent
 	#tokens = "nltk.pos_tag(words)

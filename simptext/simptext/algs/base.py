@@ -84,13 +84,13 @@ def get_triples(node):
     """
 
 
-def replace_nsubj(tokens, nsubj):
+def replace_nsubj(sent, nsubj):
     """ update the subj of the sentence """
 
     #import pdb; pdb.set_trace()
     person_taggers = []
     org_taggers = []
-    for token, title in eng_tagger.tag(tokens):
+    for token, title in eng_tagger.tag(sent.split()):
         if token.lower() in nsubj.lower().split():
             if token == 'the' or token == 'The': 
                     continue

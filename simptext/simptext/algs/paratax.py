@@ -67,7 +67,7 @@ def simp_paratax_sent(tokens, node_list):
             if tokens[inds[1]] in PUNCTUATION:
                 tokens[inds[1]] = ''
             _str2 = tokens[inds[0]+2:inds[1]]
-            str2 = subj + " " + " ".join(_str2) + " . "
+            str2 = subj + " " + " ".join(_str2) + " ."
 
 
             strs = str1  + " " + str2
@@ -128,7 +128,7 @@ def main():
     #sent = "I ate an apple and an orange."
     sent = "I ate an apple and an orange."
     sent = "Peter - nobody guessed it - showed up."
-    sent = "Peter - nobody guessed it  - showed up ."
+    sent = "Peter - nobody guessed it - showed up."
     #sent = "With the high Gulf pressures - a ship reported a pressure of 1015.5 millibars less than 60 m from the storm center at the time it was upgraded to a tropical storm - Alicia was unable to gain size , staying very small , but generated faster winds , and became a Category 1 hurricane on August 16 ."
     #sent = "In 2001 , UNESCO inscribed the 2,750-year-old city on the World Heritage List as Samarkand - Crossroads of Cultures ."
     #print(simp_coordi_sent(sent))

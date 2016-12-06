@@ -16,6 +16,7 @@ eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexpa
 
 import base
 #from algs import base
+from pattern.en import tenses, conjugate
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -65,6 +66,18 @@ def simp_passive_sent(tokens, node_list):
 
             #import pdb; pdb.set_trace()
             nsubjpass_ind = nd[4]['nsubjpass'][0]
+            det_ind = 0
+            for _nd in node_list:
+                if nsubjpass_ind == _nd[0]:
+                    if ('det' in _nd[4].keys()):
+                        det_ind = _nd[4]['det'][0]
+
+
+            #import pdb; pdb.set_trace()
+            nsubjpass = tokens[nsubjpass_ind]
+            if det_ind:
+                nsubjpass = tokens[det_ind] + " " + tokens[nsubjpass_ind]
+
 
             det_ind = 0
             subj = ""
@@ -90,7 +103,11 @@ def simp_passive_sent(tokens, node_list):
                 else:
                     subj = tokens[nmod_ind]
 
-            strs = subj + " " + root + " " + tokens[nsubjpass_ind] + " . "
+
+            #import pdb; pdb.set_trace()
+            if len(tenses(root)) > 0:
+                verb = conjugate(root, tenses(root)[0][0], 3)
+            strs = subj + " " + verb + " " + nsubjpass + " ."
             """
                 #[NOTICE]: remove the ',' after the nsubj
                 if tokens[nsubj_ind + 1] in PUNCTUATION:
@@ -113,7 +130,7 @@ def simp_passive_sent(tokens, node_list):
                 #print "2nd sent: ", str2
             """
                 #strs = str1 + ' . ' + str2
-            return strs
+            #return strs
 
 
     return strs
@@ -161,7 +178,9 @@ def simp_syn_sent_(sent):
 
 def main():
 
+    #sent = "Peter was hit by a bus."
     sent = "Peter was hit by a bus."
+    sent = "An apple was eaten by Peter."
     #sent = "Food is procured with its suckers  . "
     #print(simp_coordi_sent(sent))
     #sent = "He was born at Plessiel , a hamlet of Drucat near Abbeville , to a long-established family of Picardy , the great-nephew of the painter Eustache Le Sueur ."

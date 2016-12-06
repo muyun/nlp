@@ -97,6 +97,7 @@ def show_entries():
     etxt = cur.fetchall();
     if len(etxt) == 0:
     	entries = ""
+    flag = ""
     if len(etxt) > 0:
         print "etxt: ", etxt[0]
     
@@ -121,7 +122,7 @@ def show_entries():
         print "wordlist: ", wordlist
         print "wordlevel: ", wordlevel
         print "algs: ", algs
-    
+
         if len(wordlist) > 0:
             _words = []
     	    for w in wordlist.split(','):
@@ -140,19 +141,20 @@ def show_entries():
                 if int(wordlevel) == 4:
                     words = list(_words) + list(word4)
                     #print "words4: ", words
-        elif len(wordlevel) > 0:
-    	    if int(wordlevel) == 1:
-    		    words = word1
-            if int(wordlevel) == 2:
-    		    words = word2
-            if int(wordlevel) == 3:
-    		    words = word3	
-    	    if int(wordlevel) == 4:
-    		    words = word4
         else:
-            pass	
+            if int(wordlevel) == 1:
+    		words = word1
+            if int(wordlevel) == 2:
+    		words = word2
+            if int(wordlevel) == 3:
+    		words = word3	
+    	    if int(wordlevel) == 4:
+    		words = word4
+            if int(wordlevel) == 0:
+            	#error = 'Please include at least one word in the wordlist'
+                flag = "flag"
 
-    #print "words: ", words
+    print "flag: ", flag
     #print "words: ", words
     # TODO: update the ALGs
     #outputs = entries
@@ -160,8 +162,12 @@ def show_entries():
     s_outputs = {}
     s1_output = {}
     s2_output = {}
+    s1_child_output = {}
+    s2_child_output = {}
     s1 = ""
     s2 = ""
+    s1_child = ""
+    s2_child = ""
 
     """
     if len(entries) == 0:
@@ -174,31 +180,48 @@ def show_entries():
     """
         #s_outputs = wordcal.check_word(entries, words)
        
-    if len(entries) > 0: #Syntactic simplification firstly
+    if len(entries) > 0 and len(flag) == 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
         _syn_ret, alg1 = dt_sent.simp_syn_sent(entries, algs)
         #BUG here, todo
-        
+        begin_time4 = time.time()
+        """
         if len(_syn_ret) > 0:
             (s1, s2) = dt_sent.get_split_ret(_syn_ret)
 
-            begin_time4 = time.time()
-            s1_output = wordcal.check_word(s1, words)
-            s2_output = wordcal.check_word(s2, words)
+            if len(s2) > 0:
+            #begin_time4 = time.time()
+                outputs = wordcal.check_word(s1+s2, words)
+                print "output: ", s1_output
+                stop_index = outputs.index('.')
+                s1_output = outputs[0:stop_index+1]
+                s2_output = outputs[stop_index+1:]
+                #s2_output = wordcal.check_word(s2, words)
+                #s3_output = wordcal.check_word(s1, words)
+            else:
+            	s1_output = wordcal.check_word(s1, words)
+        """
+        if len(_syn_ret) > 0:
+            (s1, s1_child, s2, s2_child, ret, algs) = dt_sent._get_split_ret(_syn_ret, algs)
 
-        begin_time4 = time.time()
+            if len(ret) > 0: # there is the child: 3 layer
+                s1_output = wordcal.check_word(s1, words)
+                s2_output = wordcal.check_word(s2, words)
+
         s_outputs = wordcal.check_word(entries, words)   
 
         begin_time5 = time.time() - begin_time4
         print "The time of wordcal function: ", begin_time5
-        
+
     print "s1_output: ", s1_output
+    print "s1_child_output: ", s1_child_output
     print "s2_output: ", s2_output
+    print "s2_child_output: ", s2_child_output
     print "s_outputs: ", s_outputs
     
-    return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output)
-    #return render_template('show_entries.html', form=form, wordlist=wordlist, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output)
+    #return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output, flag=flag)
+    return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output, flag=flag)
     #return render_template('show_entries.html', form=form)
 
 # this view let the user add new entries if they are logged in
@@ -229,7 +252,9 @@ def add_entry():
     
     #algs0 = form.algs.data
     #print "algs0: ", algs0
+    alg = ""
     alg = ' '.join(str(e) for e in form.algs.data)
+    print "alg: ", alg
     #wordlist = ""
     #_wordlist = request.form['words']
     #txt = form.input.data
@@ -240,11 +265,13 @@ def add_entry():
     #db.session.commit()
     db = get_db()
     db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
-               [request.form['input'], request.form['wordinput'], request.form['wordlevel'],
-               alg, s1, s2])
+               [inputs, wordinput, wordlevel, alg, s1, s2])
+    
+    """
+    db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
+               [inputs, wordinput, wordlevel, alg, s1, s2])
+    """
     db.commit()
-
-    #flash('New entry was successfully posted')
 
     #return render_template('show_entries.html', text=text)
     return redirect(url_for('show_entries'))

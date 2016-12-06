@@ -648,7 +648,9 @@ def cal_mturk_sent_t1(t1, filename):
             #res = alg.simp_passive_sent(str(re))
 
         #_res, alg0 = dt_sent._simp_syn_sent(str(se))
-        _res =  relcl(str(se))
+
+        #import pdb; pdb.set_trace()
+        #_res =  relcl(str(se))
         #if len(_res) > 0:
         #    (s1, s1_child, s2, s2_child, res, alg) = dt_sent._get_split_ret(_res)
             #print "res: ", res
@@ -709,10 +711,10 @@ def main():
 
     #filename = dir + "utils/testset/sent_mturk_l4_.md"
     #gt = dt_sent.read_xlsx_file(gt_file, 1, 2)
-    #filename = dir + "dataset/t1.csv"
+    filename = dir + "dataset/t1.csv"
 
-    #t1 = dt_sent.read_xlsx_file(base_file, 1, 1)
-    #info = cal_mturk_sent_t1(t1, filename)
+    t1 = dt_sent.read_xlsx_file(base_file, 1, 1)
+    info = cal_mturk_sent_t1(t1, filename)
     
     #import pdb; pdb.set_trace()
     #_info = cal_mturk_sent(sent_file, md)
@@ -721,7 +723,7 @@ def main():
 
     # recall and precision of some type
 
-    
+    """
     _algs = [
         'punct',
         'coordi',
@@ -735,7 +737,7 @@ def main():
     ]
 
     _info = _cal_mturk_sent(base_file)
-    
+    """
 
 if __name__ == '__main__':
     main()

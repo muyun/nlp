@@ -28,6 +28,7 @@ from pattern.en import tenses, conjugate
 
 #from algs import base
 import base
+import time
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -52,12 +53,19 @@ def simp_parti_sent(tokens, node_list):
         #node_list[base.get_triples[0]] = base.get_triples(node)
 
     """
+    start_time = time.time()
 
     root = ""
     root_ind = node_list[0][4]['root'][0]
     for nd in node_list:
         if root_ind == nd[0]:
             root=nd[1]
+
+    """
+    taggers = []
+    for nd in node_list[1:]:
+        taggers.append((nd[1], nd[2]))
+    """
 
     strs = ""
     #split_ind = 0
@@ -107,10 +115,12 @@ def simp_parti_sent(tokens, node_list):
                 nsubj = nsubj[0].upper() + nsubj[1:] + " "
                 #tokens.insert(1, upper_first_char(subj))
 
+                """
                 person_taggers = []
                 org_taggers = []
             # replace the nsubj with "he/she"
-                for token, title in eng_tagger.tag(tokens):
+
+                for token, title in taggers:
                     if token in nsubj:
                         if title == 'PERSON':
                             person_taggers.append(token)
@@ -118,7 +128,7 @@ def simp_parti_sent(tokens, node_list):
                             org_taggers.append(token)
                         else:
                             org_taggers.append(token)
-
+                """
                 #import pdb; pdb.set_trace()
                 #verb = "be"
                 verb = conjugate("be", tenses(root)[0][0], 3)
@@ -146,7 +156,11 @@ def simp_parti_sent(tokens, node_list):
                 #print "1st sent: ", str1
 
                 # upper the 1st char in 2nd sent
-                _str2 = tokens[root_ind:]
+
+                #import pdb; pdb.set_trace()
+                _strs = tokens[root_ind:]
+                _str2 = " ".join(_strs)
+                """
                 if len(person_taggers) > 0:
                     str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
 
@@ -157,13 +171,26 @@ def simp_parti_sent(tokens, node_list):
                         str2 = "It" + " " + ' '.join(_str2)
                 else:
                     str2 = nsubj + ' '.join(_str2)
+                """
+                nsubj = nsubj.strip()
+                _nsubj = nsubj[0].upper() + nsubj[1:]
+
+                if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
+                    str2 = _nsubj + _str2
+                else:
+                    sent2 = _nsubj + " " + _str2
+                    nsubj2 = base.replace_nsubj(sent2, nsubj)
+                    str2 = nsubj2 + _str2
                 #w = _w + ' '
                 #str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
 
                 strs = str1 + ' . ' + str2
-                return strs
+                #return strs
 
+    end_time = time.time()
+    during_time = end_time - start_time
+    print "The time of parti function: ", during_time
     return strs
 
 def simp_syn_sent_(sent):
@@ -218,7 +245,10 @@ def main():
     #sent = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
 
     sent = "John Nash, running down the street, tripped."
-    sent = "Port Arthur was also the destination for juvenile convicts , receiving many boys , some as young as nine arrested for stealing toys ."
+    #sent = "Port Arthur was also the destination for juvenile convicts , receiving many boys , some as young as nine arrested for stealing toys ."
+    sent = "Alicia, running down the street, tripped."
+    sent = "Peter, also called Pete, came."
+    sent = "Peter, sweating hard, arrived."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

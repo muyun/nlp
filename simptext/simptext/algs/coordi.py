@@ -323,10 +323,17 @@ def simp_coordi_sent(tokens, node_list):
                     _str2 = tokens[auxpass_ind] + " " + _str2
                 
                 #import pdb; pdb.set_trace()
-                nsubj = base.replace_nsubj(tokens, nsubj)
-                str2 = nsubj + _str2
+                nsubj = nsubj.strip()
+                _nsubj = nsubj[0].upper() + nsubj[1:]
+
+                sent2 = _nsubj + " " + _str2
+                nsubj2 = base.replace_nsubj(sent2, nsubj)
+                
+                str2 = nsubj2 + _str2
                 
             else:
+
+                #import pdb; pdb.set_trace()
                 str2 = conj_nsubj + " " + " ".join(tokens[(conj_nsubj_ind + 1):])
                 str2 = str2.strip()
                 str2 =  str2[0].upper() + str2[1:]  
@@ -528,7 +535,8 @@ def main():
     #sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
 
     sent = "Hence the establishment and signing of the Charte constitutionnelle franiaise , the French Constitution otherwise known as La Charte  ."
-    
+    sent = "Peter ate fish and drank wine."
+    sent = "I ate an apple and an orange."
     #sent = "Peter was my friend and I was his friend."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    

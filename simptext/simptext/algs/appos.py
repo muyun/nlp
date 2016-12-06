@@ -19,6 +19,7 @@ eng_tagger = StanfordNERTagger('english.all.3class.distsim.crf.ser.gz')
 #The girls, on the city, like it .import base
 #from algs import base
 import base
+import time
 
 from pattern.en import tenses, conjugate
 
@@ -44,12 +45,19 @@ def simp_appos_sent(tokens, node_list):
         #node_list[base.get_triples[0]] = base.get_triples(node)
 
     """
+    start_time = time.time()
+
     root = ""
     root_ind = node_list[0][4]['root'][0]
     for nd in node_list:
         if root_ind == nd[0]:
             root=nd[1]
 
+    """
+    taggers = []
+    for nd in node_list[1:]:
+        taggers.append((nd[1], nd[2]))
+    """
     strs = ""
     #split_ind = 0
     for nd in node_list[1:]:
@@ -82,10 +90,11 @@ def simp_appos_sent(tokens, node_list):
             nsubj = nsubj + " " + tokens[nsubj_ind]
             nsubj = nsubj[0].upper() + nsubj[1:] + " "
 
+            """
             person_taggers = []
             org_taggers = []
             # replace the nsubj with "he/she"
-            for token, title in eng_tagger.tag(tokens):
+            for token, title in taggers:
                 if token in nsubj:
                     if title == 'PERSON':
                         person_taggers.append(token)
@@ -93,7 +102,7 @@ def simp_appos_sent(tokens, node_list):
                         org_taggers.append(token)
                     else:
                         org_taggers.append(token)
-
+            """
             #import pdb; pdb.set_trace()
             if ('appos' in nsubj_dict.keys()):
                 #[NOTICE]: connect the nsubj + acl as 1st
@@ -126,7 +135,9 @@ def simp_appos_sent(tokens, node_list):
                         _str1[-1] = ''
                     str1 = nsubj  + ' '.join(_str1)
 
-                    _str2 = tokens[split_ind:]
+                    _strs = tokens[split_ind:]
+                    _str2 = " ".join(_strs)
+                    """
                     if len(person_taggers) > 0:
                         str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
 
@@ -137,6 +148,16 @@ def simp_appos_sent(tokens, node_list):
                             str2 = "It" + " " + ' '.join(_str2)
                     else:
                         str2 = nsubj + ' '.join(_str2)
+                    """
+                    nsubj = nsubj.strip()
+                    _nsubj = nsubj[0].upper() + nsubj[1:]
+
+                    if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
+                        str2 = _nsubj + _str2
+                    else:
+                        sent2 = _nsubj + " " + _str2
+                        nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        str2 = nsubj2 + _str2
 
                 else:
                     _str1 = tokens[nsubj_ind+1:root_ind]
@@ -147,7 +168,9 @@ def simp_appos_sent(tokens, node_list):
                     #print "1st sent: ", str1
 
                     # upper the 1st char in 2nd sent
-                    _str2 = tokens[root_ind:]
+                    _strs = tokens[root_ind:]
+                    _str2 = " ".join(_strs)
+                    """
                     if len(person_taggers) > 0:
                         str2 = "He" + " " + ' '.join(_str2)  # 'he' will be replaced with 'he/she'
 
@@ -158,13 +181,34 @@ def simp_appos_sent(tokens, node_list):
                             str2 = "It" + " " + ' '.join(_str2)
                     else:
                         str2 = nsubj + ' '.join(_str2)
+                    """
                     #w = _w + ' '
                     #str2 = nsubj  + ' '.join(_str2)
                     #print "2nd sent: ", str2
+                    nsubj = nsubj.strip()
+                    _nsubj = nsubj[0].upper() + nsubj[1:]
+
+                    if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
+                        str2 = _nsubj + _str2
+                    else:
+                        sent2 = _nsubj + " " + _str2
+                        nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        str2 = nsubj2 + _str2
 
                 strs = str1 + ' . ' + str2
 
+                #import pdb; pdb.set_trace()
+                end_time = time.time()
+                during_time = end_time - start_time
+                print "The time of appos function: ", during_time
+
                 return strs
+
+
+    #import pdb; pdb.set_trace()
+    end_time = time.time()
+    during_time = end_time - start_time
+    print "The time of appos function: ", during_time
 
     return strs
 
@@ -216,11 +260,13 @@ def main():
     sent = "I ate an apple and an orange."
     sent = "Peter, my son, ate an apple."
     sent = "Peter, my son, eats an apple."
+    sent = "Peter, my son, ate an apple."
+    sent = "Peter, my son, eats an apple."
     #sent = "Peter, my friend, likes it."
     #sent = "Boys, my friends, like it."
     #sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
     #TODO: the tense of the output
-    sent = "John Nash, a mathematician, lectured at Princeton."
+    #sent = "John Nash, a mathematician, lectured at Princeton."
     #sent = "Robert Downey Jr. , a mathematician, lectured at Princeton."
     print(simp_syn_sent_(sent))
 
