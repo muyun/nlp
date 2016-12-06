@@ -1,0 +1,62 @@
+<li id="merge-s1">  {# TODO: update the bad solution #}
+   {% for item in s1_output %} 
+        {% if item is mapping %} {# not change #}
+   
+          {% for key, value in item.iteritems() %}
+            <select>
+              {% for v in value %}
+                 <option value={{ v }} >{{ v |safe}} </option>
+              {% endfor %}
+            </select>
+         
+          {% endfor %}
+
+        {% else %}
+           {{ item |safe }}
+              
+        {% endif %}
+
+   {% endfor %}  
+</li>
+
+<li id="merge-s2">  {# TODO: update the bad solution #}
+   {% for item in s2_output %} 
+        {% if item is mapping %} {# not change #}
+   
+          {% for key, value in item.iteritems() %}
+            <select>
+              {% for v in value %}
+                 <option value={{ v }} >{{ v |safe}} </option>
+              {% endfor %}
+            </select>
+         
+          {% endfor %}
+
+        {% else %}
+           {{ item |safe }}
+              
+        {% endif %}
+
+   {% endfor %}  
+</li>
+
+<li id="merge-s">  {# TODO: update the bad solution #}
+   {% for item in s_outputs %} 
+        {% if item is mapping %} {# not change #}
+   
+          {% for key, value in item.iteritems() %}
+            <select>
+              {% for v in value %}
+                 <option value={{ v }} >{{ v |safe}} </option>
+              {% endfor %}
+            </select>
+         
+          {% endfor %}
+
+        {% else %}
+           {{ item |safe }}
+              
+        {% endif %}
+
+   {% endfor %}  
+</li>
