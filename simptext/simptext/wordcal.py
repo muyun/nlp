@@ -16,6 +16,9 @@ from nltk.corpus import wordnet as wn
 #Use StanfordTokenizer
 #from nltk.tokenize import StanfordTokenizer
 from nltk.tokenize import wordpunct_tokenize
+from nltk.tokenize import StanfordTokenizer
+from nltk.tag import StanfordPOSTagger
+st = StanfordPOSTagger('english-bidirectional-distsim.tagger')
 
 # lemma
 from nltk.stem import WordNetLemmatizer
@@ -122,8 +125,20 @@ def check_word(strs, words):
     tokens = []
     tokens = rank._interface(strs, words)
     #print "tokens:", tokens
-
     return tokens
+
+def get_pos(sent):
+    #words = StanfordTokenizer().tokenize(str(sent))
+    #tokens = st.tag(words)
+    return st.tag(StanfordTokenizer().tokenize(str(sent)))
+
+def _check_word(sent, tags, words):
+    """ get the candidates of the difficult words """
+    print "check the sentence: ", sent
+
+    tokens = []
+    tokens = rank._interface(sent, tags, words)
+
 
 def lemma_words(words):
     output=[]

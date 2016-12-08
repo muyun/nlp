@@ -24,6 +24,8 @@ lmtzr = WordNetLemmatizer()
 EDB_list=[]
 
 import time
+from pattern.en import tenses, conjugate
+
 
 def isplural(w):
         word = w.lower()
@@ -210,7 +212,14 @@ def _interface(sentence,edblist):
 			        sub_top10 = kenlm_topn(r_sent,9,sentence)
 			        if word not in sub_top10:
 			        	sub_top10.insert(0,word)
-			        tokens[word] = sub_top10
+
+                                if len(tenses(word)) > 0:
+                    	                _sub_top10 = []
+			                for w in sub_top10:
+			                    _sub_top10.append(conjugate(w, tenses(word)[0][0], 3))
+			                tokens[word] = _sub_top10
+		                else:
+                                        tokens[word] = sub_top10
                                 
                 if tokens: token_list.append(tokens)
                 

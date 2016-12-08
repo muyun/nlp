@@ -839,14 +839,14 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     # define dic of the ALG according to the one in the form
     algs_lst = [
         paratax.simp_paratax_sent,
-        subordi.simp_subordi_sent,
-        adverb.simp_adverb_sent,
+        punct.simp_punct_sent,
+        coordi.simp_coordi_sent,
         parti.simp_parti_sent,
         adjec.simp_adjec_sent,
         appos.simp_appos_sent,
-        passive.simp_passive_sent,
-        punct.simp_punct_sent,
-        coordi.simp_coordi_sent
+        subordi.simp_subordi_sent,
+        adverb.simp_adverb_sent,
+        passive.simp_passive_sent       
     ]
 
     """

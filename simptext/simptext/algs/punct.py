@@ -60,8 +60,9 @@ def simp_punct_sent(tokens, node_list):
 
     """
     
-    PUNCTUATION = [';', ':', '-']
-    
+    #PUNCTUATION = [';', ':', '-']
+    PUNCTUATION = [';', ':']
+
     root = ""
     root_ind = node_list[0][4]['root'][0]
     for nd in node_list:

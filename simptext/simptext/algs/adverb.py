@@ -46,7 +46,7 @@ def simp_adverb_sent(tokens, node_list):
         if (root in nd) and ('advcl' in nd[4].keys() or 'xcomp' in nd[4].keys()):
             pass
 
-        if (root in nd) and ('advcl' in nd[4].keys() or 'xcomp' in nd[4].keys()):
+        if (root in nd) and ('advcl' in nd[4].keys() or 'xcomp' in nd[4].keys() or 'advmod' in nd[4].keys()):
             #print "conj: ", nd
             #print "conj node: ", nd[4]['conj']
 
@@ -366,6 +366,105 @@ def simp_adverb_sent(tokens, node_list):
                     strs = str2 + ' . '
 
                 return strs
+
+            #import pdb; pdb.set_trace()
+            advmod_ind = 0 
+            if ('advmod' in nd[4].keys()):
+                advmod_ind = nd[4]['advmod'][0]
+                #if len(tenses(root))>0:
+                #    tokens[advmod_ind] = conjugate(tokens[advmod_ind], tenses(root)[0][0], 3)
+
+                #import pdb; pdb.set_trace()
+                #advcl_dict = {}
+                for _nd in node_list: #BUG
+                    if advmod_ind == _nd[0]:
+                         advmod_dict = _nd[4]
+                         advmod_tag = _nd[2]
+                         break
+
+                #if len(tenses(root)) > 0:
+                #    tokens[xcomp_ind]=conjugate(tokens[xcomp_ind], tenses(root)[0][0])
+
+                #import pdb; pdb.set_trace()
+                verb = 'be'
+                #import pdb; pdb.set_trace()
+                if len(tenses(root))>0:
+                    verb = conjugate(verb, tenses(root)[0][0], 3)
+                # TODO
+                nsubj = nsubj.strip()
+                nsubj = nsubj[0].upper() + nsubj[1:]
+
+                split_ind = tokens.index(COMMA)
+                    #nsubj_ind = nd[4]['nsubj'][0]
+                    #if (advcl_ind < split_ind):
+                    #subj = tokens[nsubj_ind]
+                   # tokens.insert(1, base.upper_first_char(subj)) 
+
+                _str1 = tokens[:(split_ind)]
+                if _str1[-1] in PUNCTUATION:
+                    _str1[-1] = ''
+
+                str1 = ""
+
+                #import pdb; pdb.set_trace()
+                nsubj = ' '.join(nsubj.split())
+                _str1_ = ' '.join(_str1)
+                #if xcomp_tag == 'VBN':
+                if nsubj.lower() in _str1_.lower():
+                    str1 = _str1_
+                else:
+                    str1 = nsubj + " " + verb + " " + _str1_.lower()
+                """
+                #elif xcomp_tag == 'VBG':
+                    if nsubj.lower() in _str1_.lower():
+                        str1 = _str1_
+                    else:
+                        str1 = nsubj + _str1_
+                """
+                #print "1st sent: ", str1
+
+                        # upper the 1st char in 2nd sent
+                    #tokens[nsubj_ind] = base.upper_first_char(tokens[nsubj_ind])
+
+                #import pdb; pdb.set_trace()
+                _str2 = ""
+                if nsubj_ind < split_ind:
+                    _strs = tokens[split_ind+1:]
+                    if ('which' == _strs[0].lower()) or ('who' == _strs[0].lower()):
+                        _strs = tokens[split_ind+2:]
+                    _str2 = " ".join(_strs)
+                    #TODO: update the tense
+                    #_str2 = tokens[root_ind:]
+                #_str2 = tokens[split_ind+1:]
+                        #w = _w + ' '
+                     #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
+                    nsubj = nsubj.strip()
+                    _nsubj = nsubj[0].upper() + nsubj[1:]
+
+                    if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
+                        str2 = _nsubj + _str2
+                    else:
+                        sent2 = _nsubj + " " + _str2
+                        nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        str2 = nsubj2 + _str2
+                   
+                else:
+                    str2 = base.upper_first_char(nsubj) + " " + ' '.join(tokens[split_ind+2:])
+                #str2 = "That" + " " + ' '.join(_str2)
+                #print "2nd sent: ", str2
+
+                #import pdb; pdb.set_trace()
+
+                if str1:
+                    if str2:
+                        strs = str1 + ' . ' + str2 
+                    else:
+                        strs = str1 + ' . '
+                else:
+                    strs = str2 + ' . '
+
+                return strs
+            
  
     return strs
 
@@ -437,9 +536,10 @@ def main():
     sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
     #sent = "Peter came, suprising everyone ."
     sent = "Needing money, I begged my parents."
-    sent = "Peter came, surprising everyone."
-    sent = "Refreshed, Peter stood up."
+    #sent = "Peter came, surprising everyone."
+    #sent = "Refreshed, Peter stood up."
     sent = "Impatient, he stood up."
+    sent = "Peter, sweating hard, arrived."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

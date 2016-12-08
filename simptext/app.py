@@ -50,6 +50,9 @@ word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
 #words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
 #from nltk.tokenize import StanfordTokenizer
 
+import enchant
+d = enchant.Dict("en_US")
+
 def connect_db():
     """Connects to the specific database."""
     rv = sqlite3.connect(app.config['DATABASE'])
@@ -180,7 +183,7 @@ def show_entries():
     """
         #s_outputs = wordcal.check_word(entries, words)
        
-    if len(entries) > 0 and len(flag) == 0: #Syntactic simplification firstly
+    if len(entries) > 0 and d.check(entries[1])  and len(flag) == 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
         _syn_ret, alg1 = dt_sent.simp_syn_sent(entries, algs)
@@ -206,13 +209,21 @@ def show_entries():
             (s1, s1_child, s2, s2_child, ret, algs) = dt_sent._get_split_ret(_syn_ret, algs)
 
             if len(ret) > 0: # there is the child: 3 layer
+                if(s1_child) > 0:
+                    s1_child_output = wordcal.check_word(s1_child, words)
                 s1_output = wordcal.check_word(s1, words)
+                
+                if (s2_child) > 0:
+                    s2_child_output = wordcal.check_word(s2_child, words)
                 s2_output = wordcal.check_word(s2, words)
 
         s_outputs = wordcal.check_word(entries, words)   
 
         begin_time5 = time.time() - begin_time4
         print "The time of wordcal function: ", begin_time5
+
+    if len(entries) > 0 and not d.check(entries[1]): # not english words
+        s_outputs = unicode(entries)
 
     print "s1_output: ", s1_output
     print "s1_child_output: ", s1_child_output
@@ -223,6 +234,49 @@ def show_entries():
     #return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output, flag=flag)
     return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output, flag=flag)
     #return render_template('show_entries.html', form=form)
+
+@app.route('/print', methods=['GET','POST'])
+def print_words():
+    error = None
+    db = get_db()
+    cur = db.execute('select * from params WHERE id = (SELECT MAX(id) FROM params);')
+    etxt = cur.fetchall();
+
+    words = []
+    if len(etxt) == 0:
+        #print "etxt: ", etxt
+        #print "etxt[0]: ", etxt[0]
+        error = "Please submit the input firstly."
+
+    global word1, word2, word3, word4
+    if len(etxt) > 0:
+        print "etxt: ", etxt
+        #se = str(etxt[0]).split(',')
+        #entries = str(etxt[0][1])
+        #wordlist = str(etxt[0][2])
+        wordlevel = str(etxt[0][2])
+        print "wordlevel: ", wordlevel
+        #wordlevel = 1 
+
+        #print "wordlist: ", wordlist
+        #print "wordlevel: ", wordlevel
+
+        if int(wordlevel) == 1:
+            words = word1
+        if int(wordlevel) == 2:
+            words = word2
+        if int(wordlevel) == 3:
+            words = word3   
+        if int(wordlevel) == 4:
+            words = word4
+        if int(wordlevel) == 0:
+            error = "No words in this level."
+
+    print "words:", words
+
+    #return redirect(url_for('show_entries'))
+    return render_template('print_words.html', words=words, error=error)
+
 
 # this view let the user add new entries if they are logged in
 @app.route('/add', methods=['GET','POST'])
@@ -266,7 +320,9 @@ def add_entry():
     db = get_db()
     db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
                [inputs, wordinput, wordlevel, alg, s1, s2])
-    
+
+    db.execute('insert into params (words, level, algs) values (?, ?, ?)',
+               [wordinput, wordlevel, alg])
     """
     db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
                [inputs, wordinput, wordlevel, alg, s1, s2])

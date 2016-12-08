@@ -28,7 +28,7 @@ from pattern.en import tenses, conjugate
 
 #from algs import base
 import base
-import time
+#import time
 
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
@@ -188,9 +188,12 @@ def simp_parti_sent(tokens, node_list):
                 strs = str1 + ' . ' + str2
                 #return strs
 
-    end_time = time.time()
-    during_time = end_time - start_time
-    print "The time of parti function: ", during_time
+            #if ('acl' in nsubj_dict.keys()):
+
+
+    #end_time = time.time()
+    #during_time = end_time - start_time
+    #print "The time of parti function: ", during_time
     return strs
 
 def simp_syn_sent_(sent):

@@ -108,12 +108,22 @@ $(function() {
 
 });
 
+
 </script>
+
+<script>
+$(document).ready(function(){
+    $('#setting').click(function(){
+        $('#item').toggle();
+    });
+});
+</script>
+
 
 <form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry ">
       <dl>
-        <dt>Input:
-        <dd><textarea name=input rows=4 cols=60>Please type one sentence as input.</textarea> 
+        <dt>Input (<small>Please enter one sentence as input</small>):
+        <dd><textarea name=input rows=4 cols=60>Peter, my friend, ate an apple.</textarea> 
         <br/>
         <dd><input type=submit value=Simplify>
       </dl>
@@ -165,12 +175,15 @@ $(function() {
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}
-            <select>
-              {% for v in value %}
-                 <option value={{ v }} >{{ v |safe}} </option>
-              {% endfor %}
-            </select>
-         
+            {% if value|length == 1 %}
+                <strong>{{ key |safe }}</strong>
+            {% else %}
+                <select>
+                  {% for v in value %}
+                     <option value={{ v }} >{{ v |safe}} </option>
+                  {% endfor %}
+                </select>
+            {% endif %}
           {% endfor %}
 
         {% else %}
@@ -206,11 +219,15 @@ $(function() {
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}
-            <select>
+           {% if value|length == 1 %}
+               <strong>{{ key |safe }}</strong>
+            {% else %}
+               <select>
               {% for v in value %}
                  <option value={{ v }} >{{ v |safe}} </option>
               {% endfor %}
-            </select>
+               </select>
+            {% endif %}
          
           {% endfor %}
 
@@ -241,11 +258,15 @@ $(function() {
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}
-            <select>
+            {% if value|length == 1 %}
+              <strong>{{ key |safe }}</strong>
+            {% else %}
+              <select>
               {% for v in value %}
                  <option value={{ v }} >{{ v |safe}} </option>
               {% endfor %}
-            </select>
+             </select>
+            {% endif %}
          
           {% endfor %}
 
@@ -281,11 +302,15 @@ $(function() {
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}
-            <select>
+            {% if value|length == 1 %}
+                <strong>{{ key |safe }}</strong>
+            {% else %}
+               <select>
               {% for v in value %}
                  <option value={{ v }} >{{ v |safe}} </option>
               {% endfor %}
-            </select>
+              </select>
+            {% endif %}
          
           {% endfor %}
 
@@ -311,11 +336,15 @@ $(function() {
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}
-            <select>
+            {% if value|length == 1 %}
+                <strong>{{ key |safe }}</strong>
+            {% else %}
+               <select>
               {% for v in value %}
                  <option value={{ v }} >{{ v |safe}} </option>
               {% endfor %}
-            </select>
+               </select>
+            {% endif %}
          
           {% endfor %}
 
@@ -340,13 +369,30 @@ $(function() {
       <div class ="dropdown">        
         <button onclick="myFunction()" class="dropbtn">Setting</button> 
     --> 
+    <!--
+     <div>    
+        <button type="button" id="show">Show</button>
+        <button type="button" id="hide">Hide</button>
+        
+     </div>
+     -->
+       <!--
+       <div>
+           <button id="show">Show</button>
+           <button id="hide">Hide</button>
+       </div>
+       -->
+       <div>
+           <button id="setting">Setting</button>
+       </div>
+
         <hr/>
-        <div class="selection">
+        <div id="item">
            <dt>The wordlist:
            <input type="text" name=wordinput id=wordinput value=""/>
            <br/> 
            <dt>{{ form.wordlevel.label }}  
-           <dd> {{ form.wordlevel }} 
+           <dd> {{ form.wordlevel }} &nbsp; <a href="{{ url_for('print_words') }}">The words in this level</a>
            <br/> 
            <dt>{{ form.algs.label }}    
            <dd>{{ form.algs }} 

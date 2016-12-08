@@ -28,8 +28,8 @@ class Entry(db.Model):
         def __repr__(self):
             return '%s' % (self.text +  "@" + self.words + "@" + self.wordlevel + "@" + self.algs + "@" + self.s1 + "@" + self.s2 )
 
-class Select(db.Model):
-        __tablename = 'select'
+class Param(db.Model):
+        __tablename = 'params'
         
         id = db.Column(db.Integer, primary_key=True)
         words = db.Column(db.String(960), index=True)
