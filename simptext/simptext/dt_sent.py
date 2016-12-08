@@ -837,15 +837,14 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     strs = ""
     begin_time = time.time()
     # define dic of the ALG according to the one in the form
+
     algs_lst = [
-        paratax.simp_paratax_sent,
-        punct.simp_punct_sent,
         coordi.simp_coordi_sent,
-        parti.simp_parti_sent,
-        adjec.simp_adjec_sent,
-        appos.simp_appos_sent,
         subordi.simp_subordi_sent,
         adverb.simp_adverb_sent,
+        parti.simp_parti_sent,
+        relcl.simp_relcl_sent,
+        appos.simp_appos_sent,
         passive.simp_passive_sent       
     ]
 
@@ -1013,7 +1012,7 @@ def _simp_syn_sent(sent, _algs=range(1,10)):
                                             alg = "passive"
                                             return strs, alg
                                         else:
-                                            strs = relcl.simp_syn_sent_(sent)
+                                            strs = relcl.simp_relcl_sent(tokens, node_list)
                                             if len(strs) > 0:
                                                 alg= "relcl"
                                                 return strs, alg

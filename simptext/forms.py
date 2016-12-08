@@ -19,15 +19,13 @@ class LoginForm(Form):
     #password= PasswordField('password',[validators.DataRequired()])
     submit = SubmitField('Submit')
 
-AVAILABLE_CHOICES = [ (1,'Parataxis (e.g. "Peter - nobody guessed it - showed up.")'),
-                      (2,'Punctuation (e.g. "I ate fish; he drank wine.")'),
-                      (3,'Coordination (e.g. "Peter ate fish and drank wine.")'),
-                      (4,'Participial phrases (e.g. "Alicia, running down the street, tripped.")'),
-                      (5,'Adjectival Clauses (e.g. "The apple, which Peter ate, was red.")'),
-                      (6,'Appositive phrases (e.g. "Peter, my son, ate an apple.")'), 
-                      (7,'Subordinated Clauses (e.g. "Before he came, I left.")'),
-                      (8,'Adverbial Clauses (e.g. "Needing money, I begged my parents.")'),
-                      (9,'Passive voice (e.g. "Peter was hit by a bus.")')]
+AVAILABLE_CHOICES = [ (1,'Coordination (e.g. "I ate an apple and he ate an orange.")'),
+                      (2,'Subordination (e.g. "Since he was late, I left.")'),
+                      (3,'Adverbial Clauses (e.g. "Impatient, he stood up.")'),
+                      (4,'Participial phrases (e.g. "Peter, sweating hard, arrived.")'),
+                      (5,'Relative clauses (e.g. "Peter, who liked fruits, ate an apple")'),
+                      (6,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'), 
+                      (7,'Passive voice (e.g. "An apple was eaten by Peter.")')]
 
                                          
 # The function is replaced by database
