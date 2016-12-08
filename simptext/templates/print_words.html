@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<div class="entries">
+     <br/>
+     <dt> The words in this level:
+     <br/> 
+     <br/>
+     {% if error %}
+     <li><em>{{ error }}</em>
+     <li>
+
+     {% else %}
+
+       {% set index = 1 %}
+       {% for word in words %} 
+           <td>{{ word |safe }}</td>
+
+           {% if index % 1 == 0 %}
+              <br/>
+          {% endif %}
+
+           {% set index = index + 1 %}        
+       {% endfor %}
+
+    {% endif %} 
+</div>
+
+
+{% include 'footer.html' %}
+
+{% endblock %}
