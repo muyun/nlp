@@ -539,7 +539,7 @@ def main():
     #sent = "Peter came, surprising everyone."
     #sent = "Refreshed, Peter stood up."
     sent = "Impatient, he stood up."
-    sent = "Peter, sweating hard, arrived."
+    #sent = "Peter, sweating hard, arrived."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

@@ -206,7 +206,7 @@ def show_entries():
             	s1_output = wordcal.check_word(s1, words)
         """
         if len(_syn_ret) > 0:
-            (s1, s1_child, s2, s2_child, ret, algs) = dt_sent._get_split_ret(_syn_ret, algs)
+            (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
 
             if len(ret) > 0: # there is the child: 3 layer
                 if(s1_child) > 0:

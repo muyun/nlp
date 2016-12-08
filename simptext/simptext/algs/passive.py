@@ -78,7 +78,6 @@ def simp_passive_sent(tokens, node_list):
             if det_ind:
                 nsubjpass = tokens[det_ind] + " " + tokens[nsubjpass_ind]
 
-
             det_ind = 0
             subj = ""
             if ('nmod' in nd[4].keys()):
@@ -107,7 +106,7 @@ def simp_passive_sent(tokens, node_list):
             #import pdb; pdb.set_trace()
             if len(tenses(root)) > 0:
                 verb = conjugate(root, tenses(root)[0][0], 3)
-            strs = subj + " " + verb + " " + nsubjpass + " ."
+            strs = subj + " " + verb + " " + nsubjpass.lower() + " ."
             """
                 #[NOTICE]: remove the ',' after the nsubj
                 if tokens[nsubj_ind + 1] in PUNCTUATION:

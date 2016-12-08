@@ -19,12 +19,12 @@ class LoginForm(Form):
     #password= PasswordField('password',[validators.DataRequired()])
     submit = SubmitField('Submit')
 
-AVAILABLE_CHOICES = [ (1,'Coordination (e.g. "I ate an apple and he ate an orange.")'),
-                      (2,'Subordination (e.g. "Since he was late, I left.")'),
-                      (3,'Adverbial Clauses (e.g. "Impatient, he stood up.")'),
-                      (4,'Participial phrases (e.g. "Peter, sweating hard, arrived.")'),
-                      (5,'Relative clauses (e.g. "Peter, who liked fruits, ate an apple")'),
-                      (6,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'), 
+AVAILABLE_CHOICES = [ (1,'Subordination (e.g. "Since he was late, I left.")'),
+                      (2,'Adverbial Clauses (e.g. "Impatient, he stood up.")'),
+                      (3,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'), 
+                      (4,'Coordination (e.g. "I ate an apple and he ate an orange.")'),
+                      (5,'Participial phrases (e.g. "Peter, running down the street, tripped.")'),
+                      (6,'Relative clauses (e.g. "Peter, who liked fruits, ate an apple")'),
                       (7,'Passive voice (e.g. "An apple was eaten by Peter.")')]
 
                                          

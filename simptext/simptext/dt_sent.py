@@ -839,12 +839,12 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     # define dic of the ALG according to the one in the form
 
     algs_lst = [
-        coordi.simp_coordi_sent,
         subordi.simp_subordi_sent,
         adverb.simp_adverb_sent,
+        appos.simp_appos_sent,
+        coordi.simp_coordi_sent,
         parti.simp_parti_sent,
         relcl.simp_relcl_sent,
-        appos.simp_appos_sent,
         passive.simp_passive_sent       
     ]
 
@@ -893,6 +893,7 @@ def simp_syn_sent(sent, _algs=range(1,10)):
         for ind in _algs:
             #import pdb; pdb.set_trace()
             # if the alg in the choices
+            #print "dt_sent_strs: ", strs
             if len(strs) > 0:
                 #print "_strs: ", strs
                 end_time = time.time()
@@ -911,7 +912,7 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     return (strs, alg)
 
 
-def _simp_syn_sent(sent, _algs=range(1,10)):
+def _simp_syn_sent(sent, _algs=range(1,8)):
     strs = ""
     
     """ 

@@ -53,7 +53,7 @@ def simp_parti_sent(tokens, node_list):
         #node_list[base.get_triples[0]] = base.get_triples(node)
 
     """
-    start_time = time.time()
+    #start_time = time.time()
 
     root = ""
     root_ind = node_list[0][4]['root'][0]

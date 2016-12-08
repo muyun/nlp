@@ -74,22 +74,38 @@ def simp_appos_sent(tokens, node_list):
             nsubj_ind = nd[4]['nsubj'][0]
             nsubj_dict = {}
             nsubj_compound_list = []
-            for _nd in node_list: #BUG
+            nsubj_nmod_ind = 0
+            for _nd in node_list[1:]: #BUG
                 if nsubj_ind == _nd[0]:
                      nsubj_dict = _nd[4]
                      if ('compound' in nsubj_dict.keys()):
                          nsubj_compound_list = nsubj_dict['compound']
-                     break
+                     #break
+                     if ('nmod' in nsubj_dict.keys()):
+                         nsubj_nmod_ind=nsubj_dict['nmod'][0]
+
+            cop_ind = 0
+            for _nd in node_list[1:]:
+                if (root in _nd) and ('cop' in _nd[4].keys()):
+                    cop_ind = _nd[4]['cop'][0]
 
             # get the nsubj
+
+            #import pdb; pdb.set_trace()
             nsubj = ""
 
             #import pdb; pdb.set_trace()
             for i in nsubj_compound_list:
                 nsubj = nsubj + " " + tokens[i]
-            nsubj = nsubj + " " + tokens[nsubj_ind]
+
+            if nsubj_nmod_ind != 0: #BUG here
+                nsubj = " ".join(tokens[nsubj_ind:nsubj_nmod_ind+1])
+            else:
+                nsubj = nsubj + " " + tokens[nsubj_ind]
             nsubj = nsubj[0].upper() + nsubj[1:] + " "
 
+
+            #import pdb; pdb.set_trace()
             """
             person_taggers = []
             org_taggers = []
@@ -119,7 +135,7 @@ def simp_appos_sent(tokens, node_list):
                 if tokens[nsubj_ind + 1] in PUNCTUATION:
                     tokens[nsubj_ind + 1] = ''
 
-                tokens.insert(nsubj_ind + 1, verb)
+                #tokens.insert(nsubj_ind + 1, verb)
 
                 root_ind = tokens.index(root)
                 # SO bad solution, if the root isnot a 'verb'
@@ -127,15 +143,35 @@ def simp_appos_sent(tokens, node_list):
                 if ',' in tokens:
                     split_ind = tokens.index(',')
 
+                for nd in node_list[1:]: #BUG
+                    if nsubj_ind == nd[0]:
+                     nsubj_dict = _nd[4]
+                     if ('compound' in nsubj_dict.keys()):
+                         nsubj_compound_list = nsubj_dict['compound']
+                     #break
+                     if ('nmod' in nsubj_dict.keys()):
+                         nsubj_nmod_ind=nsubj_dict['nmod'][0]
+
+                #import pdb; pdb.set_trace()
                 if tokens[root_ind] > split_ind:
-                    _str1 = tokens[nsubj_ind+1:split_ind]
+                    if nsubj_nmod_ind != 0 and cop_ind !=0:
+                        _str1 = tokens[split_ind:cop_ind]
+                    else:
+                        _str1 = tokens[nsubj_ind+1:split_ind]
                     tokens[split_ind] = ''
 
-                    if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
+                    if len(_str1) > 0 and (_str1[-1] in PUNCTUATION):
                         _str1[-1] = ''
-                    str1 = nsubj  + ' '.join(_str1)
+                    if len(_str1) >0 and (_str1[0] in PUNCTUATION):
+                        _str1[0] = ''
 
-                    _strs = tokens[split_ind:]
+                    str1 = nsubj + " " + verb + ' '.join(_str1)
+
+                    if nsubj_nmod_ind != 0 and cop_ind !=0:
+                        _strs = tokens[cop_ind:]
+                    else:
+                        _strs = tokens[split_ind:]
+
                     _str2 = " ".join(_strs)
                     """
                     if len(person_taggers) > 0:
@@ -264,9 +300,9 @@ def main():
     sent = "Peter, my son, eats an apple."
     #sent = "Peter, my friend, likes it."
     #sent = "Boys, my friends, like it."
-    #sent = "Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
+    #sent = "City of Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
     #TODO: the tense of the output
-    #sent = "John Nash, a mathematician, lectured at Princeton."
+    sent = "John Nash, a mathematician, lectured at Princeton."
     #sent = "Robert Downey Jr. , a mathematician, lectured at Princeton."
     print(simp_syn_sent_(sent))
 
