@@ -63,49 +63,57 @@ def simp_appos_sent(tokens, node_list):
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
         #print(nd)
-        if (root in nd) and ('nsubj' in nd[4].keys()):
+        if (root in nd) and ('nsubj' in nd[4].keys() or ('nsubjpass' in nd[4].keys())):
             pass
 
-        if (root in nd) and ('nsubj' in nd[4].keys()):
+        if (root in nd) and ('nsubj' in nd[4].keys() or ('nsubjpass' in nd[4].keys())):
             #print "conj: ", nd
             #print "conj node: ", nd[4]['conj']
-
-            #import pdb; pdb.set_trace()
-            nsubj_ind = nd[4]['nsubj'][0]
-            nsubj_dict = {}
-            nsubj_compound_list = []
+            nsubj = ""
+            nsubj_ind = 0
             nsubj_nmod_ind = 0
-            for _nd in node_list[1:]: #BUG
-                if nsubj_ind == _nd[0]:
-                     nsubj_dict = _nd[4]
-                     if ('compound' in nsubj_dict.keys()):
-                         nsubj_compound_list = nsubj_dict['compound']
-                     #break
-                     if ('nmod' in nsubj_dict.keys()):
-                         nsubj_nmod_ind=nsubj_dict['nmod'][0]
+            nsubj_dict = {}
+            #import pdb; pdb.set_trace()
+            if ('nsubj' in nd[4].keys()):
+                nsubj_ind = nd[4]['nsubj'][0]
+                nsubj_compound_list = []
+                #nsubj_nmod_ind = 0
+                for _nd in node_list[1:]: #BUG
+                    if nsubj_ind == _nd[0]:
+                        nsubj_dict = _nd[4]
+                        if ('compound' in nsubj_dict.keys()):
+                            nsubj_compound_list = nsubj_dict['compound']
+                        #break
+                        if ('nmod' in nsubj_dict.keys()):
+                            nsubj_nmod_ind=nsubj_dict['nmod'][0]
 
-            cop_ind = 0
-            for _nd in node_list[1:]:
-                if (root in _nd) and ('cop' in _nd[4].keys()):
-                    cop_ind = _nd[4]['cop'][0]
+                #import pdb; pdb.set_trace()
+                for i in nsubj_compound_list:
+                    nsubj = nsubj + " " + tokens[i]
+
+                cop_ind = 0
+                for _nd in node_list[1:]:
+                    if (root in _nd) and ('cop' in _nd[4].keys()):
+                        cop_ind = _nd[4]['cop'][0]
 
             # get the nsubj
-
             #import pdb; pdb.set_trace()
-            nsubj = ""
 
-            #import pdb; pdb.set_trace()
-            for i in nsubj_compound_list:
-                nsubj = nsubj + " " + tokens[i]
+            auxpass_ind = 0
+            if ('nsubjpass' in nd[4].keys()):
+                nsubj_ind = nd[4]['nsubjpass'][0]
+                for _nd in node_list:
+                    if root_ind == _nd[0] and  ('auxpass' in _nd[4].keys()):
+                        auxpass_ind = nd[4]['auxpass'][0]
 
             if nsubj_nmod_ind != 0: #BUG here
                 nsubj = " ".join(tokens[nsubj_ind:nsubj_nmod_ind+1])
             else:
                 nsubj = nsubj + " " + tokens[nsubj_ind]
+
+            nsubj = nsubj.strip()
             nsubj = nsubj[0].upper() + nsubj[1:] + " "
 
-
-            #import pdb; pdb.set_trace()
             """
             person_taggers = []
             org_taggers = []
@@ -120,7 +128,7 @@ def simp_appos_sent(tokens, node_list):
                         org_taggers.append(token)
             """
             #import pdb; pdb.set_trace()
-            if ('appos' in nsubj_dict.keys()):
+            if len(nsubj_dict)>0 and ('appos' in nsubj_dict.keys()):
                 #[NOTICE]: connect the nsubj + acl as 1st
                 #import pdb; pdb.set_trace()
                 appos_ind = nsubj_dict['appos'][0]
@@ -196,6 +204,8 @@ def simp_appos_sent(tokens, node_list):
                         str2 = nsubj2 + _str2
 
                 else:
+
+                    #import pdb; pdb.set_trace()
                     _str1 = tokens[nsubj_ind+1:root_ind]
 
                     if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
@@ -237,6 +247,44 @@ def simp_appos_sent(tokens, node_list):
                 end_time = time.time()
                 during_time = end_time - start_time
                 print "The time of appos function: ", during_time
+
+                return strs
+
+            if auxpass_ind > 0:
+                split_ind = 0
+                if ',' in tokens:
+                    split_ind = tokens.index(',')
+                if split_ind == 0:
+                    return strs
+
+                #import pdb; pdb.set_trace()
+                #verb = conjugate("be", tenses(root)[0][0], 3)
+                verb = tokens[auxpass_ind]
+                if tokens[root_ind] > split_ind:
+                    _str1 = tokens[nsubj_ind+1:auxpass_ind]
+
+                    if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
+                        _str1[-1] = ''
+                    if len(_str1) > 0 and _str1[0] in PUNCTUATION:
+                        _str1[0] = ''
+                    str1 = nsubj  + " " + verb + ' '.join(_str1)
+                    #print "1st sent: ", str1
+
+                    # upper the 1st char in 2nd sent
+                    _strs = tokens[auxpass_ind:]
+                    _str2 = " ".join(_strs)
+
+                    nsubj = nsubj.strip()
+                    _nsubj = nsubj[0].upper() + nsubj[1:]
+
+                    if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
+                        str2 = _nsubj + _str2
+                    else:
+                        sent2 = _nsubj + " " + _str2
+                        nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        str2 = nsubj2 + _str2
+
+                strs = str1 + ' . ' + str2
 
                 return strs
 
@@ -292,18 +340,16 @@ def simp_syn_sent_(sent):
 def main():
     # Appositive clauses
 
-    #sent = "I ate an apple and an orange."
-    sent = "I ate an apple and an orange."
     sent = "Peter, my son, ate an apple."
-    sent = "Peter, my son, eats an apple."
-    sent = "Peter, my son, ate an apple."
-    sent = "Peter, my son, eats an apple."
+    #sent = "Peter, my son, eats an apple."
     #sent = "Peter, my friend, likes it."
     #sent = "Boys, my friends, like it."
     #sent = "City of Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
     #TODO: the tense of the output
-    sent = "John Nash, a mathematician, lectured at Princeton."
+    #sent = "John Nash, a mathematician, lectured at Princeton."
+    #sent = "Boeing, the manufacturer of airplanes, is based in Seattle."
     #sent = "Robert Downey Jr. , a mathematician, lectured at Princeton."
+    sent = "It is based in Seattle  ."
     print(simp_syn_sent_(sent))
 
 

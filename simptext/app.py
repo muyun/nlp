@@ -11,7 +11,7 @@ from flask import Flask, request, render_template, session, g, redirect, url_for
 
 from flask_sqlalchemy import SQLAlchemy
 
-from forms import EntryForm, SelectForm
+from forms import EntryForm, ParamForm
 
 import json
 
@@ -182,8 +182,10 @@ def show_entries():
         s2_output = wordcal.check_word(s2, words)
     """
         #s_outputs = wordcal.check_word(entries, words)
-       
-    if len(entries) > 0 and d.check(entries[1])  and len(flag) == 0: #Syntactic simplification firstly
+    if len(entries) == 0:
+        s_outputs = {}
+
+    elif len(entries) > 1 and d.check(entries[1])  and len(flag) == 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
         _syn_ret, alg1 = dt_sent.simp_syn_sent(entries, algs)
@@ -222,8 +224,10 @@ def show_entries():
         begin_time5 = time.time() - begin_time4
         print "The time of wordcal function: ", begin_time5
 
-    if len(entries) > 0 and not d.check(entries[1]): # not english words
+    elif len(entries) > 1 and not d.check(entries[1]): # not english words
         s_outputs = unicode(entries)
+    else:
+        pass
 
     print "s1_output: ", s1_output
     print "s1_child_output: ", s1_child_output
@@ -290,14 +294,17 @@ def add_entry():
     print "input: ", inputs
     #
     #words = ""
-    wordinput = ""
+    wordinput = "run,orange"
     wordinput = request.form['wordinput']
     #words = form.words.data
     print "words: ", wordinput
     #wordlevel = ""
     #wordlevel = request.form['wordlevel']
-    wordlevel = ""
+    wordlevel = "4"
+    #form.wordlevel.default = 4
+    print "wordlevel0: ", wordlevel
     wordlevel = request.form['wordlevel']
+    #form.process()
     #wordlevel = form.wordlevel.data
     print "wordlevel: ", wordlevel
     #txt = form.input.data

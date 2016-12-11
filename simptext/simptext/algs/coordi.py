@@ -102,7 +102,7 @@ def simp_coordi_sent(tokens, node_list):
     ##### node_list
     e.g. #(4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
     """
-    tokens = [item.lower() for item in tokens]
+    #tokens = [item.lower() for item in tokens]
     root = ""
     root_ind = node_list[0][4]['root'][0]
     for nd in node_list:
@@ -293,7 +293,8 @@ def simp_coordi_sent(tokens, node_list):
 
                 #import pdb; pdb.set_trace()
                 if len(nsubj) > 0:
-                    _nsubj_ind = tokens.index(nsubj.lower().split()[0])
+                    _tokens = [item.lower() for item in tokens]
+                    _nsubj_ind = _tokens.index(nsubj.lower().split()[0])
                     if _nsubj_ind > 0:
                         str1 = " ".join(tokens[:_nsubj_ind]) + " " + _str1
                         str1 = str1.strip()
@@ -330,6 +331,8 @@ def simp_coordi_sent(tokens, node_list):
                 nsubj2 = base.replace_nsubj(sent2, nsubj)
                 
                 str2 = nsubj2 + _str2
+                str2 = str2.strip()
+                str2 = str2[0].upper() + str2[1:]
                 
             else:
 

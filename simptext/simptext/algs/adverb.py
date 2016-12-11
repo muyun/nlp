@@ -85,6 +85,9 @@ def simp_adverb_sent(tokens, node_list):
                 else:
                     nsubj = nsubj + " " + tokens[nsubj_ind]
 
+
+                #import pdb; pdb.set_trace()
+                nsubj = nsubj.strip()
                 nsubj = nsubj[0].upper() + nsubj[1:] + " "
                 
                 #cop_ind = 0
@@ -102,7 +105,9 @@ def simp_adverb_sent(tokens, node_list):
                             det_ind = _nd[4]['det'][0]
                             
                 nsubj = tokens[det_ind] + " " + tokens[nsubj_ind]
+                nsubj = nsubj.strip()
 
+            #import pdb; pdb.set_trace()
             """
             person_taggers = []
             org_taggers = []
@@ -133,22 +138,35 @@ def simp_adverb_sent(tokens, node_list):
                 
                 #import pdb; pdb.set_trace()
                 #advcl_dict = {}
-                for _nd in node_list: #BUG
+                for _nd in node_list[1:]: #BUG
                     if advcl_ind == _nd[0]:
                          advcl_dict = _nd[4]
                          advcl_tag = _nd[2]
                          break
 
+                # check the nsubj of the advcl, if they are the same subj, it is adverb
+                for _nd in node_list[1:]:
+                    if advcl_ind == _nd[0]:
+                        if 'nsubj' in _nd[4].keys():
+                            #import pdb; pdb.set_trace()
+                            advcl_nsubj_ind = _nd[4]['nsubj'][0]
+                            if tokens[advcl_nsubj_ind].lower() not in nsubj:
+                                return strs
+
                 #import pdb; pdb.set_trace()
-                verb = 'be'
+                verb = 'was'
                 #import pdb; pdb.set_trace()
                 if len(tenses(root)) > 0:
-                    verb = conjugate(verb, tenses(root)[0][0], 3)
-                
+                    if nsubj.strip().lower() == 'they':
+                        verb = conjugate(verb, tenses(root)[0][0], 2)
+                    else:
+                        verb = conjugate(verb, tenses(root)[0][0], 3)
+
+                #import pdb; pdb.set_trace()
                 # TODO, the tense
                 if advcl_tag == 'VBN':
                     if len(nsubj)>0:
-                        nsubj = nsubj[0].upper() + nsubj[1:] + " " + verb + " "
+                        nsubj = nsubj[0].upper() + nsubj[1:] + " "
                 if advcl_tag == 'VBG':
                     if len(nsubj)>0:
                         nsubj = nsubj[0].upper() + nsubj[1:] + " "
@@ -174,15 +192,17 @@ def simp_adverb_sent(tokens, node_list):
                 if advcl_tag == 'VBG':
                     str1 = ' '.join(_str1)
                 """
-
                 #import pdb; pdb.set_trace()
                 _str1_ = ' '.join(_str1)
                 nsubj = ' '.join(nsubj.split())
                 str1 = ""
-                if nsubj.lower() in _str1_.lower():
+                if nsubj.lower() + ' ' in _str1_.lower():
                     str1 = _str1_
                 else:
-                    str1 = nsubj + _str1_
+                    if advcl_tag == 'VBN':
+                        str1 = nsubj + " " +  verb + " " + _str1_
+                    else:
+                        str1 = nsubj + " " + _str1_
                 #print "1st sent: ", str1
 
                         # upper the 1st char in 2nd sent
@@ -271,13 +291,16 @@ def simp_adverb_sent(tokens, node_list):
                 #    tokens[xcomp_ind]=conjugate(tokens[xcomp_ind], tenses(root)[0][0])
 
                 #import pdb; pdb.set_trace()
-                verb = 'be'
+                verb = 'was'
                 #import pdb; pdb.set_trace()
-                if len(tenses(root))>0:
-                    verb = conjugate(verb, tenses(root)[0][0], 3)
+                if len(tenses(root)) > 0:
+                    if nsubj.strip().lower() == 'they':
+                        verb = conjugate(verb, tenses(root)[0][0], 2)
+                    else:
+                        verb = conjugate(verb, tenses(root)[0][0], 3)
                 # TODO
                 if xcomp_tag == 'VBN':
-                    nsubj = nsubj[0].upper() + nsubj[1:] + " " + verb + " "
+                    nsubj = nsubj[0].upper() + nsubj[1:] + " "
                 if xcomp_tag == 'VBG':
                     nsubj = nsubj[0].upper() + nsubj[1:] + " "
 
@@ -297,10 +320,13 @@ def simp_adverb_sent(tokens, node_list):
                 nsubj = ' '.join(nsubj.split())
                 _str1_ = ' '.join(_str1)
                 #if xcomp_tag == 'VBN':
-                if nsubj.lower() in _str1_.lower():
+                if nsubj.lower() + ' ' in _str1_.lower():
                     str1 = _str1_
                 else:
-                    str1 = nsubj + _str1_
+                    if advcl_tag == 'VBN':
+                        str1 = nsubj + " " +  verb + " " + _str1_
+                    else:
+                        str1 = nsubj + " " +  _str1_
                 """
                 #elif xcomp_tag == 'VBG':
                     if nsubj.lower() in _str1_.lower():
@@ -386,10 +412,13 @@ def simp_adverb_sent(tokens, node_list):
                 #    tokens[xcomp_ind]=conjugate(tokens[xcomp_ind], tenses(root)[0][0])
 
                 #import pdb; pdb.set_trace()
-                verb = 'be'
+                verb = 'was'
                 #import pdb; pdb.set_trace()
-                if len(tenses(root))>0:
-                    verb = conjugate(verb, tenses(root)[0][0], 3)
+                if len(tenses(root)) > 0:
+                    if nsubj.strip().lower() == 'they':
+                        verb = conjugate(verb, tenses(root)[0][0], 2)
+                    else:
+                        verb = conjugate(verb, tenses(root)[0][0], 3)
                 # TODO
                 nsubj = nsubj.strip()
                 nsubj = nsubj[0].upper() + nsubj[1:]
@@ -410,7 +439,7 @@ def simp_adverb_sent(tokens, node_list):
                 nsubj = ' '.join(nsubj.split())
                 _str1_ = ' '.join(_str1)
                 #if xcomp_tag == 'VBN':
-                if nsubj.lower() in _str1_.lower():
+                if nsubj.lower() + ' ' in _str1_.lower():
                     str1 = _str1_
                 else:
                     str1 = nsubj + " " + verb + " " + _str1_.lower()
@@ -534,11 +563,16 @@ def main():
     sent = "Notrium is played from a top-down perspective , giving an overhead view of proceedings ."
     sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
     sent = "They locate food by smell , using sensors in the tip of their snout , and regularly feast on ants and termites ."
-    #sent = "Peter came, suprising everyone ."
-    sent = "Needing money, I begged my parents."
+    sent = "Peter came, suprising everyone ."
+    #sent = "Needing money, I begged my parents."
     #sent = "Peter came, surprising everyone."
     #sent = "Refreshed, Peter stood up."
-    sent = "Impatient, he stood up."
+    #sent = "Impatient, he stood up."
+    #sent = "Impatient, they stood up."
+    sent = "Refreshed, they stood up."
+    sent = "Refreshed,  Alicia Smith stood up."
+    #sent = "Since he was late, I left."
+    #sent = "Refreshed, Alicia stood up."
     #sent = "Peter, sweating hard, arrived."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    

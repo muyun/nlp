@@ -22,11 +22,20 @@ PUNCTUATION = (';', ':', ',', '.', '!', '?')
 
 
 def simp_passive_sent(tokens, node_list):
-    """
+    dict1 = {
+        'me': 'I',
+        'him': 'He',
+        'her': 'She',
+        'them': 'They',
+        'i': 'me',
+        'he': 'him',
+        'she': 'her',
+        'they': 'them'
+    }
+
     strs = ""
+    """
     # the original tokens in the sent
-
-
     #import pdb; pdb.set_trace()
     print(sent)
     #import pdb; pdb.set_trace()
@@ -51,7 +60,6 @@ def simp_passive_sent(tokens, node_list):
         if root_ind == nd[0]:
             root=nd[1]
 
-    strs = ""
     #split_ind = 0
     for nd in node_list[1:]:
         #import pdb; pdb.set_trace()
@@ -77,36 +85,71 @@ def simp_passive_sent(tokens, node_list):
             nsubjpass = tokens[nsubjpass_ind]
             if det_ind:
                 nsubjpass = tokens[det_ind] + " " + tokens[nsubjpass_ind]
+            elif nsubjpass.lower() in dict1:
+                nsubjpass = dict1[nsubjpass.lower()]
+            else:
+                pass
 
-            det_ind = 0
+            auxpass_ind = 0
+            if ('auxpass' in nd[4].keys()):
+                auxpass_ind = nd[4]['auxpass'][0]
+
+            #det_ind = 0
             subj = ""
             if ('nmod' in nd[4].keys()):
                 nmod_ind = nd[4]['nmod'][0]
 
+                case_ind = 0
+                # check whether the agent is explicitly stated using "by"
+                for nd in node_list[1:]:
+                    if nmod_ind == nd[0]:
+                        if ('case' in nd[4].keys()):
+                            case_ind = nd[4]['case'][0]
+                            break
+                #import pdb; pdb.set_trace()
+                if case_ind == 0:
+                    return strs
+                if tokens[case_ind] != 'by':
+                    return strs
+
                 nmod_dict = {}
-                for _nd in node_list: #BUG
+                for _nd in node_list[1:]: #BUG
                     if nmod_ind == _nd[0]:
                          nmod_dict = _nd[4]
                          break
-
 
                 #import pdb; pdb.set_trace()
             #if ('case' in nmod_dict.keys()): # 'by'
                 #[NOTICE]: connect the nsubj + acl as 1st
                 #import pdb; pdb.set_trace()
+                det_ind = 0
                 if ('det' in nmod_dict):
                     det_ind = nmod_dict['det'][0]
 
                 if det_ind:
                     subj = base.upper_first_char(tokens[det_ind]) + " " + tokens[nmod_ind]
+                elif tokens[nmod_ind] in dict1:
+                    subj = dict1[tokens[nmod_ind]]
                 else:
                     subj = tokens[nmod_ind]
 
+                #import pdb; pdb.set_trace()
+                verb = root
+                if len(tenses(root)) > 0:
+                    if auxpass_ind != 0:
+                        if subj.strip().lower() == 'they':
+                            verb = conjugate(root, tenses(tokens[auxpass_ind])[0][0], 2)
+                        else:
+                            verb = conjugate(root, tenses(tokens[auxpass_ind])[0][0], 3)
+                    else:
+                        if subj.strip().lower() == 'they':
+                            verb = conjugate(root, tenses(root)[0][0], 2)
+                        else:
+                            verb = conjugate(root, tenses(root)[0][0], 3)
+                
+                strs = subj + " " + verb + " " + nsubjpass.lower() + " ."
 
-            #import pdb; pdb.set_trace()
-            if len(tenses(root)) > 0:
-                verb = conjugate(root, tenses(root)[0][0], 3)
-            strs = subj + " " + verb + " " + nsubjpass.lower() + " ."
+                return strs
             """
                 #[NOTICE]: remove the ',' after the nsubj
                 if tokens[nsubj_ind + 1] in PUNCTUATION:
@@ -177,9 +220,16 @@ def simp_syn_sent_(sent):
 
 def main():
 
-    #sent = "Peter was hit by a bus."
     sent = "Peter was hit by a bus."
-    sent = "An apple was eaten by Peter."
+    #sent = "An apple was eaten by Peter."
+    #sent = "The work was done by her."
+    #sent = "They was hit by the bus."
+    sent = "The work was done by them."
+    sent = "Peter is blamed by them."
+    #sent = "Peter was refreshed ."
+    #sent = "Peter is being blamed by him."
+    #sent = "Peter  was also called Pete  ."
+    #sent = "It is situated on the banks of river ghaghra  ."
     #sent = "Food is procured with its suckers  . "
     #print(simp_coordi_sent(sent))
     #sent = "He was born at Plessiel , a hamlet of Drucat near Abbeville , to a long-established family of Picardy , the great-nephew of the painter Eustache Le Sueur ."

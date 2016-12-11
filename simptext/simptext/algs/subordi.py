@@ -231,13 +231,14 @@ def simp_syn_sent_(sent):
 
 def main():
     #  clauses
-    #sent = "Since he came, I left"
+    sent = "Since he came, I left"
+    sent = "Since he was late, I left."
     #sent = "Before he came, I left"
     #sent = "He weakened to a tropical storm while also dumping heavy rain on already-devastated Haiti  ."
-    sent = "John McCain polled 62.5 % in the 2008 Presidential Election while 70.9 % of Utahns opted for George W. Bush in 2004 ."
+    #sent = "John McCain polled 62.5 % in the 2008 Presidential Election while 70.9 % of Utahns opted for George W. Bush in 2004 ."
     #sent = "I feel angry when provoked"
     #sent = "After eating dinner, he goes home."
-    sent = "Peter - nobody guessed it - showed up."
+    #sent = "Peter - nobody guessed it - showed up."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

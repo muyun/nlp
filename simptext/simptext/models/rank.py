@@ -41,7 +41,7 @@ def get_triples(node):
 
     #import pdb; pdb.set_trace()
     return (node[1]['address'], node[1]['word'], node[1]['ctag'], node[1]['rel'], node[1]['deps'])      
-        
+         
 
 def _Stem(sub_sent,edblist):
 	#words = nltk.word_tokenize(sub_sent)
@@ -193,14 +193,20 @@ def _interface(sentence,edblist):
 	token_list =[]
  
         #import pdb; pdb.set_trace()
+        #print "word_pre:", word_pre
+        if len(word_pre) > 0:
+            word_pre[0] = word_pre[0][0].upper() + word_pre[0][1:]
+        #import pdb; pdb.set_trace()
 	for word in word_pre:
 	        tokens = {}
                 if word == "He": # is a person, subject?
                         tokens[word] = [ "He", "She"]
-                elif word == "They":
-                        tokens[word] = [ "They"]
-                elif word == "It":
-                        tokens[word] = [ "It"]
+                #elif word == "They":
+                        #tokens[word] = [ "They"]
+                        
+                #elif word == "It":
+                        #tokens[word] = [ "It"]
+                #        pass
                 else:
                         if word not in target_words:
                                 token_list.append(word)

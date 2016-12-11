@@ -98,8 +98,6 @@ $(function() {
   var selectedItem = sessionStorage.getItem("SelectedItem");  
   $('#wordlevel').val(selectedItem);
   //console.log(selectedItem)
-  //sessionStorage.setItem("SelectedItem", "4");
-
   $('#wordlevel').change(function() { 
     var dropVal = $(this).val();
     //console.log(dropVal)
@@ -123,7 +121,7 @@ $(document).ready(function(){
 <form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry ">
       <dl>
         <dt>Input (<small>Please enter one sentence as input</small>):
-        <dd><textarea name=input rows=4 cols=60>Peter, my friend, ate an apple.</textarea> 
+        <dd><textarea name=input rows=4 cols=60></textarea> 
         <br/>
         <dd><input type=submit value=Simplify>
       </dl>
@@ -383,16 +381,23 @@ $(document).ready(function(){
        </div>
        -->
        <div>
-           <button id="setting">Setting</button>
+           <button type="button" id="setting" >Settings</button>
        </div>
 
         <hr/>
-        <div id="item">
+        <div class="params" id="item" style="display:none;">
            <dt>The wordlist:
            <input type="text" name=wordinput id=wordinput value=""/>
            <br/> 
-           <dt>{{ form.wordlevel.label }}  
-           <dd> {{ form.wordlevel }} &nbsp; <a href="{{ url_for('print_words') }}">The words in this level</a>
+           <dt>The level:
+           <select name="wordlevel">
+              <option value="0">custom</option>
+              <option value="1">level 1</option>
+              <option value="2">level 2</option>
+              <option value="3">level 3</option>
+              <option value="4" selected>level 4</option>
+           </select>
+            &nbsp; <a href="{{ url_for('print_words') }}">words</a>
            <br/> 
            <dt>{{ form.algs.label }}    
            <dd>{{ form.algs }} 

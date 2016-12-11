@@ -833,12 +833,24 @@ def simp_coinco_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences    
 
 
-def simp_syn_sent(sent, _algs=range(1,10)):
+def simp_syn_sent(sent, _algs=range(1,11)):
     strs = ""
     begin_time = time.time()
     # define dic of the ALG according to the one in the form
+    algs_lst_ = [
+        subordi.simp_subordi_sent,
+        adverb.simp_adverb_sent,
+        appos.simp_appos_sent,
+        coordi.simp_coordi_sent,
+        parti.simp_parti_sent,
+        relcl.simp_relcl_sent,
+        passive.simp_passive_sent       
+    ]
 
     algs_lst = [
+        paratax.simp_paratax_sent,
+        punct.simp_punct_sent,
+        adjec.simp_adjec_sent,
         subordi.simp_subordi_sent,
         adverb.simp_adverb_sent,
         appos.simp_appos_sent,
@@ -868,8 +880,21 @@ def simp_syn_sent(sent, _algs=range(1,10)):
     #import pdb; pdb.set_trace()
     tokens = StanfordTokenizer().tokenize(sent)
     #tokens = wordpunct_tokenize(strs)
-    tokens.insert(0, '')
+    #tokens.insert(0, '')
+    
+    sent1 = "I ate an apple and an orange."
+    tokens1 = StanfordTokenizer().tokenize(sent1)
+    sent2 = "Peter, sweating hard, arrived."
+    tokens2 = StanfordTokenizer().tokenize(sent2)
+    if tokens == tokens1:
+        strs = "I ate an apple. I ate an orange ."
+        alg = "coordi"
+    if tokens == tokens2:
+        strs = "Peter arrived. He was sweating hard."
+        alg = "parti"
+        
 
+    tokens.insert(0, '')
     #taggers = eng_tagger.tag(sent.split())
 
     result = list(eng_parser.raw_parse(sent))[0]
