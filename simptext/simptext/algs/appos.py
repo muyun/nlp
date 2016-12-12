@@ -134,7 +134,7 @@ def simp_appos_sent(tokens, node_list):
                 appos_ind = nsubj_dict['appos'][0]
 
                 #verb = "is"
-                verb = conjugate("be", tenses(root)[0][0], 3)
+                verb = conjugate("was", tenses(root)[0][0], 3)
                 #verb = base.update_vb_conjugation(verb, root)
 
                 #nsubj = base.upper_first_char(tokens[nsubj_ind])
@@ -199,9 +199,10 @@ def simp_appos_sent(tokens, node_list):
                     if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
                         str2 = _nsubj + _str2
                     else:
-                        sent2 = _nsubj + " " + _str2
-                        nsubj2 = base.replace_nsubj(sent2, nsubj)
-                        str2 = nsubj2 + _str2
+                        #sent2 = _nsubj + " " + _str2
+                        #nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        #str2 = nsubj2 + _str2
+                        str2 = _nsubj + " " + _str2
 
                 else:
 
@@ -237,9 +238,10 @@ def simp_appos_sent(tokens, node_list):
                     if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
                         str2 = _nsubj + _str2
                     else:
-                        sent2 = _nsubj + " " + _str2
-                        nsubj2 = base.replace_nsubj(sent2, nsubj)
-                        str2 = nsubj2 + _str2
+                        #sent2 = _nsubj + " " + _str2
+                        #nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        #str2 = nsubj2 + _str2
+                        str2 = _nsubj + " " + _str2
 
                 strs = str1 + ' . ' + str2
 
@@ -280,9 +282,10 @@ def simp_appos_sent(tokens, node_list):
                     if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
                         str2 = _nsubj + _str2
                     else:
-                        sent2 = _nsubj + " " + _str2
-                        nsubj2 = base.replace_nsubj(sent2, nsubj)
-                        str2 = nsubj2 + _str2
+                        #sent2 = _nsubj + " " + _str2
+                        #nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        #str2 = nsubj2 + _str2
+                        str2 = _nsubj + " " + _str2
 
                 strs = str1 + ' . ' + str2
 
@@ -341,15 +344,16 @@ def main():
     # Appositive clauses
 
     sent = "Peter, my son, ate an apple."
-    #sent = "Peter, my son, eats an apple."
+    sent = "Peter, my son, eats an apple."
     #sent = "Peter, my friend, likes it."
-    #sent = "Boys, my friends, like it."
+    sent = "Boys, my friends, like it."
     #sent = "City of Faizabad, the headquarters of Faizabad District, is a municipal board in the state of Uttar Pradesh , India ."
     #TODO: the tense of the output
-    #sent = "John Nash, a mathematician, lectured at Princeton."
-    #sent = "Boeing, the manufacturer of airplanes, is based in Seattle."
-    #sent = "Robert Downey Jr. , a mathematician, lectured at Princeton."
-    sent = "It is based in Seattle  ."
+    sent = "John Nash, a mathematician, lectured at Princeton."
+    sent = "Boeing, the manufacturer of airplanes, is based in Seattle."
+    sent = "Robert Downey Jr. , a mathematician, lectured at Princeton."
+    sent = "Boeing, the airplane company, went bankrupt."
+    #sent = "It is based in Seattle  ."
     print(simp_syn_sent_(sent))
 
 

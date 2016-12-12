@@ -91,15 +91,17 @@ def simp_punct_sent(tokens, node_list):
         # the sentence contains the punctuation, split it
         for ind, token in enumerate(tokens):
             if token in PUNCTUATION:
-                tokens[ind] = ' . ' # remove the punctuation
+                tokens[ind] = '.' # remove the punctuation
                 # if the 2nd sentence is a noun
                 word = tokens[ind+1]
 
-                #import pdb; pdb.set_trace()
+                """
+                import pdb; pdb.set_trace()
                 if 'NN' in check_tag(word, node_list):
                     # a pronoun and verb be added
                     tokens.insert(ind+1, verb)
                     tokens.insert(ind+1, pron)
+                """
                 
                 tokens[ind+1] = base.upper_first_char(tokens[ind+1]) # upper the next word
                 punct_ind = ind 
@@ -165,11 +167,14 @@ def simp_syn_sent_(sent):
 def main():
     # punctuation clauses
 
-    sent = "I ate fish; he drank wine; this is a bine; "
+    sent = "I ate fish; he drank wine. "
     #sent = "I have two brothers: they both live in China."
     #sent = "I have two brothers: Peter and Sam."
     #sent = "In March 1992 , Linux version 0.95 was the first to be capable of running X : This large version number jump was due to a feeling that a version 1.0 with no major missing pieces was imminent ."
-    sent = "This is a test ."
+    #sent = "This is a test ."
+    sent = "I ate fish; raymond drank wine. "
+    sent = "I have two brothers: they both live in China."
+    sent = "I ate fish and Peter drank wine."
     print(simp_syn_sent_(sent))    
 
         

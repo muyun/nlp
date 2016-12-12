@@ -24,8 +24,15 @@ lmtzr = WordNetLemmatizer()
 EDB_list=[]
 
 import time
-from pattern.en import tenses, conjugate
+from pattern.en import tenses, conjugate, singularize
 
+def _isplural(w):
+        word = w.lower()
+        singula = singularize(word)
+        if singula == word:
+            return False
+        else:
+            return True
 
 def isplural(w):
         word = w.lower()
@@ -41,7 +48,45 @@ def get_triples(node):
 
     #import pdb; pdb.set_trace()
     return (node[1]['address'], node[1]['word'], node[1]['ctag'], node[1]['rel'], node[1]['deps'])      
-         
+
+
+def replace_nsubj(sent, nsubj):
+    """ update the subj of the sentence """
+    #import pdb; pdb.set_trace()
+    person_taggers = []
+    org_taggers = []
+    for token, title in eng_tagger.tag(sent.split()):
+        if token.lower() in nsubj.lower().split():
+            if token == 'the' or token == 'The': 
+                    continue
+            if title == 'PERSON':
+                    person_taggers.append(token)
+            elif title == 'ORGANIZATION':
+                    org_taggers.append(token)
+            else:
+                    org_taggers.append(token)
+
+    nsubj2 = ""
+    #import pdb; pdb.set_trace()
+    if len(nsubj)>0:
+        if (('it' in nsubj.lower().split()) or ('they' in nsubj.lower().split())):
+            nsubj2 = nsubj
+        else:
+            if len(person_taggers) > 0:
+                nsubj2 = "He"   # 'he' will be replaced with 'he/she'
+            elif len(org_taggers) > 0:
+                if _isplural(org_taggers[-1]) or (org_taggers[-1].lower() == 'they'):
+                    nsubj2 = "They"
+                elif org_taggers[-1].lower() == 'he':
+                    nsubj2 = "He"
+                elif org_taggers[-1].lower() == 'she':
+                    nsubj2 = "She"
+                else:
+                    nsubj2 = "It"
+            else:
+                pass
+        
+    return nsubj2 + " "        
 
 def _Stem(sub_sent,edblist):
 	#words = nltk.word_tokenize(sub_sent)
@@ -74,12 +119,13 @@ def _Stem(sub_sent,edblist):
                         
         org_taggers = words[nsubj_ind-1]
         """
-        nsubj_ind = 1
+        # Assume the name is firstname, middlename, lastname
+        nsubj_ind = 3
         if len(words) > 0:
-                nsubj_taggers = words[nsubj_ind-1]
+                nsubj_taggers = " ".join(words[:nsubj_ind])
         else:
                 nsubj_taggers = ""
-        
+ 
 	word_list = []
 	word_pre = []
 	pos = ['NNP','NNPS','POS',',','.','\'','$','WRB','MD','SYM','TO','WP','WDT',':','CD','DT','EX', 'PRP','PRP$']
@@ -94,10 +140,12 @@ def _Stem(sub_sent,edblist):
 			temp = e[0].lower()
 			if e[1] in v_pos:
 				word_list.append(lmtzr.lemmatize(temp,'v'))
-				word_pre.append(lmtzr.lemmatize(temp,'v'))
+				#word_pre.append(lmtzr.lemmatize(temp,'v'))
+                                word_pre.append(temp)
 			elif (e[1] in n_pos) and (e[0] != nsubj_taggers):
 				word_list.append(lmtzr.lemmatize(temp))
-				word_pre.append(lmtzr.lemmatize(temp))
+				#word_pre.append(lmtzr.lemmatize(temp))
+                                word_pre.append(temp)
 			else:
 				word_list.append(temp)
 				word_pre.append(temp)
@@ -116,13 +164,52 @@ def _Stem(sub_sent,edblist):
 		if w and w not in edblist:
 			sub_words.append(w.strip())
 
-        # get the person name based on StanfordNERTagger
-        
+        # get the person name based on StanfordNERTagger        
         #import pdb; pdb.set_trace()
         taggers = []
-        if nsubj_taggers in _taggers:
-                taggers.append(nsubj_taggers)
-                
+        if len(nsubj_taggers) > 0 :
+                _nsubj = nsubj_taggers.split()
+                for _nsubj in _taggers:
+                        taggers.append(nsubj_taggers)
+
+        _taggers = " ".join(taggers)
+        person_taggers = []
+        org_taggers = []
+        for token, title in eng_tagger.tag(words):
+            if token.lower() in _taggers.lower().split():
+                if token == 'the' or token == 'The': 
+                        continue
+                if title == 'PERSON':
+                        person_taggers.append(token)
+                elif title == 'ORGANIZATION':
+                        org_taggers.append(token)
+                else:
+                    #org_taggers.append(token)
+                        pass
+
+        _word_pre = []
+        if len(person_taggers) > 0 and word_pre[0] in person_taggers: # nsubj
+            #w = []
+            #_word_pre = []
+            # whether the person is in the 1st
+            for _w  in word_pre:
+                    if _w not in person_taggers:
+                            _word_pre.append(_w)  
+            _word_pre.insert(0, ' '.join(person_taggers))
+            
+        if len(org_taggers) > 0 and word_pre[0] in org_taggers:
+            #_word_pre = []
+            for _w  in word_pre:
+                    if _w not in org_taggers:
+                            _word_pre.append(_w)  
+            _word_pre.insert(0, ' '.join(org_taggers))
+
+        if len(_word_pre) == 0:
+                _word_pre = list(word_pre)
+                person_taggers = []
+                org_taggers = []
+
+        #import pdb; pdb.set_trace()
         """
         person_taggers = []
         org_taggers = []
@@ -136,7 +223,7 @@ def _Stem(sub_sent,edblist):
                                 org_taggers.append(token)
         """                                     
 	#import pdb; pdb.set_trace()
-	return sub_words, word_pre, taggers
+	return sub_words, _word_pre, ' '.join(person_taggers), ' '.join(org_taggers)
 
 def Initial(fin): #load EDB_List
 	flist = open(fin,'r')
@@ -189,7 +276,7 @@ def _process_args():
     return parser.parse_args(sys.argv[1:])
 
 def _interface(sentence,edblist):
-	target_words, word_pre, taggers =  _Stem(sentence,edblist)
+	target_words, word_pre, person_taggers, org_taggers =  _Stem(sentence,edblist)
 	token_list =[]
  
         #import pdb; pdb.set_trace()
@@ -199,16 +286,21 @@ def _interface(sentence,edblist):
         #import pdb; pdb.set_trace()
 	for word in word_pre:
 	        tokens = {}
-                if word == "He": # is a person, subject?
-                        tokens[word] = [ "He", "She"]
-                #elif word == "They":
+                #if word == "He": # is a person, subject?
+                #        tokens[word] = ["He", "She"]
+                if word.strip().lower() == person_taggers.strip().lower():
+                        tokens[word] = [word, "He", "She"]
                         #tokens[word] = [ "They"]
                         
-                #elif word == "It":
+                elif word.strip().lower() == org_taggers.strip().lower():
+                        if _isplural(org_taggers.strip().split()[-1]) or (org_taggers.strip().split()[-1] == 'they'):
+                                tokens[word] = [word, "They"]
+                        else:
+                                tokens[word] = [word, "It"]
                         #tokens[word] = [ "It"]
                 #        pass
                 else:
-                        if word not in target_words:
+                        if lmtzr.lemmatize(word) not in target_words:
                                 token_list.append(word)
                         else:
                                 r_sent = []
@@ -216,7 +308,7 @@ def _interface(sentence,edblist):
 			        for i in range(len(candidates)):
 				        r_sent.append(candidates[i] + "@" + sentence.replace(word,candidates[i]))
 			        sub_top10 = kenlm_topn(r_sent,9,sentence)
-			        if word not in sub_top10:
+			        if lmtzr.lemmatize(word) not in sub_top10:
 			        	sub_top10.insert(0,word)
 
                                 if len(tenses(word)) > 0:

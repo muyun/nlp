@@ -131,7 +131,7 @@ def simp_parti_sent(tokens, node_list):
                 """
                 #import pdb; pdb.set_trace()
                 #verb = "be"
-                verb = conjugate("be", tenses(root)[0][0], 3)
+                verb = conjugate("was", tenses(root)[0][0], 3)
                 root_ind = tokens.index(root)
 
                 advmod_ind = 0
@@ -176,11 +176,12 @@ def simp_parti_sent(tokens, node_list):
                 _nsubj = nsubj[0].upper() + nsubj[1:]
 
                 if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
-                    str2 = _nsubj + _str2
+                    str2 = _nsubj + " " + _str2
                 else:
-                    sent2 = _nsubj + " " + _str2
-                    nsubj2 = base.replace_nsubj(sent2, nsubj)
-                    str2 = nsubj2 + _str2
+                    #sent2 = _nsubj + " " + _str2
+                    #nsubj2 = base.replace_nsubj(sent2, nsubj)
+                    #str2 = nsubj2 + _str2
+                    str2 = _nsubj + " " + _str2
                 #w = _w + ' '
                 #str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
                 #print "2nd sent: ", str2
@@ -249,9 +250,9 @@ def main():
 
     sent = "John Nash, running down the street, tripped."
     #sent = "Port Arthur was also the destination for juvenile convicts , receiving many boys , some as young as nine arrested for stealing toys ."
-    sent = "Alicia, running down the street, tripped."
-    sent = "Peter, also called Pete, came."
-    sent = "Peter, sweating hard, arrived."
+    #sent = "Alicia, running down the street, tripped."
+    #sent = "Alice emith, also called Pete, came."
+    #sent = "alice emith, sweating hard, arrived."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

@@ -123,7 +123,8 @@ def check_word(strs, words):
     print "check strs: ", strs
 
     tokens = []
-    tokens = rank._interface(strs, words)
+    if len(strs) > 0:
+        tokens = rank._interface(strs, words)
     #print "tokens:", tokens
     return tokens
 

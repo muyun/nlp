@@ -26,7 +26,8 @@ import base
 PUNCTUATION = (';', ':', ',', '.', '!', '?')
 COMMA = ','
 
-def simp_adverb_sent(tokens, node_list):
+def simp_adverb_sent(_tokens, node_list):
+    tokens = list(_tokens)
     strs = ""
 
     #import pdb; pdb.set_trace()
@@ -132,7 +133,10 @@ def simp_adverb_sent(tokens, node_list):
 
                 #import pdb; pdb.set_trace()
                 if len(tenses(root))>0:
-                    tokens[advcl_ind] = conjugate(tokens[advcl_ind], tenses(root)[0][0], 3)
+                    if tenses(root)[0][0] == 'infinitive':
+                        tokens[advcl_ind] = conjugate(tokens[advcl_ind], tenses(root)[1][0], 3)
+                    else:
+                        tokens[advcl_ind] = conjugate(tokens[advcl_ind], tenses(root)[0][0], 3)
 
                 #TODO: update the tense of the advcl_ind
                 
@@ -158,9 +162,15 @@ def simp_adverb_sent(tokens, node_list):
                 #import pdb; pdb.set_trace()
                 if len(tenses(root)) > 0:
                     if nsubj.strip().lower() == 'they':
-                        verb = conjugate(verb, tenses(root)[0][0], 2)
+                        if tenses(root)[0][0] == 'infinitive':
+                            verb = conjugate(verb, tenses(root)[1][0], 2)
+                        else:
+                            verb = conjugate(verb, tenses(root)[0][0], 2)
                     else:
-                        verb = conjugate(verb, tenses(root)[0][0], 3)
+                        if tenses(root)[0][0] == 'infinitive':
+                            verb = conjugate(verb, tenses(root)[1][0], 3)
+                        else:
+                            verb = conjugate(verb, tenses(root)[0][0], 3)
 
                 #import pdb; pdb.set_trace()
                 # TODO, the tense
@@ -241,10 +251,11 @@ def simp_adverb_sent(tokens, node_list):
                     if _nsubj == 'I' or _nsubj == 'She' or _nsubj == 'He':
                         str2 = _nsubj + " " + _str2
                     else:
-                        sent2 = _nsubj + " " + _str2
+                        #sent2 = _nsubj + " " + _str2
                     
-                        nsubj = base.replace_nsubj(sent2, nsubj)
-                        str2 = nsubj + _str2
+                        #nsubj = base.replace_nsubj(sent2, nsubj)
+                        #str2 = nsubj + _str2
+                        str2 = _nsubj + " " + _str2
                 else:
                     _strs = tokens[split_ind+1:]
                     if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
@@ -258,10 +269,11 @@ def simp_adverb_sent(tokens, node_list):
                     if _nsubj == 'I' or _nsubj == 'She' or _nsubj == 'He':
                         str2 = _nsubj + " " + _str2
                     else:
-                        sent2 = _nsubj + " " + _str2
+                        #sent2 = _nsubj + " " + _str2
                     
-                        nsubj = base.replace_nsubj(sent2, nsubj)
-                        str2 = nsubj + " " + _str2
+                        #nsubj = base.replace_nsubj(sent2, nsubj)
+                        #str2 = nsubj + " " + _str2
+                        str2 = _nsubj + " " + _str2
                     
                 #print "2nd sent: ", str2
 
@@ -372,11 +384,12 @@ def simp_adverb_sent(tokens, node_list):
                     _nsubj = nsubj[0].upper() + nsubj[1:]
 
                     if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
-                        str2 = _nsubj + _str2
+                        str2 = _nsubj + " " + _str2
                     else:
-                        sent2 = _nsubj + " " + _str2
-                        nsubj2 = base.replace_nsubj(sent2, nsubj)
-                        str2 = nsubj2 + _str2
+                        #sent2 = _nsubj + " " + _str2
+                        #nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        #str2 = nsubj2 + _str2
+                        str2 = _nsubj + " " + _str2
                    
                 else:
                     str2 = base.upper_first_char(nsubj) + " " + ' '.join(tokens[split_ind+2:])
@@ -471,11 +484,12 @@ def simp_adverb_sent(tokens, node_list):
                     _nsubj = nsubj[0].upper() + nsubj[1:]
 
                     if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
-                        str2 = _nsubj + _str2
+                        str2 = _nsubj + " " + _str2
                     else:
-                        sent2 = _nsubj + " " + _str2
-                        nsubj2 = base.replace_nsubj(sent2, nsubj)
-                        str2 = nsubj2 + _str2
+                        #sent2 = _nsubj + " " + _str2
+                        #nsubj2 = base.replace_nsubj(sent2, nsubj)
+                        #str2 = nsubj2 + _str2
+                        str2 = _nsubj + " " + _str2
                    
                 else:
                     str2 = base.upper_first_char(nsubj) + " " + ' '.join(tokens[split_ind+2:])
@@ -505,9 +519,9 @@ def simp_syn_sent_(sent):
     #import pdb; pdb.set_trace()
     #print(sent)
     #import pdb; pdb.set_trace()
-    tokens = StanfordTokenizer().tokenize(str(sent))
+    _tokens = StanfordTokenizer().tokenize(str(sent))
     #tokens = wordpunct_tokenize(str(sent))
-    tokens.insert(0, '')
+    _tokens.insert(0, '')
 
     result = list(eng_parser.raw_parse(sent))[0]
     root = result.root['word']
@@ -529,7 +543,7 @@ def simp_syn_sent_(sent):
     #import pdb; pdb.set_trace()
     #strs = simp_coordi_sent(tokens, node_list)
     #strs = simp_subordi_sent(tokens, node_list)
-    strs = simp_adverb_sent(tokens, node_list)
+    strs = simp_adverb_sent(_tokens, node_list)
     #strs = simp_parti_sent(tokens, node_list)
     #strs = simp_adjec_sent(tokens, node_list)
     #strs = simp_appos_sent(tokens, node_list)
@@ -571,7 +585,10 @@ def main():
     #sent = "Impatient, they stood up."
     sent = "Refreshed, they stood up."
     sent = "Refreshed,  Alicia Smith stood up."
+    sent = "Devastated, they left."
+    
     #sent = "Since he was late, I left."
+    #sent = "Since she was thirsty , he offered a drink."
     #sent = "Refreshed, Alicia stood up."
     #sent = "Peter, sweating hard, arrived."
     #print(simp_coordi_sent(sent))

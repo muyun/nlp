@@ -78,44 +78,34 @@ def simp_adjec_sent(tokens, node_list):
             #import pdb; pdb.set_trace()
             nsubj_ind = nd[4]['nsubj'][0]
             nsubj_compound_list = []
+            amod_list = []
+            nsubj_dict = {}
+            det_ind = 0
             for _nd in node_list: #BUG
                 if nsubj_ind == _nd[0]:
                      nsubj_dict = _nd[4]
+                     if ('amod' in nsubj_dict.keys()):
+                         amod_list = nsubj_dict['amod']
                      if ('compound' in nsubj_dict.keys()):
                          nsubj_compound_list = nsubj_dict['compound']
-                     break
+                     if ('det' in nsubj_dict.keys()):
+                         det_ind = nsubj_dict['det'][0]
+                     #break
 
             #nsubj = tokens[nsubj_ind]
             # get the nsubj
             nsubj = ""
             #import pdb; pdb.set_trace()
+            for j in amod_list:
+                nsubj = nsubj + " " + tokens[j]
             for i in nsubj_compound_list:
                 nsubj = nsubj + " " + tokens[i]
-            nsubj = nsubj + " " + tokens[nsubj_ind]
-            nsubj = nsubj[0].upper() + nsubj[1:] + " "
-
-            person_taggers = []
-            org_taggers = []
-            # replace the nsubj with "he/she"
-            for token, title in taggers:
-                if token in nsubj:
-                    if title == 'PERSON':
-                        person_taggers.append(token)
-                    elif title == 'ORGANIZATION':
-                        org_taggers.append(token)
-                    else:
-                        org_taggers.append(token)
-
-            nsubj_dict = {}
-            det_ind = 0
-            for _nd in node_list[1:]: #BUG
-                if nsubj_ind == _nd[0]:
-                    nsubj_dict = _nd[4]
-                    if ('det' in nsubj_dict.keys()):
-                        det_ind = _nd[4]['det'][0]
-                        nsubj = tokens[det_ind] + " " + nsubj
-
-                    break
+            if det_ind > 0:
+                nsubj = tokens[det_ind] + " " + nsubj + " " + tokens[nsubj_ind]
+            else:
+                nsubj = nsubj + " " + tokens[nsubj_ind]
+            #nsubj = nsubj + " " + tokens[nsubj_ind]
+            nsubj = nsubj[0].upper() + nsubj[1:]
 
             # are
             cop_ind = 0
@@ -132,6 +122,7 @@ def simp_adjec_sent(tokens, node_list):
                 dobj_ind = 0
                 rel_nsubj_ind = 0
                 nmod_ind = 0
+                det_ind = 0
                 for _nd in node_list[1:]:
                     if relcl_ind == _nd[0]:
                         if ('dobj' in _nd[4].keys()):
@@ -179,26 +170,28 @@ def simp_adjec_sent(tokens, node_list):
                             if ('case' in _nd[4].keys()):
                                 case_ind = _nd[4]['case'][0]
 
-
                     #import pdb; pdb.set_trace()
                     rel_nsubj = base.upper_first_char(tokens[rel_nsubj_ind])
                     _str1 =  tokens[relcl_ind:(root_ind-1)]
 
                     if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                        _str1[-1] = ''
-                    str1 = rel_nsubj + " " + ' '.join(_str1) + " " + tokens[case_ind] + " " + tokens[nsubj_ind]
+                    str1 = rel_nsubj + " " + ' '.join(_str1) + " " + tokens[case_ind] + " " + nsubj.lower()
 
                    # upper the 1st char in 2nd sent
                     _str2 = tokens[root_ind:]
                    #w = _w + ' '
+                    nsubj = nsubj.strip()
                     if cop_ind > 0:
                         #str2 = base.upper_first_char(nsubj) + " " + tokens[cop_ind] + " " + ' '.join(_str2)
                         str2 = nsubj + " " + tokens[cop_ind] + " " + ' '.join(_str2)
                     else:
                         #str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
+
                         str2 = nsubj + " " + ' '.join(_str2)
                    #print "2nd sent: ", str2
 
+                    str2 = base.upper_first_char(str2)
                     strs = str2 + ' ' + str1 + " ."
 
                     #return strs
@@ -330,11 +323,11 @@ def main():
     # adjectival Clauses
     sent = "Peter, who liked fruits, ate an apple."
     #sent = "I ate fish and he drank wine."
-    sent = "The apple, which Peter ate, was red."
-    sent = "Peter, whom I know, came."
+    #sent = "The apple, which Peter ate, was red."
+    #sent = "Alice emith, whom I know, came."
 
-    sent = "Peter, to whom I talked, came."
-    sent = "The books, most of which I read, are interesting."
+    #sent = "alice emitch, to whom I talked, came."
+    #sent = "The books, most of which I read, are interesting."
     #sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
 
     #sent = "At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake ."

@@ -72,39 +72,75 @@ def simp_subordi_sent(tokens, node_list):
 
             #import pdb; pdb.set_trace()
             mark_list = []
-            
+
+            nsubj = ""
             nsubj_ind = 0
+            full_nsubj_ind = 0
+            det_ind = 0
             nsubj_word = ""
-            nsubj_compound_list=[]
             if ('nsubj' in nd[4].keys()):
                 nsubj_ind = nd[4]['nsubj'][0]
-                for _nd in node_list[1:]:
-                    if nsubj_ind == _nd[0]:
+                nsubj_dict = {}
+                nsubj_compound_list = []
+                amod_list = []
+                det_ind = 0
+                #import pdb; pdb.set_trace()
+                for _nd in node_list:
+                    #import pdb; pdb.set_trace()
+                    if (nsubj_ind == _nd[0]):
+                        #import pdb; pdb.set_trace()
                         nsubj_dict = _nd[4]
+                        if ('amod' in nsubj_dict.keys()):
+                            amod_list = nsubj_dict['amod']
                         if ('compound' in nsubj_dict.keys()):
-                             nsubj_compound_list = nsubj_dict['compound']
-                        nsubj_word = _nd[1]
-                        break
+                            nsubj_compound_list = nsubj_dict['compound']
+                        if ('det' in nsubj_dict.keys()):
+                            det_ind = nsubj_dict['det'][0]
+
+                #import pdb; pdb.set_trace()
+                for j in amod_list:
+                    nsubj = nsubj + " " + tokens[j]
+                for i in nsubj_compound_list:
+                    nsubj = nsubj + " " + tokens[i]
+                if det_ind > 0:
+                    nsubj = tokens[det_ind] + " " + nsubj + " " + tokens[nsubj_ind]
+                else:
+                    nsubj = nsubj + " " + tokens[nsubj_ind]
+
+                #import pdb; pdb.set_trace()
+                full_nsubj_ind = tokens.index(nsubj.split()[0])
+                nsubj = nsubj.strip()
+                nsubj = nsubj[0].upper() + nsubj[1:] + " "
 
             advcl_dict = {}
             for _nd in node_list[1:]: #BUG
                 if advcl_ind == _nd[0]:
                      advcl_dict = _nd[4]
                      mark_list = _nd
-                     break
-                 
+                     break                
             # the nsubj of the advcl
+            #import pdb; pdb.set_trace()
             nsubj_advcl_word = ""
+            advcl_det_ind =0
             if ('nsubj' in advcl_dict.keys()):
                 nsubj_advcl_ind = advcl_dict['nsubj'][0]
-                for __nd in node_list[1:]:
-                    if nsubj_advcl_ind == __nd[0]:
-                        nsubj_advcl_word = __nd[1] # get the subj of the advcl
-                        break
+                for nnd in node_list[1:]:
+                    if nsubj_advcl_ind == nnd[0]:
+                        if ('det' in nnd[4].keys()):
+                            advcl_det_ind = nnd[4]['det'][0]
+                        #nsubj_advcl_word = nnd[1] # get the subj of the advcl
+                        #break
+            if advcl_det_ind > 0:
+                nsubj_advcl_word = tokens[advcl_det_ind] + " " + tokens[nsubj_advcl_ind]
+            else:
+                nsubj_advcl_word =  tokens[nsubj_advcl_ind]
 
+            """
+            for the sentence "Since he was hungry, he ate a banana.""
+            import pdb; pdb.set_trace()
             if nsubj_word == nsubj_advcl_word:
                 return strs
-           
+            """
             #import pdb; pdb.set_trace()
             if ('mark' in advcl_dict.keys()):
                 #import pdb; pdb.set_trace()
@@ -116,6 +152,8 @@ def simp_subordi_sent(tokens, node_list):
                 #tokens[mark_ind+1] = upper_first_char(tokens[mark_ind+1])
                 # if the marker is in the dict1
                 # [NOTICE]: we use the punctuation to check the sentence
+
+                #import pdb; pdb.set_trace()
                 if (marker in dict1.keys()): # if dict1, subordinated clause goes first
                     # delete the conjunction,
                     _w = dict1[marker]
@@ -126,13 +164,29 @@ def simp_subordi_sent(tokens, node_list):
 
                     #import pdb; pdb.set_trace()
                     if nsubj_ind != 0:
-                        _str1 = tokens[:(nsubj_ind)]
+                        #_str1 = tokens[:(nsubj_ind)]
+                        if tokens[full_nsubj_ind].lower() == tokens[nsubj_ind].lower():
+                            
+                            _str1 = tokens[:nsubj_ind]
+                        else:
+                            if det_ind > 0:
+                                _str1 = tokens[:det_ind]
+                            else:
+                                _str1 = tokens[:full_nsubj_ind]
                         if _str1[-1] in PUNCTUATION:
                             _str1[-1] = ''
                         str1 = ' '.join(_str1)
+                        str1 = str1[0].upper() + str1[1:]
                     #print "1st sent: ", str1
 
-                        _str2 = tokens[nsubj_ind:]
+                        #_str2 = tokens[nsubj_ind:]
+                        if tokens[full_nsubj_ind].lower() == tokens[nsubj_ind].lower():
+                            _str2 = tokens[nsubj_ind:]
+                        else:
+                            if det_ind > 0:
+                                _str2 = tokens[det_ind:]
+                            else:
+                                _str2 = tokens[full_nsubj_ind:]
                     #w = _w + ' '
                         str2 = _w + ' ' + ' '.join(_str2)
                     #print "2nd sent: ", str2
@@ -155,14 +209,28 @@ def simp_subordi_sent(tokens, node_list):
 
                     #TODO add it before the nsubj
                     if nsubj_ind != 0:
-                        _str1 = tokens[:(nsubj_ind)]
+                        if tokens[full_nsubj_ind].lower() == tokens[nsubj_ind].lower():
+                            _str1 = tokens[:nsubj_ind]
+                        else:
+                            if det_ind > 0:
+                                _str1 = tokens[:det_ind]
+                            else:
+                                _str1 = tokens[:full_nsubj_ind]
+                        #_str1 = tokens[:(nsubj_ind)]
                         if _str1[-1] in PUNCTUATION:
                             _str1[-1] = ''
 
                         #str1 = ' '.join(_str1)
                         #print "1st sent: ", str1
 
-                        _str2 = tokens[nsubj_ind:]
+                        #_str2 = tokens[nsubj_ind:]
+                        if tokens[full_nsubj_ind].lower() == tokens[nsubj_ind].lower():
+                            _str2 = tokens[nsubj_ind:]
+                        else:
+                            if det_ind > 0:
+                                _str2 = tokens[det_ind:]
+                            else:
+                                _str2 = tokens[full_nsubj_ind:]
                         if _str2[-1] in PUNCTUATION:
                             _str2[-1] = ''
 
@@ -170,6 +238,7 @@ def simp_subordi_sent(tokens, node_list):
                             (_str1, _str2) = (_str2, _str1)
 
                         str1 = ' '.join(_str1)
+                        str1 = str1[0].upper() + str1[1:]
                         print "1st sent: ", str1
                     #w = _w + ' '
                         str2 = _w + ' ' + ' '.join(_str2)
@@ -231,14 +300,25 @@ def simp_syn_sent_(sent):
 
 def main():
     #  clauses
-    sent = "Since he came, I left"
+    sent = "Since alice emith came, I left"
     sent = "Since he was late, I left."
-    #sent = "Before he came, I left"
+    sent = "Since he was hungry, he ate a banana."
+    sent = " Since she was thirsty , she drank water."
+    #sent = " Since she was thirsty , he offered a drink. "
+    #sent = "Since she was thirsty , he offered a drink."
+    #sent = " Since she was hungry, they gave food. "
+    sent = "Before he came, I left"
+    sent = "Before he came to school, she ate an apple."
     #sent = "He weakened to a tropical storm while also dumping heavy rain on already-devastated Haiti  ."
     #sent = "John McCain polled 62.5 % in the 2008 Presidential Election while 70.9 % of Utahns opted for George W. Bush in 2004 ."
     #sent = "I feel angry when provoked"
     #sent = "After eating dinner, he goes home."
     #sent = "Peter - nobody guessed it - showed up."
+    sent = "Because he liked sushi, Mr. Smith went to the restaurant."
+    #sent = "Because the economy is bad, the Federal Reserve lowers the interest rate."
+    #sent = "Because she was pretty, Sam liked her."
+    #sent = "Although she ate something, she did not drink anything."
+    #sent = "Because the economy is bad, the Federal Reserve lowers the interest rate."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

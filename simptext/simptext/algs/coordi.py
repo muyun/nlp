@@ -248,8 +248,7 @@ def simp_coordi_sent(tokens, node_list):
                     if root_ind == _nd[0] and  ('auxpass' in _nd[4].keys()):
                             auxpass_ind = nd[4]['auxpass'][0]
     
-                nsubj = base.upper_first_char(tokens[nsubj_ind]) + " "  + nsubj
-            
+                nsubj = base.upper_first_char(tokens[nsubj_ind]) + " "  + nsubj  
 
             #import pdb; pdb.set_trace()
             #print "cc_node: ", nd[4]['cc']
@@ -270,7 +269,6 @@ def simp_coordi_sent(tokens, node_list):
             """
             # 1st str1
             # remove the conjunction word
-
             #import pdb; pdb.set_trace()
             tokens[cc_ind] = ''
             if tokens[cc_ind - 1] == '':  # no word before the conjunction word
@@ -326,13 +324,17 @@ def simp_coordi_sent(tokens, node_list):
                 #import pdb; pdb.set_trace()
                 nsubj = nsubj.strip()
                 _nsubj = nsubj[0].upper() + nsubj[1:]
-
+                
+                str2 = _nsubj + " " + _str2
+                """
                 sent2 = _nsubj + " " + _str2
+                
                 nsubj2 = base.replace_nsubj(sent2, nsubj)
                 
                 str2 = nsubj2 + _str2
                 str2 = str2.strip()
                 str2 = str2[0].upper() + str2[1:]
+                """
                 
             else:
 
@@ -538,9 +540,10 @@ def main():
     #sent = "The first amniotes , such as Casineria , resembled small lizards and evolved from amphibian reptiliomorphs about 340 million years ago ."
 
     sent = "Hence the establishment and signing of the Charte constitutionnelle franiaise , the French Constitution otherwise known as La Charte  ."
-    sent = "Peter ate fish and drank wine."
-    sent = "I ate an apple and an orange."
+    sent = "Alicia Emith ate fish and drank wine."
+    sent = "I ate an apple and drank wine."
     #sent = "Peter was my friend and I was his friend."
+    #sent = "I ate fish and Peter drank wine."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

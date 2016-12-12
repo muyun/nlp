@@ -29,12 +29,12 @@ AVAILABLE_CHOICES_ = [ (1,'Subordination (e.g. "Since he was late, I left.")'),
 
 AVAILABLE_CHOICES = [ (1,'Parataxis (e.g. "Peter - nobody guessed it - showed up.")'),
                       (2,'Punctuation (e.g. "I ate fish; he drank wine.")'),
-                      (5,'Adjectival Clauses (e.g. "The apple, which Peter ate, was red.")'),
-                      (7,'Subordination (e.g. "Since he was late, I left.")'),
-                      (8,'Adverbial Clauses (e.g. "Impatient, he stood up.")'),
-                      (6,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'), 
-                      (3,'Coordination (e.g. "I ate an apple and he ate an orange.")'),
-                      (4,'Participial phrases (e.g. "Alicia, running down the street, tripped.")'),
+                      (3,'Adjectival Clauses (e.g. "The apple, which Peter ate, was red.")'),
+                      (4,'Subordination (e.g. "Since he was late, I left.")'),
+                      (5,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'),
+                      (6,'Adverbial Clauses (e.g. "Impatient, he stood up.")'),              
+                      (7,'Coordination (e.g. "I ate an apple and he ate an orange.")'),
+                      (8,'Participial phrases (e.g. "Alicia, running down the street, tripped.")'),
                       (9,'Relative clauses (e.g. "Peter, who liked fruits, ate an apple.")'),
                       (10,'Passive voice (e.g. "An apple was eaten by Peter.")')]
 

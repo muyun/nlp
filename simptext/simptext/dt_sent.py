@@ -852,8 +852,8 @@ def simp_syn_sent(sent, _algs=range(1,11)):
         punct.simp_punct_sent,
         adjec.simp_adjec_sent,
         subordi.simp_subordi_sent,
-        adverb.simp_adverb_sent,
         appos.simp_appos_sent,
+        adverb.simp_adverb_sent,
         coordi.simp_coordi_sent,
         parti.simp_parti_sent,
         relcl.simp_relcl_sent,
@@ -882,18 +882,13 @@ def simp_syn_sent(sent, _algs=range(1,11)):
     #tokens = wordpunct_tokenize(strs)
     #tokens.insert(0, '')
     
+    """
     sent1 = "I ate an apple and an orange."
     tokens1 = StanfordTokenizer().tokenize(sent1)
-    sent2 = "Peter, sweating hard, arrived."
-    tokens2 = StanfordTokenizer().tokenize(sent2)
     if tokens == tokens1:
         strs = "I ate an apple. I ate an orange ."
         alg = "coordi"
-    if tokens == tokens2:
-        strs = "Peter arrived. He was sweating hard."
-        alg = "parti"
-        
-
+    """
     tokens.insert(0, '')
     #taggers = eng_tagger.tag(sent.split())
 
@@ -915,19 +910,21 @@ def simp_syn_sent(sent, _algs=range(1,11)):
     alg = ""
     #import pdb; pdb.set_trace()
     if len(sent) > 0:
+        print "sent:", sent
         for ind in _algs:
             #import pdb; pdb.set_trace()
             # if the alg in the choices
             #print "dt_sent_strs: ", strs
             if len(strs) > 0:
-                #print "_strs: ", strs
                 end_time = time.time()
                 print "The time of alg: ", end_time - begin_time
                 return strs, algs_lst[ind-1]
             else:
                 #func = _algs_lst[ind]
                 print "_alg: ", algs_lst[ind-1]
+                #print "tokens: ", tokens
                 strs = algs_lst[ind-1](tokens,node_list)
+                #print "strs in alg: ", strs
 
     #import pdb; pdb.set_trace()
     end_time = time.time()
@@ -1065,7 +1062,9 @@ def _get_split_ret(_str, _algs):
     print "S1+S2: ", _str
     ret = ""
 
-    _strs = _str.split('.')
+    _strs = _str.split(' .')
+    if len(_strs[-1]) == 0:
+        _strs.pop()
 
     s1 = _strs[0] + ' . '
     print "S1: ", s1
@@ -1210,9 +1209,10 @@ def main():
     entries = "However , the new king , Louis XVIII , knew that ideas of nationalism and democracy still lingered in his country ; hence the establishment and signing of the Charte constitutionnelle fraise , the French Constitution otherwise known as La Charte ."
     entries = "She has three older brothers : Aaron , Benjamin , and Nathaniel , the latter of whom is a model and actor ."
     entries = "Peter was hit by a bus."
+    entries = "Since she was thirsty , he offered a drink."
+    entries = "Since he was hungry, he ate a banana."
     re, alg = simp_syn_sent(entries)
     print(re)
-    """
     print(alg)
     if len(re) > 0:
         print "S1S2:", re
@@ -1220,7 +1220,7 @@ def main():
     else:
         print(re)
         print(alg)
-    """
+    
     
     #entries = "i ate an apple and an orange."
     #re = simp_syn_sent(entries)
