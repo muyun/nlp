@@ -364,8 +364,8 @@ def simp_coordi_sent(tokens, node_list):
             
             return strs
 
-        """
-        elif (root in nd) and ('dobj' in nd[4].keys() or 'nsubj' in nd[4].keys()):
+
+        if (root in nd) and ('dobj' in nd[4].keys() or 'nsubj' in nd[4].keys()):
             #
 
             #import pdb; pdb.set_trace()
@@ -376,15 +376,24 @@ def simp_coordi_sent(tokens, node_list):
                 for _nd in node_list[1:]:
                     if (dobj_ind == _nd[0]) and ('conj' in _nd[4].keys()) and ('cc' in _nd[4].keys()):
                         cc_ind = _nd[4]['cc'][0]
-                        break
+                        #break
+
+            #import pdb; pdb.set_trace()
+            if cc_ind == 0:
+                return strs
 
             nsubj_ind = 0
+            #_cc_ind = 0
             if ('nsubj' in nd[4].keys()): # there is BUG here
                 nsubj_ind = nd[4]['nsubj'][0]
                 for _nd in node_list[1:]:
                     if (nsubj_ind == _nd[0]) and ('conj' in _nd[4].keys()) and ('cc' in _nd[4].keys()):
                         cc_ind = _nd[4]['cc'][0]
-                        break
+                        #break
+
+            #import pdb; pdb.set_trace()
+            #if _cc_ind == 0:
+            #    return strs
 
             #import pdb; pdb.set_trace()
             str1 = " ".join(tokens[:(dobj_ind+1)])
@@ -398,12 +407,7 @@ def simp_coordi_sent(tokens, node_list):
             strs = str1 + " . " + str2
 
             return strs
-        
-        else:
-            #print "Hello, World"
-            pass  
 
-        """
     """
     ret = []
 
@@ -541,7 +545,8 @@ def main():
 
     sent = "Hence the establishment and signing of the Charte constitutionnelle franiaise , the French Constitution otherwise known as La Charte  ."
     sent = "Alicia Emith ate fish and drank wine."
-    sent = "I ate an apple and drank wine."
+    #sent = "I ate an apple and drank wine."
+    #sent = "I ate an apple and an orange."
     #sent = "Peter was my friend and I was his friend."
     #sent = "I ate fish and Peter drank wine."
     #print(simp_coordi_sent(sent))

@@ -91,7 +91,7 @@ def simp_punct_sent(tokens, node_list):
         # the sentence contains the punctuation, split it
         for ind, token in enumerate(tokens):
             if token in PUNCTUATION:
-                tokens[ind] = '.' # remove the punctuation
+                tokens[ind] = ' .' # remove the punctuation
                 # if the 2nd sentence is a noun
                 word = tokens[ind+1]
 
@@ -175,6 +175,7 @@ def main():
     sent = "I ate fish; raymond drank wine. "
     sent = "I have two brothers: they both live in China."
     sent = "I ate fish and Peter drank wine."
+    sent = "Since he was hungry, he ate a banana."
     print(simp_syn_sent_(sent))    
 
         

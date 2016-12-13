@@ -130,10 +130,10 @@ def simp_subordi_sent(tokens, node_list):
                             advcl_det_ind = nnd[4]['det'][0]
                         #nsubj_advcl_word = nnd[1] # get the subj of the advcl
                         #break
-            if advcl_det_ind > 0:
-                nsubj_advcl_word = tokens[advcl_det_ind] + " " + tokens[nsubj_advcl_ind]
-            else:
-                nsubj_advcl_word =  tokens[nsubj_advcl_ind]
+                if advcl_det_ind > 0:
+                    nsubj_advcl_word = tokens[advcl_det_ind] + " " + tokens[nsubj_advcl_ind]
+                else:
+                    nsubj_advcl_word =  tokens[nsubj_advcl_ind]
 
             """
             for the sentence "Since he was hungry, he ate a banana.""
@@ -314,7 +314,7 @@ def main():
     #sent = "I feel angry when provoked"
     #sent = "After eating dinner, he goes home."
     #sent = "Peter - nobody guessed it - showed up."
-    sent = "Because he liked sushi, Mr. Smith went to the restaurant."
+    #sent = "Because he liked sushi, Mr. Smith went to the restaurant."
     #sent = "Because the economy is bad, the Federal Reserve lowers the interest rate."
     #sent = "Because she was pretty, Sam liked her."
     #sent = "Although she ate something, she did not drink anything."

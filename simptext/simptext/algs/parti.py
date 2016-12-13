@@ -145,7 +145,10 @@ def simp_parti_sent(tokens, node_list):
                 if advmod_ind == 0:
                     _str1 = tokens[acl_ind:root_ind]
                 else:
-                    _str1 = tokens[advmod_ind:root_ind]
+                    if advmod_ind > acl_ind:
+                        _str1 = tokens[acl_ind:root_ind]
+                    else:
+                        _str1 = tokens[advmod_ind:root_ind]
 
                 if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                     _str1[-1] = ''
@@ -242,13 +245,14 @@ def main():
     # participial clauses
     sent = "Alicia, running down the street, tripped."
 
-    sent = "Peter, also called Pete, came."
+    #sent = "Peter, also called Pete, came."
 
     #sent = "The MTR was immediately popular with residents of Hong Kong ; as a result , subsequent lines have been built to cover more territory . There are continual debates regarding how and where to expand the MTR network ."
 
     #sent = "Radiometric dating is a technique used to date materials , usually based on a comparison between the observed abundance of a naturally occurring radioactive isotope and its decay products , using known decay rates ."
 
-    sent = "John Nash, running down the street, tripped."
+    #sent = "John Nash, running down the street, tripped."
+    #sent = "Tom, running fast, tears down."
     #sent = "Port Arthur was also the destination for juvenile convicts , receiving many boys , some as young as nine arrested for stealing toys ."
     #sent = "Alicia, running down the street, tripped."
     #sent = "Alice emith, also called Pete, came."

@@ -33,7 +33,7 @@ AVAILABLE_CHOICES = [ (1,'Parataxis (e.g. "Peter - nobody guessed it - showed up
                       (4,'Subordination (e.g. "Since he was late, I left.")'),
                       (5,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'),
                       (6,'Adverbial Clauses (e.g. "Impatient, he stood up.")'),              
-                      (7,'Coordination (e.g. "I ate an apple and he ate an orange.")'),
+                      (7,'Coordination (e.g. "Peter ate fish and drank wine.")'),
                       (8,'Participial phrases (e.g. "Alicia, running down the street, tripped.")'),
                       (9,'Relative clauses (e.g. "Peter, who liked fruits, ate an apple.")'),
                       (10,'Passive voice (e.g. "An apple was eaten by Peter.")')]
