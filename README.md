@@ -1,6 +1,6 @@
 ##### Project
 
-##### About NLP
+##### About Language
   * Part-of-speech (POS) tagging  
     Chunking -> labels phrases or segments with tags  
     Named-entity recognition (NER) -> labels recognised entities  
