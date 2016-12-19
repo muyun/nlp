@@ -1,3 +1,11 @@
+##### note about Linguistics
+  * phonetics: the sounds of your language  
+  * phonology: the distribution of speech sounds    
+  * morphology: about word formation  
+  * syntax: how words combine to form phrases and sentences  
+  * semantics: the meaning of sentences  
+  * pragmatics:  use context in order to interpret an utterance's meaning   
+
 ##### note about NLP
   * Part-of-speech (POS) tagging  
     Chunking -> labels phrases or segments with tags  
