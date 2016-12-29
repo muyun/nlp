@@ -105,8 +105,6 @@ $(function() {
   });
 
 });
-
-
 </script>
 
 <script>
@@ -117,11 +115,10 @@ $(document).ready(function(){
 });
 </script>
 
-
 <form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry ">
       <dl>
         <dt>Input (<small>Please enter one sentence as input</small>):
-        <dd><textarea name=input rows=4 cols=60></textarea> 
+        <dd><textarea name=input rows=5 cols=60></textarea> 
         <br/>
         <dd><input type=submit value=Simplify>
       </dl>
@@ -387,9 +384,9 @@ $(document).ready(function(){
         <hr/>
         <div class="params" id="item" style="display:none;">
            <dt>The wordlist:
-           <input type="text" name=wordinput id=wordinput value=""/>
+           <input type="text" name=wordinput id=wordinput rows=1 cols=40 value=""/>
            <br/> 
-           <dt>The level:
+           <dt> The level:
            <select name="wordlevel">
               <option value="0">custom</option>
               <option value="1">level 1</option>
@@ -397,7 +394,7 @@ $(document).ready(function(){
               <option value="3">level 3</option>
               <option value="4" selected>level 4</option>
            </select>
-            &nbsp; <a href="{{ url_for('print_words') }}">words</a>
+            &nbsp; <a href="{{ url_for('print_words') }}" target="_blank">words</a>
            <br/> 
            <dt>{{ form.algs.label }}    
            <dd>{{ form.algs }} 

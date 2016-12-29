@@ -1211,6 +1211,7 @@ def main():
     entries = "Peter was hit by a bus."
     entries = "Since she was thirsty , he offered a drink."
     entries = "Since he was hungry, he ate a banana."
+    entries = "Mary ate a pineapple and John ate an orange."
     re, alg = simp_syn_sent(entries)
     print(re)
     print(alg)

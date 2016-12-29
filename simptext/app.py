@@ -11,7 +11,7 @@ from flask import Flask, request, render_template, session, g, redirect, url_for
 
 from flask_sqlalchemy import SQLAlchemy
 
-from forms import EntryForm, ParamForm
+from forms import EntryForm
 
 import json
 
@@ -182,15 +182,17 @@ def show_entries():
         s2_output = wordcal.check_word(s2, words)
     """
         #s_outputs = wordcal.check_word(entries, words)
+    begin_time1 = time.time()
     if len(entries) == 0:
         s_outputs = {}
-
+  
     elif len(entries) > 1 and d.check(entries[1])  and len(flag) == 0: #Syntactic simplification firstly
         #print "entries-:", entries
         #tokens = StanfordTokenizer().tokenize(entries)
+        begin_time2 = time.time()
+
         _syn_ret, alg1 = dt_sent.simp_syn_sent(entries, algs)
         #BUG here, todo
-        begin_time4 = time.time()
         """
         if len(_syn_ret) > 0:
             (s1, s2) = dt_sent.get_split_ret(_syn_ret)
@@ -210,24 +212,34 @@ def show_entries():
         if len(_syn_ret) > 0:
             (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
 
+            split_time = time.time() - begin_time2
+            print "The time of split function: ", split_time
+
+            begin_time3 = time.time()
+            s_tags = wordcal.get_pos(entries)
             if len(ret) > 0: # there is the child: 3 layer
+                #import pdb; pdb.set_trace()         
                 if(s1_child) > 0:
-                    s1_child_output = wordcal.check_word(s1_child, words)
-                s1_output = wordcal.check_word(s1, words)
+                    s1_child_output = wordcal._check_word(s1_child, s_tags, words)
+                s1_output = wordcal._check_word(s1, s_tags, words)
                 
                 if (s2_child) > 0:
-                    s2_child_output = wordcal.check_word(s2_child, words)
-                s2_output = wordcal.check_word(s2, words)
+                    s2_child_output = wordcal._check_word(s2_child, s_tags, words)
+                #import pdb; pdb.set_trace()
+                s2_output = wordcal._check_word(s2, s_tags, words)
 
-        s_outputs = wordcal.check_word(entries, words)   
+        s_outputs = wordcal._check_word(entries, s_tags, words)  
 
-        begin_time5 = time.time() - begin_time4
-        print "The time of wordcal function: ", begin_time5
+        worcal_time = time.time() - begin_time3
+        print "The time of wordcal function: ", worcal_time
 
     elif len(entries) > 1 and not d.check(entries[1]): # not english words
         s_outputs = unicode(entries)
     else:
         pass
+    
+    all_time = time.time() - begin_time1
+    print "The time of all functions: ", all_time
 
     print "s1_output: ", s1_output
     print "s1_child_output: ", s1_child_output

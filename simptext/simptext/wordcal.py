@@ -66,7 +66,7 @@ def get_hyponyms(w):
 def get_lemma(word):
     return wnl.lemmatize(word.lower(), pos='v')
 
-def _check_word(strs, words):
+def check_word_(strs, words):
     """ check the word is words list, and return the string"""
     #output=[]
     #output= OrderedDict()
@@ -116,29 +116,40 @@ def _check_word(strs, words):
     return tokens
 
 
-def check_word(strs, words):
-    """ check the word is words list, and return the string"""
+def check_word(sent, words):
+    """ check the word is words list, and return the string """
     #output=[]
     #output= OrderedDict()
-    print "check strs: ", strs
+    print "check the sentence: ", sent
 
     tokens = []
-    if len(strs) > 0:
-        tokens = rank._interface(strs, words)
+    #tags = []
+    if len(sent) > 0:
+        #tags = get_pos(sent)
+        tokens = rank._interface(sent, words)
     #print "tokens:", tokens
     return tokens
 
 def get_pos(sent):
     #words = StanfordTokenizer().tokenize(str(sent))
     #tokens = st.tag(words)
-    return st.tag(StanfordTokenizer().tokenize(str(sent)))
+    tokens = {}
+
+    for tag in st.tag(StanfordTokenizer().tokenize(str(sent))):
+        tokens[tag[0].lower()] = tag[1]
+
+    return tokens
 
 def _check_word(sent, tags, words):
     """ get the candidates of the difficult words """
     print "check the sentence: ", sent
 
     tokens = []
-    tokens = rank._interface(sent, tags, words)
+    if len(sent) > 0:
+        tokens = rank._interface(sent, tags, words)
+
+    #import pdb; pdb.set_trace()
+    return tokens
 
 
 def lemma_words(words):

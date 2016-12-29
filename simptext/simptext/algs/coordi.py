@@ -116,7 +116,7 @@ def simp_coordi_sent(tokens, node_list):
         #print(nd)
         #depes.append(row)
 
-        #import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
         # look for the root word, and check the root word has a modifier
         """
         #if (root in nd) and ('conj' in nd[4].keys()):
@@ -138,12 +138,14 @@ def simp_coordi_sent(tokens, node_list):
             #print "conj_lst_: ", lst_
             ret.append(lst_)
         """
+
+        #import pdb; pdb.set_trace()
         if (root in nd) and ('conj' in nd[4].keys()) and ('cc' in nd[4].keys()):
             # coordination
             # Note: remove the conjunction word, and
             #       if there is words before the conjunction, we consider it as a sent,
             #       or,
-            #import pdb; pdb.set_trace()
+            import pdb; pdb.set_trace()
 
             nsubj = ""
             nsubj_ind = 0
@@ -492,7 +494,6 @@ def simp_syn_sent_(sent):
         node_list.append(base.get_triples(node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
 
-
     #import pdb; pdb.set_trace()
     strs = simp_coordi_sent(tokens, node_list)
     #strs = simp_subordi_sent(tokens, node_list)
@@ -548,7 +549,9 @@ def main():
     #sent = "I ate an apple and drank wine."
     #sent = "I ate an apple and an orange."
     #sent = "Peter was my friend and I was his friend."
-    #sent = "I ate fish and Peter drank wine."
+    sent = "I ate fish and he drank wine."
+    sent = "I ate fish and Peter drank wine."
+    sent = "Mary ate a pineapple and John ate an orange. "
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 
