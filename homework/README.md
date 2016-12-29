@@ -1,5 +1,6 @@
 #### courses
  * [CS287: Natural Language Processing](http://cs287.fas.harvard.edu/)
+ * [CSE 40657/60657 Natural Language Processing](http://www3.nd.edu/~dchiang/teaching/nlp/2016/readings.html)
  * [Natural language understanding (almost) from scratch](https://blog.acolyer.org/2016/07/04/natural-language-understanding-almost-from-scratch/)
  * [Introduction to Natural Language Processing
 ](https://www.coursera.org/learn/natural-language-processing/home/welcome)
