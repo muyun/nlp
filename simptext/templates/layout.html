@@ -14,7 +14,9 @@ $('button').click(function(){
 <title>Text simplification editor</title>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css')}}">
 <div class="page">
-  <h1>Text simplification editor</h1>
+  
+  <h1>Text simplification editor &nbsp;&nbsp; <img  src="{{ url_for('static', filename = 'logo.png') }}" height="32" width="32" /> </h1>
+
   <!--
   <div class="metanav">
     {% if not session.logged_in %}

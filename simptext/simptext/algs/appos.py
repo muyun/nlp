@@ -252,44 +252,44 @@ def simp_appos_sent(tokens, node_list):
 
                 return strs
 
-            if auxpass_ind > 0:
-                split_ind = 0
-                if ',' in tokens:
-                    split_ind = tokens.index(',')
-                if split_ind == 0:
-                    return strs
+                if auxpass_ind > 0:
+                    split_ind = 0
+                    if ',' in tokens:
+                        split_ind = tokens.index(',')
+                    if split_ind == 0:
+                        return strs
 
-                #import pdb; pdb.set_trace()
-                #verb = conjugate("be", tenses(root)[0][0], 3)
-                verb = tokens[auxpass_ind]
-                if tokens[root_ind] > split_ind:
-                    _str1 = tokens[nsubj_ind+1:auxpass_ind]
+                    #import pdb; pdb.set_trace()
+                    #verb = conjugate("be", tenses(root)[0][0], 3)
+                    verb = tokens[auxpass_ind]
+                    if tokens[root_ind] > split_ind:
+                        _str1 = tokens[nsubj_ind+1:auxpass_ind]
 
-                    if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
-                        _str1[-1] = ''
-                    if len(_str1) > 0 and _str1[0] in PUNCTUATION:
-                        _str1[0] = ''
-                    str1 = nsubj  + " " + verb + ' '.join(_str1)
+                        if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
+                            _str1[-1] = ''
+                        if len(_str1) > 0 and _str1[0] in PUNCTUATION:
+                            _str1[0] = ''
+                        str1 = nsubj  + " " + verb + ' '.join(_str1)
                     #print "1st sent: ", str1
 
                     # upper the 1st char in 2nd sent
-                    _strs = tokens[auxpass_ind:]
-                    _str2 = " ".join(_strs)
+                        _strs = tokens[auxpass_ind:]
+                        _str2 = " ".join(_strs)
 
-                    nsubj = nsubj.strip()
-                    _nsubj = nsubj[0].upper() + nsubj[1:]
+                        nsubj = nsubj.strip()
+                        _nsubj = nsubj[0].upper() + nsubj[1:]
 
-                    if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
-                        str2 = _nsubj + _str2
-                    else:
+                        if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
+                            str2 = _nsubj + _str2
+                        else:
                         #sent2 = _nsubj + " " + _str2
                         #nsubj2 = base.replace_nsubj(sent2, nsubj)
                         #str2 = nsubj2 + _str2
-                        str2 = _nsubj + " " + _str2
+                            str2 = _nsubj + " " + _str2
 
-                strs = str1 + ' . ' + str2
+                    strs = str1 + ' . ' + str2
 
-                return strs
+                    return strs
 
 
     #import pdb; pdb.set_trace()
@@ -352,7 +352,8 @@ def main():
     sent = "John Nash, a mathematician, lectured at Princeton."
     sent = "Boeing, the manufacturer of airplanes, is based in Seattle."
     sent = "Robert Downey Jr. , a mathematician, lectured at Princeton."
-    sent = "Boeing, the airplane company, went bankrupt."
+    #sent = "Boeing, the airplane company, went bankrupt."
+    #sent = "The paper is written by Mr. Smith, but he also burnt magnesium."
     #sent = "It is based in Seattle  ."
     print(simp_syn_sent_(sent))
 

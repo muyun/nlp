@@ -176,7 +176,8 @@ def simp_subordi_sent(tokens, node_list):
                         if _str1[-1] in PUNCTUATION:
                             _str1[-1] = ''
                         str1 = ' '.join(_str1)
-                        str1 = str1[0].upper() + str1[1:]
+                        if len(str1)>0:
+                            str1 = str1[0].upper() + str1[1:]
                     #print "1st sent: ", str1
 
                         #_str2 = tokens[nsubj_ind:]
@@ -238,7 +239,8 @@ def simp_subordi_sent(tokens, node_list):
                             (_str1, _str2) = (_str2, _str1)
 
                         str1 = ' '.join(_str1)
-                        str1 = str1[0].upper() + str1[1:]
+                        if len(str1)>0:
+                            str1 = str1[0].upper() + str1[1:]
                         print "1st sent: ", str1
                     #w = _w + ' '
                         str2 = _w + ' ' + ' '.join(_str2)

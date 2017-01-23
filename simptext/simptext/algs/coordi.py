@@ -116,7 +116,7 @@ def simp_coordi_sent(tokens, node_list):
         #print(nd)
         #depes.append(row)
 
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         # look for the root word, and check the root word has a modifier
         """
         #if (root in nd) and ('conj' in nd[4].keys()):
@@ -145,7 +145,7 @@ def simp_coordi_sent(tokens, node_list):
             # Note: remove the conjunction word, and
             #       if there is words before the conjunction, we consider it as a sent,
             #       or,
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
 
             nsubj = ""
             nsubj_ind = 0

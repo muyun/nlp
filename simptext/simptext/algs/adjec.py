@@ -331,6 +331,7 @@ def main():
     #sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
 
     #sent = "At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake ."
+    sent = "The automobile, which Jane Smith bought, was scarlet."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

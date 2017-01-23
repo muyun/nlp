@@ -10,8 +10,8 @@ from collections import defaultdict
 from nltk.tokenize import StanfordTokenizer
 #from nltk.tokenize import wordpunct_tokenize
 
-from nltk.tag import StanfordPOSTagger
-eng_tagger = StanfordPOSTagger('english-bidirectional-distsim.tagger')
+#from nltk.tag import StanfordPOSTagger
+#eng_tagger = StanfordPOSTagger('english-bidirectional-distsim.tagger')
 
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')

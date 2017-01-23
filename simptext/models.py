@@ -32,7 +32,7 @@ class Param(db.Model):
         __tablename = 'params'
         
         id = db.Column(db.Integer, primary_key=True)
-        words = db.Column(db.String(960), index=True)
+        words = db.Column(db.String, index=True)
         wordlevel = db.Column(db.String(2), index=True)
         algs = db.Column(db.String(16), index=True)
 

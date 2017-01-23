@@ -1058,6 +1058,64 @@ def get_split_ret(_str):
 
     return (s1,  s2)
 
+
+def get_split_ret_(_str):
+    print "S1+S2: ", _str
+    ret = ""
+
+    _strs = _str.split(' .')
+    if len(_strs[-1]) == 0:
+        _strs.pop()
+
+    s1 = _strs[0] + ' . '
+    print "S1: ", s1
+    s1_child = ""
+    s2 = ""
+    s2_child = ""
+    #syn_ret = ""
+    algs = ""
+
+    #import pdb; pdb.set_trace()
+    if len(_strs) == 1 or len(_strs[1]) == 0:
+        return s1, s1_child, s2, s2_child, _str, algs
+     
+    s1_child, alg1 = _simp_syn_sent(s1)
+    #s1_child, alg1 = simp_syn_sent(s1)
+    print "S11+S12: ", s1_child
+    print "alg1: ", alg1
+    
+    #print "str2: ", _strs[1]
+
+    #import pdb; pdb.set_trace()
+    s2 = _strs[1] + ' .'
+    print "S2: ", s2
+    s2_child, alg2 = _simp_syn_sent(s2)
+    #s2_child, alg2 = simp_syn_sent(s2, _algs)
+    print "S21+S22: ", s2_child
+    print "alg2: ", alg2
+
+    if len(s1_child)>0: # syn_ret1
+        if len(s2_child)>0: # syn_ret2
+            ret = s1_child + s2_child
+            print "1+2: ", ret
+        else:
+            ret = s1_child + s2 
+            print "1+in+2: ", ret
+    else:
+        if len(s2_child)>0:
+            ret = s1 + s2_child
+            print "in+1+2: ", ret
+        else:
+            ret = _str 
+            print "in+1+in+2: ", ret   
+
+    print "Syntactic result: ", ret
+
+    algs = str(alg1) + "@" + str(alg2)
+
+    return s1, s1_child, s2, s2_child, ret, algs
+
+
 def _get_split_ret(_str, _algs):
     print "S1+S2: ", _str
     ret = ""

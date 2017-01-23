@@ -49,6 +49,8 @@ COMMA = ','
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+import time
+
 def get_wordnet_pos(pos_tag):
     if pos_tag[1].startswith('J'):
         return (pos_tag[0], wordnet.ADJ)
@@ -371,6 +373,7 @@ def _cal_mturk_sent(base_file):
     num = 1
     line = ""
     output = OrderedDict()
+    #_output = OrderedDict()
 
     #import pdb; pdb.set_trace()
     for line in models[1:]:
@@ -400,7 +403,7 @@ def _cal_mturk_sent(base_file):
                         ratios.append(ratio)
                         _ret = (m, s, ratio)
                         ret.append(_ret)
-
+           
             #import pdb; pdb.set_trace()
 
         if answer[num] == '[\'Y\']':
@@ -409,11 +412,12 @@ def _cal_mturk_sent(base_file):
             average = sum(ratios)/len(ratios)            
         if not cresults[num]:
             cresults[num] = ""
+        
         if not algs[num]:
             algs[num] = ""
         if len(ret) == 0:
             ret = ""
-            
+
         output[num] = [sents[num],
                            models[num],
                            cresults[num],
@@ -422,7 +426,7 @@ def _cal_mturk_sent(base_file):
                            ret,
                            average]
 
-        with codecs.open('mturk_evaluate_1.csv', 'a', encoding='utf-8') as outfile:
+        with codecs.open('mturk_evaluate_5.csv', 'a', encoding='utf-8') as outfile:
             wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
             wr.writerow(output[num])
 
@@ -602,6 +606,7 @@ def relcl(sent):
 
 
 def cal_mturk_sent_t1(t1, filename):
+    start_time = time.time()
     num_sentences = 0
     num_splitted_sentences = 0
     #data = json.load(open(datafile))
@@ -612,6 +617,7 @@ def cal_mturk_sent_t1(t1, filename):
     # number of sentences, based on the 'sent' tag
     #sentences = soup.find_all("instance")
     #num_sentences = len(sentences)
+    sents = dt_sent.read_xlsx_file(t1, 1, 1)
 
     #p = re.compile(r'<.*?>')
     #import pdb; pdb.set_trace()
@@ -622,7 +628,7 @@ def cal_mturk_sent_t1(t1, filename):
     #algs = ""
     #for line in f:
     #line = line.strip('\n')
-    for se in t1:
+    for se in sents[1:]:
         #import pdb; pdb.set_trace()
         #num_sentences = num_sentences + 1
         num = num + 1
@@ -647,25 +653,32 @@ def cal_mturk_sent_t1(t1, filename):
             #res = paratax.simp_syn_sent_(str(se))
             #res = alg.simp_passive_sent(str(re))
 
-        #_res, alg0 = dt_sent._simp_syn_sent(str(se))
+        _res, alg0 = dt_sent._simp_syn_sent(str(se))
 
         #import pdb; pdb.set_trace()
         #_res =  relcl(str(se))
-        #if len(_res) > 0:
-        #    (s1, s1_child, s2, s2_child, res, alg) = dt_sent._get_split_ret(_res)
+        if len(_res) > 0:
+            (s1, s1_child, s2, s2_child, res, alg) = dt_sent.get_split_ret_(_res)
             #print "res: ", res
-        #else:
-        #    res = _res
+        else:
+            res = _res
 
-        res = _res
+        #res = _res
         print "res: ", _res
-        #print "alg0: ", alg0
+        print "alg0: ", alg0
+
+        algs = ""
+        if len(alg0) > 0:
+            algs = alg0 + "@" + alg
 
         #import pdb; pdb.set_trace()
         output[num] = [se,
-                       res]
+                       res,
+                       algs]
+        end_time = time.time()
+        print "The total time:", end_time - start_time
 
-            #import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         with codecs.open(filename, 'a', encoding='utf-8') as outfile:
             wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
             wr.writerow(output[num])
@@ -682,6 +695,7 @@ def cal_mturk_sent_t1(t1, filename):
 
 def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/"
+    dir = "/home/wenlzhao/workspace/simptext/simptext/"
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
@@ -713,17 +727,21 @@ def main():
     #gt = dt_sent.read_xlsx_file(gt_file, 1, 2)
     filename = dir + "dataset/t1.csv"
 
-    t1 = dt_sent.read_xlsx_file(base_file, 1, 1)
+    #t1 = dt_sent.read_xlsx_file(base_file, 1, 1)
+    #start_time = time.time()
+    t1 = dir + "dataset/3.xlsx"
+    filename = "wiki_3.csv"
     info = cal_mturk_sent_t1(t1, filename)
+    #end_time = time.time()
+    #print "The total time:", end_time - start_time
     
     #import pdb; pdb.set_trace()
     #_info = cal_mturk_sent(sent_file, md)
 
-    
-
     # recall and precision of some type
 
-    """
+    #start_time = time.time()
+    
     _algs = [
         'punct',
         'coordi',
@@ -736,8 +754,10 @@ def main():
         'paratax'
     ]
 
-    _info = _cal_mturk_sent(base_file)
-    """
+    #_info = _cal_mturk_sent(base_file)
+    #end_time = time.time()
+    #print "THe total time:", end_time - start_time
+    
 
 if __name__ == '__main__':
     main()

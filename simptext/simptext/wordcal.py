@@ -140,6 +140,94 @@ def get_pos(sent):
 
     return tokens
 
+"""
+def get_word_candidates(sent, s_dict):
+    #
+    lst = []
+
+    _lst = []
+    for x in s_dict:
+        if type(x) is dict:
+            _lst.extend(x.keys())
+        else:
+            _lst.append(x)
+    
+    for w in sent.split():
+        #import pdb; pdb.set_trace()
+        if w in _lst:
+            ind = _lst.index(w)
+            lst.append(s_dict[ind])
+        else:
+            lst.append(w)
+
+    return lst
+"""
+
+def get_word_candidates(sent, s_dict, referenced):
+    #named_entities_person, named_entities_org = chunk_sent_ner(sent)
+    #print ("named_entities_person, named_entities_org")
+    #print (named_entities_person, named_entities_org, sent)
+
+    lst = []
+
+    _lst = []
+    for x in s_dict:
+        if type(x) is dict:
+            _lst.extend(x.keys())
+        else:
+            _lst.append(x)
+    #print "_lst"
+    #print _lst, s_dict
+
+
+    sentence = chunk_sent(sent, s_dict, _lst)
+    #print("sentence")
+    #print (sentence)
+    #print(sent)
+    for w in sentence.split():
+    #for w in sent.split():
+        #import pdb; pdb.set_trace()
+        #print("w, _lst")
+        #print (w, _lst)
+        if '_' in w:
+            w = w.replace("_", " ")
+        if w in _lst:
+
+            print(w)
+            ind = _lst.index(w)
+            #print (referenced, s_dict[ind], w, sent)
+            if s_dict[ind] == {w: [w, 'He','She']} or s_dict[ind] == {w: [w, 'She']} or s_dict[ind] == {w: [w, 'He']} or s_dict[ind] == {w: [w, 'They']} or s_dict[ind] == {w: [w, 'It'] }:
+                if w in referenced:
+                    lst.append(s_dict[ind])
+                else:
+                    lst.append(w)
+                    referenced.append(w)
+            else:
+                lst.append(s_dict[ind])
+        else:
+            lst.append(w)
+
+    return lst, referenced
+    
+def chunk_sent(sent, s_dict, _lst):
+    for c in _lst:
+        #print ("c")
+
+        #ind = _lst.index(c)
+        #print (c)
+        if ' ' in c:
+            #print ("c joinned")
+            c_joinned = c.replace(" ", "_")
+            sent = sent.replace(c,  c_joinned)
+            #sent = sent.replace("_", " " )
+            #print sent
+
+    sentence =[]
+    for w in sent.split():
+        sentence.append(w)
+    return " ".join(sentence)
+   
+
 def _check_word(sent, tags, words):
     """ get the candidates of the difficult words """
     print "check the sentence: ", sent

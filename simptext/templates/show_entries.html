@@ -77,48 +77,225 @@ $(function() {
     $('#undo-6').remove();
   }); 
 
-  document.getElementById("wordinput").value = localStorage.getItem("words");
-  $('#wordinput').change(function() { 
-    var words = document.getElementById("wordinput").value;
+  //document.getElementById("wordinput").value = localStorage.getItem("words");
+  //$('#wordinput').change(function() { 
+  //  var words = document.getElementById("wordinput").value;
     //console.log(words)
-    //if (words == "") {
-    //    alert("Please enter words in first!");
-    //    return false;
-    //}
-    //if (words != "") {
-    localStorage.setItem("words", words);
+  //  if (words == "") {
+  //      alert("Please enter words in first!");
+  //     return false;
+  //  }
+  //  if (words != "") {
+  //  localStorage.setItem("words", words);
     //alert("Your words has been saved!");
-    //}
-    location.reload();
+  //  }
+   // location.reload();
     //return false;
     //return true;
+  //});
+
+    // get the selected value
+      var selectedItem = localStorage.getItem("wordlevel");
+      console.log(selectedItem);
+      if  (selectedItem)  {
+          $('#wordlevel').val(selectedItem);
+      } else {  
+          console.log("hello");
+          var dropVal = 4;
+          localStorage.setItem("wordlevel", dropVal);
+      }
+        //console.log(selectedItem);
+      
+      $('#wordlevel').change(function() { 
+         var dropVal = $(this).val();
+         console.log("The dropVal");
+         console.log(dropVal);
+         localStorage.setItem("wordlevel", dropVal);     
+      //});   
+
+      //console.log('selectedItem');
+      console.log(dropVal);
+
+
+      //var submit_form = function(e) {
+      //$.getJSON($SCRIPT_ROOT + '/_submit_level', {
+      //	 wordlevel: dropVal
+      //  wordlevel: $('#wordlevel').val()
+      //  wordlevel: $('input[name="a"]').val(),
+      //}, function(data) {
+        //console.log($('#result').text(data.result));
+      //  $('#result').text(data.result);
+      //  return true;
+      //});
+      //return false;
+      //};
+  
+      //$('a#clicked_link').bind('click', submit_form);
+
+      //$('#wordlevel').focus();
+
+    });
+
+});
+</script>
+
+<!--
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#result').change(function() { 
+         var dropVal = $(this).attr('value');
+         console.log('selectedItem');
+         console.log(dropVal);
+
+         var submit_form = function(e) {
+         $.getJSON($SCRIPT_ROOT + '/_submit_level', {
+            wordlevel: dropVal
+         }, function(data) {
+            $('#result').text(data.result);
+            console.log(data.result);
+        //console.log(txt);
+         });
+         return false;
+      };
+      $('#clicked_link').bind('click', submit_form);
+
+    });
+
+    });
+</script>
+-->
+<!--
+<script type="text/javascript">
+  $(function() {
+    var submit_form = function(e) {
+      var selectedItem = localStorage.getItem("wordlevel");  
+      $('#wordlevel').val(selectedItem);
+        //console.log(selectedItem);
+      var dropVal = 4;
+      $('#wordlevel').change(function() { 
+      var dropVal = $(this).val();
+        //console.log("The dropVal");
+      //console.log(dropVal);
+      localStorage.setItem("wordlevel", dropVal);     
+      });
+
+      console.log('selectedItem');
+      console.log(dropVal);
+
+      $.getJSON($SCRIPT_ROOT + '/_submit_level', {
+        wordlevel: dropVal
+      }, function(data) {
+        $('#result').text(data.result);
+        //console.log(txt);
+      });
+      return false;
+    };
+
+    $('a#calculate').bind('click', submit_form);
+
+    $('input[type=text]').bind('keydown', function(e) {
+      if (e.keyCode == 13) {
+        submit_form(e);
+      }
+    });
+
   });
+</script>
+-->
 
+<!--
+<script>
+$(document).ready(function(){
+    $('#setting').click(function(){
+        $('#settingitem').toggle();
+        //$('#settingitem').show();
+        //$('#textarea').show();
+    });
+    //$('#setting').click(function(){
+        //$('#settingitem').toggle();
+    //    $('#settingitem').hide();
+    //    $('#textarea').hide();
+    //});
+});
+</script>
+-->
 
-  var selectedItem = sessionStorage.getItem("SelectedItem");  
-  $('#wordlevel').val(selectedItem);
-  //console.log(selectedItem)
-  $('#wordlevel').change(function() { 
-    var dropVal = $(this).val();
-    //console.log(dropVal)
-    sessionStorage.setItem("SelectedItem", dropVal);
-  });
-
+<script>
+$(document).ready(function(){
+    $('#wlevel').click(function(){
+        $('#wlevelitem').toggle();
+    });
 });
 </script>
 
 <script>
 $(document).ready(function(){
-    $('#setting').click(function(){
-        $('#item').toggle();
+    $('#slevel').click(function(){
+        $('#slevelitem').toggle();
     });
 });
 </script>
 
-<form action="{{ url_for('add_entry') }}" autocomplete="off" method=post class=add-entry ">
+
+<script>
+$(document).ready(function(){
+    $('#rlevel').click(function(){
+        document.getElementById("algs").disabled= true;
+
+    });
+});
+</script>
+
+<script>
+$(document).ready(function(){
+         
+     $("#rlevel").click(function () {
+        if ($("#algs #algs-0").is(':checked')) {
+            $("#algs input[type=checkbox]").each(function () {
+                console.log('true');
+                $(this).attr("checked", false);
+            });
+
+            if($(this).text()=='Remove all'){
+              $(this).text('Add all');
+            }
+
+        } else {
+            $("#algs input[type=checkbox]").each(function () {
+                console.log('false');
+                $(this).attr("checked", true);
+            });
+
+            if($(this).text()=='Add all'){
+              $(this).text('Remove all');
+            }
+        }
+    });
+});
+</script>
+
+
+<!--
+<script>
+$(document).ready(function(){
+  $('#setting_').click(function(){
+    
+    if($(this).text()=='+'){
+        $('#item').show();
+        $(this).text('-');
+    }else{
+        $('#item').hide();
+        $(this).text('+');
+    }
+  });
+});
+</script>
+-->
+
+<form action="{{ url_for('add_entry') }}" autocomplete="off" method="POST" class=add-entry ">
       <dl>
-        <dt>Input (<small>Please enter one sentence as input</small>):
-        <dd><textarea name=input rows=5 cols=60></textarea> 
+        <dt><small>Please enter a sentence to be simplified </small>:
+        <dd><textarea name=input rows=5 cols=60 placeholder="Since he was late, I left."></textarea> 
         <br/>
         <dd><input type=submit value=Simplify>
       </dl>
@@ -127,20 +304,40 @@ $(document).ready(function(){
   {% if flag|length > 0 %}
   <li><em>ERROR: Please include at least one word in The wordlist.</em>
          <br/>
-         <br/>
-         <br/>
-         <br/>
          <hr/>
-        <div class="selection">
-           <dt>The wordlist:
-           <input type="text" name=wordinput id=wordinput value=""/>
-           <br/> 
-           <dt>{{ form.wordlevel.label }}  
-           <dd> {{ form.wordlevel }} 
-           <br/> 
-           <dt>{{ form.algs.label }}    
-           <dd>{{ form.algs }} 
+        <div>
+        <button type="button" id="wlevel" >Vocabulary list</button>
+        <button type="button" id="slevel" >Sentence editing</button>
+
+        <hr/>
+        <div class="params" id="wlevelitem" style="display:none;">
+           <br/>
+           <dt> Vocabulary list:               
+           <select class="wordlevel" name=wordlevel id=wordlevel onchange="this.form.submit()">         
+              <option value="0">custom</option>   
+              <option value="1">level 1</option>
+              <option value="2">level 2</option>
+              <option value="3">level 3</option>
+              <option value="4" selected>level 4</option>
+              <option value="5" >All</option>
+           </select> 
+              <textarea name=words rows=6 cols=51 >{{ words|safe}}</textarea> 
         </div>
+      </div>
+
+      <br/> 
+      <div id="slevelitem" style="display:none;">
+          <dt> Sentence editing:
+          <button type="button" id="rlevel" >Remove all</button> 
+          <!--
+          <button type="button" id="alevel" >Add all</button>
+          -->
+          <div id="algschoice">
+             <dd>{{ form.algs }} 
+          </div>
+
+      </div>
+
 
         </form> 
   {% else %}
@@ -377,34 +574,48 @@ $(document).ready(function(){
            <button id="hide">Hide</button>
        </div>
        -->
-       <div>
-           <button type="button" id="setting" >Settings</button>
-       </div>
+      <div>
+        <button type="button" id="wlevel" >Vocabulary list</button>
+        <button type="button" id="slevel" >Sentence editing</button>
 
         <hr/>
-        <div class="params" id="item" style="display:none;">
-           <dt>The wordlist:
-           <input type="text" name=wordinput id=wordinput rows=1 cols=40 value=""/>
-           <br/> 
-           <dt> The level:
-           <select name="wordlevel">
-              <option value="0">custom</option>
+        <div class="params" id="wlevelitem" style="display:none;">
+           <br/>
+           <dt> Vocabulary list:               
+           <select class="wordlevel" name=wordlevel id=wordlevel onchange="this.form.submit()">         
+              <option value="0">custom</option>   
               <option value="1">level 1</option>
               <option value="2">level 2</option>
               <option value="3">level 3</option>
               <option value="4" selected>level 4</option>
-           </select>
-            &nbsp; <a href="{{ url_for('print_words') }}" target="_blank">words</a>
-           <br/> 
-           <dt>{{ form.algs.label }}    
-           <dd>{{ form.algs }} 
+              <!--
+              <option value="5" >All</option>
+              -->
+           </select> 
+              <textarea name=words rows=6 cols=51 >{{ words|safe}}</textarea> 
         </div>
+      </div>
+
+      <br/> 
+      <div id="slevelitem" style="display:none;">
+          <dt> Sentence editing:
+          <button type="button" id="rlevel" >Remove all</button> 
+          <!--
+          <button type="button" id="alevel" >Add all</button>
+          -->
+          <div id="algschoice">
+             <dd>{{ form.algs }} 
+          </div>
+
+      </div>
 
       </form> 
   {% endif %}
 </ul>
 
 {% include 'merge.html' %}
+<!--
 {% include 'footer.html' %}
+-->
 
 {% endblock %}

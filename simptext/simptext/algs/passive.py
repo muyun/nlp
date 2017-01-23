@@ -123,15 +123,21 @@ def simp_passive_sent(tokens, node_list):
                 #[NOTICE]: connect the nsubj + acl as 1st
                 #import pdb; pdb.set_trace()
                 det_ind = 0
+                nsubj_compound_list = []
                 if ('det' in nmod_dict):
                     det_ind = nmod_dict['det'][0]
+                if ('compound' in nmod_dict):
+                    nsubj_compound_list = nmod_dict['compound']
+
+                for i in nsubj_compound_list:
+                    subj = subj + " " + tokens[i]
 
                 if det_ind:
-                    subj = base.upper_first_char(tokens[det_ind]) + " " + tokens[nmod_ind]
+                    subj = base.upper_first_char(tokens[det_ind]) + " " + subj + tokens[nmod_ind]
                 elif tokens[nmod_ind] in dict1:
                     subj = dict1[tokens[nmod_ind]]
                 else:
-                    subj = tokens[nmod_ind]
+                    subj = subj + " " + tokens[nmod_ind]
 
                 #import pdb; pdb.set_trace()
                 verb = root
@@ -233,6 +239,7 @@ def main():
     #sent = "Food is procured with its suckers  . "
     #print(simp_coordi_sent(sent))
     #sent = "He was born at Plessiel , a hamlet of Drucat near Abbeville , to a long-established family of Picardy , the great-nephew of the painter Eustache Le Sueur ."
+    sent = "The paper was written by Mr. Smith ."
     print(simp_syn_sent_(sent))
 
 

@@ -21,22 +21,22 @@ class LoginForm(Form):
 
 AVAILABLE_CHOICES_ = [ (1,'Subordination (e.g. "Since he was late, I left.")'),
                       (2,'Adverbial Clauses (e.g. "Impatient, he stood up.")'),
-                      (3,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'), 
+                      (3,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'),
                       (4,'Coordination (e.g. "I ate an apple and he ate an orange.")'),
                       (5,'Participial phrases (e.g. "Peter, running down the street, tripped.")'),
                       (6,'Relative clauses (e.g. "Peter, who liked fruits, ate an apple")'),
                       (7,'Passive voice (e.g. "An apple was eaten by Peter.")')]
 
-AVAILABLE_CHOICES = [ (1,'Parataxis (e.g. "Peter - nobody guessed it - showed up.")'),
-                      (2,'Punctuation (e.g. "I ate fish; he drank wine.")'),
-                      (3,'Adjectival Clauses (e.g. "The apple, which Peter ate, was red.")'),
-                      (4,'Subordination (e.g. "Since he was late, I left.")'),
-                      (5,'Appositive phrases (e.g. "Peter, my friend, ate an apple.")'),
-                      (6,'Adverbial Clauses (e.g. "Impatient, he stood up.")'),              
-                      (7,'Coordination (e.g. "Peter ate fish and drank wine.")'),
-                      (8,'Participial phrases (e.g. "Alicia, running down the street, tripped.")'),
-                      (9,'Relative clauses (e.g. "Peter, who liked fruits, ate an apple.")'),
-                      (10,'Passive voice (e.g. "An apple was eaten by Peter.")')]
+AVAILABLE_CHOICES = [ (1,'Parataxis </br> <small> e.g. "Peter - nobody guessed it - showed up." -> "Peter showed up. Nobody guessed it." </small>'),
+                      (2,'Punctuation  </br> <small> e.g. "I ate fish; he drank water." --> "I ate fish. He drank water."</small>'),
+                      (3,'Adjectival Clauses </br> <small> e.g. "The automobile, which Peter bought, was red." --> "Peter bought the automobile. The automobile was red."</small>'),
+                      (4,'Subordination </br> <small> e.g. "Since he was late, I left." --> "He was late. So, I left ."</small>'),
+                      (5,'Appositive phrases </br> <small>  e.g. "Peter, my friend, bought an automobile." --> "Peter was my friend. Peter bought an automobile."</small>'),
+                      (6,'Adverbial Clauses </br> <small> e.g. "Impatient, he stood up." --> "He was impatient. He stood up."</small>'),
+                      (7,'Coordination </br> <small> e.g. "Peter ate fish and drank water." --> "Peter ate fish. Peter drank water."'),
+                      (8,'Participial phrases </br>  <small> e.g. "Monica, running down the street, tripped." --> "Monica was running down the street. Monica tripped."</small>'),
+                      (9,'Relative clauses </br>  <small> e.g. "Peter, who liked fruits, ate an orange." --> "Peter ate an orange. Peter liked fruits.</small>'),
+                      (10,'Passive voice </br>  <small> e.g. "The design was tailored by Peter. --> "Peter tailored the design."</small>')]
 
                                          
 # The function is replaced by database
@@ -45,7 +45,7 @@ class EntryForm(Form):
     #words=StringField('password', [validators.Length(min=4, max=25)])
     #password= PasswordField('password',[validators.DataRequired()])
     wordinput = TextField('wordinput')
-    wordlevel = SelectField('The level:', choices = [(0, 'custom'), (1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')], default=4)
+    wordlevel = SelectField('The level:', choices = [(1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4'), (5, 'ALL')], default=4)
     algs = MultiCheckboxField('The simplification procedures:', 
                                  choices = AVAILABLE_CHOICES, default=[1,2,3,4,5,6,7,8,9,10])
 

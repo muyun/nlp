@@ -88,13 +88,13 @@ def replace_nsubj(sent, nsubj):
         
     return nsubj2 + " "        
 
-def _Stem(sub_sent, tags, edblist):
+def _Stem(sub_sent, edblist):
 	#words = nltk.word_tokenize(sub_sent)
 	start_time = time.time()
-	#_words = StanfordTokenizer().tokenize(str(sub_sent))
-        words = str(sub_sent).split()
+	words = StanfordTokenizer().tokenize(str(sub_sent))
+        #words = str(sub_sent).split()
         #words =  [item.lower() for item in words]
-	#tokens = st.tag(words)
+	tokens = st.tag(words)
 	end_time = time.time()
         during_time = end_time - start_time
         print "The time of tag function in rank: ", during_time
@@ -136,32 +136,29 @@ def _Stem(sub_sent, tags, edblist):
         n_tag =['NN', 'NNS', 'NNP', 'NNPS']
 
         #import pdb; pdb.set_trace()
+        sub_words = []
         _taggers = []
-	for w in words:
-                if w in tags: # dict
-                        e0 = w
-                        e1 = tags[w]
-		        if e1 not in pos:
-			        temp = e0.lower()
-			        if e1 in v_pos:
-				        word_list.append(lmtzr.lemmatize(temp,'v'))
-                                        word_pre.append(temp)
+	for e in tokens:
+		if e[1] not in pos:
+			temp = e[0].lower()
+			if e[1] in v_pos:
+				word_list.append(lmtzr.lemmatize(temp,'v'))
+                                word_pre.append(temp)
 				#word_pre.append(lmtzr.lemmatize(temp,'v'))
-			        elif (e1 in n_pos) and (e0 != nsubj_taggers):
-				        word_list.append(lmtzr.lemmatize(temp))
-                                        word_pre.append(temp)
-			        else:
-				        word_list.append(temp)
-				        word_pre.append(temp)
-		        else:
-			        word_pre.append(e0)
+			elif (e[1] in n_pos) and (e[0] != nsubj_taggers):
+				word_list.append(lmtzr.lemmatize(temp))
+                                word_pre.append(temp)
+			else:
+				word_list.append(temp)
+				word_pre.append(temp)
+		else:
+			word_pre.append(e[0])
 
-                        if e1 in n_tag:
-                                _taggers.append(e0)
+                if e[1] in n_tag:
+                        _taggers.append(e[0])
                         
 	sub_words = []
 	#Print word_pre
-
         #import pdb; pdb.set_trace()
 	for w in word_list:
 		w = w.strip()
@@ -280,8 +277,8 @@ def _process_args():
     return parser.parse_args(sys.argv[1:])
 
 
-def _interface(sentence,tags, edblist):
-	target_words, word_pre, person_taggers, org_taggers =  _Stem(sentence, tags, edblist)
+def _interface(sentence,edblist):
+	target_words, word_pre, person_taggers, org_taggers =  _Stem(sentence, edblist)
 	token_list =[]
  
         #import pdb; pdb.set_trace()
@@ -290,6 +287,8 @@ def _interface(sentence,tags, edblist):
             word_pre[0] = word_pre[0][0].upper() + word_pre[0][1:]
         #import pdb; pdb.set_trace()
 	for word in word_pre:
+
+                #import pdb; pdb.set_trace()
 	        tokens = {}
                 #if word == "He": # is a person, subject?
                 #        tokens[word] = ["He", "She"]

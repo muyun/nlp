@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<div class="entries">
+<form action="{{ url_for('submit_words') }}" autocomplete="off" method="POST" class=entries ">
+      <dl>
      <br/>
      <dt> The words in this level :
      <br/> 
@@ -10,8 +11,9 @@
      <li><em>{{ error }}</em>
      <li>
 
-     {% else %}
+     {% else %} 
 
+       <!--
        {% set index = 1 %}
        {% for word in words %} 
            <td>{{ word |safe }}</td>
@@ -22,11 +24,18 @@
 
            {% set index = index + 1 %}        
        {% endfor %}
+       -->
+       <dd><textarea name=words rows=50 cols=75>{{ words|safe}}</textarea> 
 
-    {% endif %} 
-</div>
+        <br/>
+        <dd><input type=submit value=submit>
+      </dl>
+      {% endif %} 
 
+</form>
 
+<!--
 {% include 'footer.html' %}
+-->
 
 {% endblock %}

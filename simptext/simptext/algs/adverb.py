@@ -220,6 +220,7 @@ def simp_adverb_sent(_tokens, node_list):
 
                 #import pdb; pdb.set_trace()
                 _str2 = ""
+                str2 = ""
                 if split_ind < nsubj_ind:
                     #_str2 = tokens[split_ind+1:] 
                     _strs = tokens[root_ind:]
@@ -353,6 +354,7 @@ def simp_adverb_sent(_tokens, node_list):
 
                 #import pdb; pdb.set_trace()
                 _str2 = ""
+                str2 = ""
                 if nsubj_ind < split_ind:
                     _strs = tokens[split_ind+1:]
                     if ('which' == _strs[0].lower()) or ('who' == _strs[0].lower()):
@@ -433,8 +435,9 @@ def simp_adverb_sent(_tokens, node_list):
                     else:
                         verb = conjugate(verb, tenses(root)[0][0], 3)
                 # TODO
-                nsubj = nsubj.strip()
-                nsubj = nsubj[0].upper() + nsubj[1:]
+                if nsubj:
+                    nsubj = nsubj.strip()
+                    nsubj = nsubj[0].upper() + nsubj[1:]
 
                 split_ind = tokens.index(COMMA)
                     #nsubj_ind = nd[4]['nsubj'][0]
@@ -470,6 +473,7 @@ def simp_adverb_sent(_tokens, node_list):
 
                 #import pdb; pdb.set_trace()
                 _str2 = ""
+                str2 = ""
                 if nsubj_ind < split_ind:
                     _strs = tokens[split_ind+1:]
                     if ('which' == _strs[0].lower()) or ('who' == _strs[0].lower()):
@@ -480,16 +484,18 @@ def simp_adverb_sent(_tokens, node_list):
                 #_str2 = tokens[split_ind+1:]
                         #w = _w + ' '
                      #str2 = nsubj[0].upper() + nsubj[1:] + " " + ' '.join(_str2)
+                    
                     nsubj = nsubj.strip()
-                    _nsubj = nsubj[0].upper() + nsubj[1:]
+                    if nsubj:
+                        _nsubj = nsubj[0].upper() + nsubj[1:]
 
-                    if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
-                        str2 = _nsubj + " " + _str2
-                    else:
+                        if _nsubj == 'I' or _nsubj == 'He' or _nsubj == 'She':
+                            str2 = _nsubj + " " + _str2
+                        else:
                         #sent2 = _nsubj + " " + _str2
                         #nsubj2 = base.replace_nsubj(sent2, nsubj)
                         #str2 = nsubj2 + _str2
-                        str2 = _nsubj + " " + _str2
+                            str2 = _nsubj + " " + _str2
                    
                 else:
                     str2 = base.upper_first_char(nsubj) + " " + ' '.join(tokens[split_ind+2:])
