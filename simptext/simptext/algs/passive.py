@@ -75,18 +75,34 @@ def simp_passive_sent(tokens, node_list):
             #import pdb; pdb.set_trace()
             nsubjpass_ind = nd[4]['nsubjpass'][0]
             det_ind = 0
+            #amod_ind_list = [] # the list of adjectival modifier  
             for _nd in node_list:
                 if nsubjpass_ind == _nd[0]:
                     if ('det' in _nd[4].keys()):
                         det_ind = _nd[4]['det'][0]
-
+                        #amod_ind_list = _nd[4]['amod']
 
             #import pdb; pdb.set_trace()
             nsubjpass = tokens[nsubjpass_ind]
+            # amod
+            """
+            amod_list = ""
+            if len(amod_ind_list) > 0:
+                for i in amod_ind_list:
+                    amod_list = amod_list + " " + tokens[i]
+                nsubjpass = amod_list + " " + nsubjpass
+            """
+            amod_list = base.get_dependency_list(tokens, node_list, nsubjpass_ind)
+
+            nsubjpass = amod_list + " " + nsubjpass
+            
+            # det
+
+            #import pdb; pdb.set_trace()
             if det_ind:
-                nsubjpass = tokens[det_ind] + " " + tokens[nsubjpass_ind]
-            elif nsubjpass.lower() in dict1:
-                nsubjpass = dict1[nsubjpass.lower()]
+                nsubjpass = tokens[det_ind] + " " + nsubjpass
+            elif str(nsubjpass.lower().strip()) in dict1:
+                nsubjpass = dict1[str(nsubjpass.lower().strip())]
             else:
                 pass
 
@@ -97,20 +113,31 @@ def simp_passive_sent(tokens, node_list):
             #det_ind = 0
             subj = ""
             if ('nmod' in nd[4].keys()):
-                nmod_ind = nd[4]['nmod'][0]
+                # bugs: the case
+                nmod_ind_list = nd[4]['nmod']
 
                 case_ind = 0
-                # check whether the agent is explicitly stated using "by"
-                for nd in node_list[1:]:
-                    if nmod_ind == nd[0]:
-                        if ('case' in nd[4].keys()):
-                            case_ind = nd[4]['case'][0]
+                case_ind_2 = 0
+                for nmod_ind in nmod_ind_list:
+                    _case_ind = 0       
+                    for nd in node_list[1:]:
+                        if nmod_ind == nd[0]:
+                            if ('case' in nd[4].keys()):
+                                _case_ind = nd[4]['case'][0]
+                                break
+                    # check whether the agent is explicitly stated using "by"
+                    if _case_ind > 0:
+                        if tokens[_case_ind] == 'by':
+                            case_ind = _case_ind
                             break
+                        else:
+                            case_ind_2 = _case_ind
+                            
                 #import pdb; pdb.set_trace()
                 if case_ind == 0:
                     return strs
-                if tokens[case_ind] != 'by':
-                    return strs
+                #if tokens[case_ind] != 'by':
+                #    return strs
 
                 nmod_dict = {}
                 for _nd in node_list[1:]: #BUG
@@ -152,8 +179,13 @@ def simp_passive_sent(tokens, node_list):
                             verb = conjugate(root, tenses(root)[0][0], 2)
                         else:
                             verb = conjugate(root, tenses(root)[0][0], 3)
-                
-                strs = subj + " " + verb + " " + nsubjpass.lower() + " ."
+
+                #import pdb; pdb.set_trace()
+                if case_ind_2 > 0:
+                    _case_str = " ".join(tokens[case_ind_2:case_ind])
+                    strs = subj + " " + verb + " " + nsubjpass.lower() + " " + _case_str + " ."
+                else:
+                    strs = subj + " " + verb + " " + nsubjpass.lower() + " ."
 
                 return strs
             """
@@ -239,7 +271,10 @@ def main():
     #sent = "Food is procured with its suckers  . "
     #print(simp_coordi_sent(sent))
     #sent = "He was born at Plessiel , a hamlet of Drucat near Abbeville , to a long-established family of Picardy , the great-nephew of the painter Eustache Le Sueur ."
-    sent = "The paper was written by Mr. Smith ."
+    #sent = "The paper was written by Mr. Smith ."
+    #sent = "the recent bad issues were brought by Peter."
+    #sent = "The books were given to John by Peter ."
+    sent = "He was  frightened by the sound ."
     print(simp_syn_sent_(sent))
 
 

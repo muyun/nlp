@@ -109,7 +109,8 @@ def simp_adjec_sent(tokens, node_list):
 
             # are
             cop_ind = 0
-            if ('cop' in nd[4].keys()):
+            if ('cop' in
+                nd[4].keys()):
                 cop_ind = nd[4]['cop'][0]
 
             #import pdb; pdb.set_trace()
@@ -171,14 +172,25 @@ def simp_adjec_sent(tokens, node_list):
                                 case_ind = _nd[4]['case'][0]
 
                     #import pdb; pdb.set_trace()
-                    rel_nsubj = base.upper_first_char(tokens[rel_nsubj_ind])
+                    #rel_nsubj = base.upper_first_char(tokens[rel_nsubj_ind])
+                    if tokens[rel_nsubj_ind].lower() == 'who' or tokens[rel_nsubj_ind].lower() == 'which':
+                        rel_nsubj = nsubj
+                    else:
+                        rel_nsubj = base.get_nsubj_compound_list(tokens, node_list, rel_nsubj_ind)
+
                     _str1 =  tokens[relcl_ind:(root_ind-1)]
 
                     if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                        _str1[-1] = ''
-                    str1 = rel_nsubj + " " + ' '.join(_str1) + " " + tokens[case_ind] + " " + nsubj.lower()
+
+                    if tokens[rel_nsubj_ind].lower() == 'who':
+                        str1 = rel_nsubj + " " + ' '.join(_str1)
+                    else:
+                        str1 = rel_nsubj + " " + ' '.join(_str1) + " " + tokens[case_ind] + " " + nsubj.lower()
 
                    # upper the 1st char in 2nd sent
+
+                    #import pdb; pdb.set_trace()
                     _str2 = tokens[root_ind:]
                    #w = _w + ' '
                     nsubj = nsubj.strip()
@@ -204,7 +216,9 @@ def simp_adjec_sent(tokens, node_list):
                     #import pdb; pdb.set_trace()
                     root_ind = tokens.index(root)
 
-                    rel_nsubj = base.upper_first_char(tokens[rel_nsubj_ind])
+                    #import pdb; pdb.set_trace()
+                    #rel_nsubj = base.upper_first_char(tokens[rel_nsubj_ind])
+                    rel_nsubj = base.get_nsubj_compound_list(tokens, node_list, rel_nsubj_ind)
 
                     #relcl_ind = nsubj_dict['acl:relcl'][0]
 
@@ -241,26 +255,36 @@ def simp_adjec_sent(tokens, node_list):
                     if len(_str1) > 0 and _str1[-1] in PUNCTUATION:
                         _str1[-1] = ''
 
+                    #import pdb; pdb.set_trace()
                     #str1 = base.upper_first_char(nsubj) + " " + ' '.join(_str1)
                     if dobj:
                         #str1 = rel_nsubj + " " + ' '.join(_str1) + " " + dobj.lower()
                         str1 = rel_nsubj + " " + ' '.join(_str1) + " " + dobj.lower() + " " + nsubj.lower() #Bugs
                     else:
-                        if rel_nsubj.lower() == 'who':
-                            str1 = nsubj + " " + ' '.join(_str1)
+                        if rel_nsubj.lower() == 'who' or rel_nsubj.lower() == 'which':
+                            _nsubj = nsubj.lower()
+                            if 'did' in _nsubj:
+                                _nsubj = _nsubj.replace("did", "")
+                            if 'does' in nsubj:
+                                _nsubj = _nsubj.replace("does", "")
+                            _nsubj = base.upper_first_char(_nsubj.strip())
+
+                            str1 = _nsubj + " " + ' '.join(_str1)
                         else:
                             str1 = rel_nsubj + " " + ' '.join(_str1) + " " + nsubj.lower()
                         #str1 = nsubj + " " + ' '.join(_str1)
                     #print "1st sent: ", str1
 
                 # upper the 1st char in 2nd sent
+
+                    #import pdb; pdb.set_trace()
                     if cop_ind:
                         _str2 = tokens[cop_ind:]
                     else:
                         _str2 = tokens[root_ind:]
                 #w = _w + ' '
 
-                    str2 = base.upper_first_char(nsubj) + " " + ' '.join(_str2)
+                    str2 = base.upper_first_char(nsubj.strip()) + " " + ' '.join(_str2)
                     #print "2nd sent: ", str2
 
                     strs = str2 + " " + str1 + " ."
@@ -331,7 +355,9 @@ def main():
     #sent = "Dodd simply retained his athletic director position , which he had acquired in 1950 ."
 
     #sent = "At present it is formed by the Aa , which descends from the Rigi and enters the southern extremity of the lake ."
-    sent = "The automobile, which Jane Smith bought, was scarlet."
+    sent = "Did Peter, who liked fruits, eat an orange?"
+    sent = "The apple, which Katrina Cox ate, was red."
+    sent = "Mary Fischer, who works at the hospital, ate an apple. "
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

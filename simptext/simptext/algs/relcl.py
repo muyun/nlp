@@ -78,6 +78,8 @@ def simp_relcl_sent(tokens, node_list):
             _nsubj = nsubj[0].upper() + nsubj[1:]
             nsubj = _nsubj.strip()  + " "
 
+
+            import pdb; pdb.set_trace()
             split_ind = 0
             if COMMA in tokens:
                 split_ind = tokens.index(COMMA)
@@ -188,6 +190,7 @@ def main():
     sent = "Typically , the biggest difference between film and stage musicals is the use of lavish background scenery which would be impractical in a theater ."
     #sent = "Fernando Navarro i Corbacho is a Spanish footballer who currently plays for Sevilla FC , as a left defender ."
     sent = "Peter, who liked fruits, ate an apple."
+    sent = "They renamed the place Alcante or Alcanatif which means Port of Salt , due to the old salt industry of Phoenicians and Romans ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))
 

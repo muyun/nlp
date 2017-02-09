@@ -131,8 +131,48 @@ def include_aux(node_list, root_ind, nsubj):
         if root_ind == nd[0]:
             if ('auxpass' in nd[4].keys()):
                     auxpass_ind = nd[4]['auxpass'][0]
-    return nsubj     
+    return nsubj
 
+def get_nsubj_compound_list(tokens, node_list, nsubj_ind):
+    nsubj_dict = {}
+    nsubj_compound_list = []
+
+    for nd in node_list:
+        if nsubj_ind == nd[0]:
+            nsubj_dict = nd[4]
+            if ('compound' in nsubj_dict.keys()):
+                nsubj_compound_list = nsubj_dict['compound']
+
+
+    #import pdb; pdb.set_trace()
+    nsubj = tokens[nsubj_ind]
+    for i in nsubj_compound_list:
+        nsubj =  tokens[i] + " " + nsubj
+
+    return nsubj
+    
+
+def get_dependency_list(tokens, node_list, nominal_ind, dependency='amod'):
+    """
+    return the adjectival modifier of the "nominal"
+
+    tokens is the tokens of the sentence
+    node_list includes the word relationships of the sentence
+    """
+    dependency_ind_list = []
+    for nd in node_list:
+        if nominal_ind == nd[0]:
+            if (dependency in nd[4].keys()):
+                dependency_ind_list = nd[4][dependency]
+
+
+    #import pdb; pdb.set_trace()
+    dependency_list = ""
+    if len(dependency_ind_list) > 0:
+        for i in dependency_ind_list:
+            dependency_list = dependency_list + " " + tokens[i]
+
+    return dependency_list
 
 class Tree:
     def __init__(self, data):

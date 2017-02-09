@@ -2,6 +2,8 @@
 {% block body %}
 
 <script type=text/javascript>
+
+
 $(function() {
   //var lastInput = {{ entries | tojson }};
   //var merge = document.getElementById('merge').innerHTML;
@@ -9,12 +11,15 @@ $(function() {
   document.getElementById('merge-s2').style.visibility = "hidden";
   document.getElementById('merge-s').style.visibility = "hidden";
 
+  merge6 = document.getElementById('merge-s').innerHTML;
+  //console.log("merge6_1")
+  //console.log(merge6)
+
     //var lastInput = {{ entries | tojson }};
   //var merge = document.getElementById('merge').innerHTML;
   //document.getElementById('merge-s1').style.visibility = "hidden";
   //document.getElementById('merge-s2').style.visibility = "hidden";
   //document.getElementById('merge-s').style.visibility = "hidden";
-
 
   $('#undo-2').click(function(){
     //var _lastSent = document.getElementById("reverse-1").innerHTML;
@@ -53,12 +58,14 @@ $(function() {
     //console.log(lastSent)
     //var merge4 = lastSent + document.getElementById("reverse-4").innerHTML;
 
-    var merge6 = document.getElementById('merge-s').innerHTML; 
-    //console.log(merge4)
+    //var merge6 = document.getElementById('merge-s').innerHTML; 
+    //console.log("merge6_2");
+    //console.log(merge6);
     document.getElementById("reverse-5").innerHTML = merge6;
 
     //document.getElementById('undo-4').style.visibility='hidden';
     $('#reverse-1').remove();  // remove s1
+    $('#reverse-2').remove();  // remove s1
     $('#undo-5').remove();
   }); 
 
@@ -74,7 +81,28 @@ $(function() {
 
     //document.getElementById('undo-4').style.visibility='hidden';
     $('#reverse-5').remove();
+    //$('#reverse-6').remove();
+    //$('#undo-5').remove();
     $('#undo-6').remove();
+
+       //rollback from S2 to S
+       $('#undo-5').click(function(){  // s2 doesn't have the children
+       //var _lastSent = document.getElementById("reverse-3").innerHTML;
+       //var lastSent = _lastSent.replace(/^\s*<br\s*\/?>|<br\s*\/?>\s*$/g,'');
+       //console.log(lastSent)
+       //var merge4 = lastSent + document.getElementById("reverse-4").innerHTML;
+
+      // var merge6 = document.getElementById('merge-s').innerHTML; 
+       //console.log("merge6_3");
+       //console.log(merge6);
+       document.getElementById("reverse-6").innerHTML = merge6 ;
+
+       //document.getElementById('undo-4').style.visibility='hidden';
+       $('#reverse-1').remove();  // remove s1
+       $('#reverse-2').remove();  // remove s1
+       $('#undo-5').remove();
+     });
+
   }); 
 
   //document.getElementById("wordinput").value = localStorage.getItem("words");
@@ -95,14 +123,14 @@ $(function() {
   //});
 
     // get the selected value
-      var selectedItem = localStorage.getItem("wordlevel");
+      var selectedItem = sessionStorage.getItem("wordlevel");
       console.log(selectedItem);
       if  (selectedItem)  {
           $('#wordlevel').val(selectedItem);
       } else {  
           console.log("hello");
           var dropVal = 4;
-          localStorage.setItem("wordlevel", dropVal);
+          sessionStorage.setItem("wordlevel", dropVal);
       }
         //console.log(selectedItem);
       
@@ -110,7 +138,7 @@ $(function() {
          var dropVal = $(this).val();
          console.log("The dropVal");
          console.log(dropVal);
-         localStorage.setItem("wordlevel", dropVal);     
+         sessionStorage.setItem("wordlevel", dropVal);     
       //});   
 
       //console.log('selectedItem');
@@ -223,7 +251,14 @@ $(document).ready(function(){
 <script>
 $(document).ready(function(){
     $('#wlevel').click(function(){
-        $('#wlevelitem').toggle();
+        //$('#wlevelitem').toggle();
+        if($(this).text()=='+'){
+           $('#wlevelitem').show();
+           $(this).text('-');
+        }else{
+           $('#wlevelitem').hide();
+           $(this).text('+');
+        }
     });
 });
 </script>
@@ -231,7 +266,15 @@ $(document).ready(function(){
 <script>
 $(document).ready(function(){
     $('#slevel').click(function(){
-        $('#slevelitem').toggle();
+        //$('#slevelitem').toggle();
+        if($(this).text()=='+'){
+           $('#slevelitem').show();
+           $(this).text('-');
+        }else{
+           $('#slevelitem').hide();
+           $(this).text('+');
+        }
+
     });
 });
 </script>
@@ -295,7 +338,7 @@ $(document).ready(function(){
 <form action="{{ url_for('add_entry') }}" autocomplete="off" method="POST" class=add-entry ">
       <dl>
         <dt><small>Please enter a sentence to be simplified </small>:
-        <dd><textarea name=input rows=5 cols=60 placeholder="Since he was late, I left."></textarea> 
+        <dd><textarea name=input rows=5 cols=60 placeholder="Monica, running down the street, tripped.">{{ entries|safe}}</textarea> 
         <br/>
         <dd><input type=submit value=Simplify>
       </dl>
@@ -304,38 +347,41 @@ $(document).ready(function(){
   {% if flag|length > 0 %}
   <li><em>ERROR: Please include at least one word in The wordlist.</em>
          <br/>
-         <hr/>
-        <div>
-        <button type="button" id="wlevel" >Vocabulary list</button>
-        <button type="button" id="slevel" >Sentence editing</button>
-
+      <div>
+        <button type="button" id="wlevel" >+</button> Vocabulary list
+        <!--
         <hr/>
-        <div class="params" id="wlevelitem" style="display:none;">
+        -->
+         <div class="params" id="wlevelitem" style="display:none;">
            <br/>
-           <dt> Vocabulary list:               
-           <select class="wordlevel" name=wordlevel id=wordlevel onchange="this.form.submit()">         
-              <option value="0">custom</option>   
+           <dt> <small>The Level:</small>  <select class="wordlevel" name=wordlevel id=wordlevel onchange="this.form.submit()">         
+              <!--
+              <option value="0">custom</option>
+              -->   
               <option value="1">level 1</option>
               <option value="2">level 2</option>
               <option value="3">level 3</option>
               <option value="4" selected>level 4</option>
+              <!--
               <option value="5" >All</option>
+              -->
            </select> 
-              <textarea name=words rows=6 cols=51 >{{ words|safe}}</textarea> 
-        </div>
+           <br/>
+            <textarea name=words rows=6 cols=51 >{{ words|safe}}</textarea> 
+         </div>
       </div>
 
-      <br/> 
-      <div id="slevelitem" style="display:none;">
-          <dt> Sentence editing:
-          <button type="button" id="rlevel" >Remove all</button> 
-          <!--
-          <button type="button" id="alevel" >Add all</button>
-          -->
+      <br/>
+      <div>
+       <button type="button" id="slevel" >+</button> Sentence editing 
+      <br/>
+       <div id="slevelitem" style="display:none;">
+          <br/>
+          <dt> <small>The Selection:</small> <button type="button" id="rlevel" >Remove all</button> 
           <div id="algschoice">
-             <dd>{{ form.algs }} 
+               {{ form.algs }} 
           </div>
-
+       </div>
       </div>
 
 
@@ -343,10 +389,12 @@ $(document).ready(function(){
   {% else %}
 
   {% if entries %}
+    <!--
      <li><h2>Input:</h2>
      <li>
      {{ entries }}
      </li>
+     -->
 
      <!--
      {% if wordlist %}
@@ -575,38 +623,44 @@ $(document).ready(function(){
        </div>
        -->
       <div>
-        <button type="button" id="wlevel" >Vocabulary list</button>
-        <button type="button" id="slevel" >Sentence editing</button>
-
+        <button type="button" id="wlevel" >+</button> Vocabulary list
+        <!--
         <hr/>
-        <div class="params" id="wlevelitem" style="display:none;">
+        -->
+         <div class="params" id="wlevelitem" style="display:none;">
            <br/>
-           <dt> Vocabulary list:               
-           <select class="wordlevel" name=wordlevel id=wordlevel onchange="this.form.submit()">         
-              <option value="0">custom</option>   
-              <option value="1">level 1</option>
-              <option value="2">level 2</option>
-              <option value="3">level 3</option>
-              <option value="4" selected>level 4</option>
+           <dt> <small>Please enter a list of known vocabulary.  The system will attempt to simplify all words outside this list. 
+           (<a href ="http://cd1.edb.hkedcity.net/cd/eng/vocab09/appendix_1_content.htm">Use the [Primary 3|Primary 6|Secondary 3|Secondary 6] vocabulary list from the Hong Kong Education Bureau</a> )</small>
+            <br/>
+            <br/>
+            <select class="wordlevel" name=wordlevel id=wordlevel onchange="this.form.submit()">         
+              <!--
+              <option value="0">custom</option>
+              -->   
+              <option value="1">Primary 3</option>
+              <option value="2">Primary 6</option>
+              <option value="3">Secondary 3</option>
+              <option value="4" selected>Secondary 6</option>
               <!--
               <option value="5" >All</option>
               -->
            </select> 
-              <textarea name=words rows=6 cols=51 >{{ words|safe}}</textarea> 
-        </div>
+           <br/>
+            <textarea name=words rows=6 cols=51 >{{ words|safe}}</textarea> 
+         </div>
       </div>
 
-      <br/> 
-      <div id="slevelitem" style="display:none;">
-          <dt> Sentence editing:
-          <button type="button" id="rlevel" >Remove all</button> 
-          <!--
-          <button type="button" id="alevel" >Add all</button>
-          -->
+      <br/>
+      <div>
+       <button type="button" id="slevel" >+</button> Sentence editing 
+      <br/>
+       <div id="slevelitem" style="display:none;">
+          <br/>
+          <dt> <small>The Selection:</small> <button type="button" id="rlevel" >Remove all</button> 
           <div id="algschoice">
-             <dd>{{ form.algs }} 
+               {{ form.algs }} 
           </div>
-
+       </div>
       </div>
 
       </form> 

@@ -35,8 +35,12 @@
 
         {% else %}
            {{ item |safe }}
+
+            {% if item == "." %}  {# is a sentence? #}     
+               <input type='button' id="undo-{{cnt}}" value='Merge'/>
+            {% endif %}
               
-        {% endif %}
+           {% endif %}
 
    {% endfor %}  
 </li>

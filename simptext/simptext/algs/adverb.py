@@ -86,7 +86,6 @@ def simp_adverb_sent(_tokens, node_list):
                 else:
                     nsubj = nsubj + " " + tokens[nsubj_ind]
 
-
                 #import pdb; pdb.set_trace()
                 nsubj = nsubj.strip()
                 nsubj = nsubj[0].upper() + nsubj[1:] + " "
@@ -108,7 +107,6 @@ def simp_adverb_sent(_tokens, node_list):
                 nsubj = tokens[det_ind] + " " + tokens[nsubj_ind]
                 nsubj = nsubj.strip()
 
-            #import pdb; pdb.set_trace()
             """
             person_taggers = []
             org_taggers = []
@@ -149,6 +147,7 @@ def simp_adverb_sent(_tokens, node_list):
                          break
 
                 # check the nsubj of the advcl, if they are the same subj, it is adverb
+                advcl_dobj_ind = 0
                 for _nd in node_list[1:]:
                     if advcl_ind == _nd[0]:
                         if 'nsubj' in _nd[4].keys():
@@ -156,6 +155,8 @@ def simp_adverb_sent(_tokens, node_list):
                             advcl_nsubj_ind = _nd[4]['nsubj'][0]
                             if tokens[advcl_nsubj_ind].lower() not in nsubj:
                                 return strs
+                        if 'dobj' in _nd[4].keys():
+                            advcl_dobj_ind = _nd[4]['dobj'][0]
 
                 #import pdb; pdb.set_trace()
                 verb = 'was'
@@ -172,7 +173,6 @@ def simp_adverb_sent(_tokens, node_list):
                         else:
                             verb = conjugate(verb, tenses(root)[0][0], 3)
 
-                #import pdb; pdb.set_trace()
                 # TODO, the tense
                 if advcl_tag == 'VBN':
                     if len(nsubj)>0:
@@ -181,7 +181,8 @@ def simp_adverb_sent(_tokens, node_list):
                     if len(nsubj)>0:
                         nsubj = nsubj[0].upper() + nsubj[1:] + " "
 
-                #ASSUME ',' is the splitting tag    
+                #ASSUME ',' is the splitting tag
+                # This assumation isnot right
                 split_ind = tokens.index(COMMA)
                     #nsubj_ind = nd[4]['nsubj'][0]
                     #if (advcl_ind < split_ind):
@@ -190,11 +191,17 @@ def simp_adverb_sent(_tokens, node_list):
 
                 #if len(tenses(root))>0:
                 #    tokens[advcl_ind]=conjugate(tokens[advcl_ind], tenses(root)[0][0])
+                #
 
-                _str1 = tokens[:(split_ind)]
-                if _str1[-1] in PUNCTUATION:
-                    _str1[-1] = ''
-
+                #import pdb; pdb.set_trace()
+                if advcl_dobj_ind > split_ind:
+                    tokens[split_ind] = ""
+                    _str1 = tokens[split_ind:advcl_dobj_ind+1]
+                else:
+                    #_str1 = ""
+                    _str1 = tokens[:(split_ind)]
+                    if _str1[-1] in PUNCTUATION:
+                        _str1[-1] = ''
                 """
                 str1 = ""
                 if advcl_tag == 'VBN':
@@ -206,7 +213,7 @@ def simp_adverb_sent(_tokens, node_list):
                 _str1_ = ' '.join(_str1)
                 nsubj = ' '.join(nsubj.split())
                 str1 = ""
-                if nsubj.lower() + ' ' in _str1_.lower():
+                if nsubj.lower() + ' ' in _str1_.lower().split():
                     str1 = _str1_
                 else:
                     if advcl_tag == 'VBN':
@@ -258,8 +265,14 @@ def simp_adverb_sent(_tokens, node_list):
                         #str2 = nsubj + _str2
                         str2 = _nsubj + " " + _str2
                 else:
-                    _strs = tokens[split_ind+1:]
-                    if ('which' == _str2[0].lower()) or ('who' == _str2[0].lower()):
+                    if advcl_dobj_ind > split_ind:
+                        _strs = tokens[advcl_dobj_ind+1:]
+                        if _strs[0] in PUNCTUATION:
+                            _strs[0] = ''
+                    else:
+                        _strs = tokens[split_ind+1:]
+                        
+                    if len(_str2)>0 and (('which' == _str2[0].lower()) or ('who' == _str2[0].lower())):
                         _strs = tokens[split_ind+2:]
 
                     _str2 = " ".join(_strs)
@@ -589,7 +602,7 @@ def main():
     #sent = "Refreshed, Peter stood up."
     #sent = "Impatient, he stood up."
     #sent = "Impatient, they stood up."
-    sent = "Refreshed, they stood up."
+    #sent = "Refreshed, they stood up."
     sent = "Refreshed,  Alicia Smith stood up."
     sent = "Devastated, they left."
     
@@ -597,11 +610,13 @@ def main():
     #sent = "Since she was thirsty , he offered a drink."
     #sent = "Refreshed, Alicia stood up."
     #sent = "Peter, sweating hard, arrived."
+    sent = "Alicia, running down the street, stumbled."
+    #sent = "Needing money, I begged my parents."
+    #sent = "Professor Cameron, carrying many books, came into the classroom."
+    sent = "Frightened by the sound, he ran away."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 
         
 if __name__ == '__main__':
     main()
-
-        
