@@ -128,7 +128,7 @@ $(function() {
       if  (selectedItem)  {
           $('#wordlevel').val(selectedItem);
       } else {  
-          console.log("hello");
+          //console.log("hello");
           var dropVal = 4;
           sessionStorage.setItem("wordlevel", dropVal);
       }
@@ -136,13 +136,13 @@ $(function() {
       
       $('#wordlevel').change(function() { 
          var dropVal = $(this).val();
-         console.log("The dropVal");
-         console.log(dropVal);
+         //console.log("The dropVal");
+         //console.log(dropVal);
          sessionStorage.setItem("wordlevel", dropVal);     
       //});   
 
       //console.log('selectedItem');
-      console.log(dropVal);
+      //console.log(dropVal);
 
 
       //var submit_form = function(e) {
@@ -163,6 +163,7 @@ $(function() {
       //$('#wordlevel').focus();
 
     });
+
 
 });
 </script>
@@ -289,6 +290,7 @@ $(document).ready(function(){
 });
 </script>
 
+<!--
 <script>
 $(document).ready(function(){
          
@@ -314,6 +316,116 @@ $(document).ready(function(){
             }
         }
     });
+});
+</script>
+-->
+
+<script>
+$(document).ready(function(){
+
+	  //document.getElementById("wordlevel").disabled= true;
+     // document.getElementById("words").disabled= true;
+      //
+      $('#wlevelitem').click(function() {
+	  var selectedItem = $(this).find(":checked").val();
+
+      //console.log("vocabulary option");
+      //console.log(selectedItem);
+
+      if (selectedItem*1 == 0) {
+      	  //console.log("helloword0");
+      	  document.getElementById("wordlevel").disabled= true;
+          document.getElementById("words").disabled= true;
+      } 
+      if  (selectedItem*1 == 1) {
+      	  //console.log("helloword1");
+      	  document.getElementById("wordlevel").disabled= false;
+          document.getElementById("words").disabled= false;
+      }
+  });
+
+          document.getElementById("algs").disabled= true;
+          var algsItems = document.getElementsByName('algs');
+          //var algs_value;
+          for(var i = 0; i < algsItems.length; i++){  
+          	     //console.log(algsItems[i].value);
+                 algsItems[i].disabled = true;
+              
+          }
+          //document.getElementById("algs-0").disabled= true;
+          //document.getElementById("algs-1").disabled= true;
+          //document.getElementById("algs-2").disabled= true;
+          //document.getElementById("algs-3").disabled= true;
+          //document.getElementById("algs-4").disabled= true;
+          //document.getElementById("algs-5").disabled= true;
+          //document.getElementById("algs-6").disabled= true;
+          //document.getElementById("algs-7").disabled= true;
+          //document.getElementById("algs-8").disabled= true;
+          //document.getElementById("algs-9").disabled= true;
+
+      $('#slevelitem').click(function() {
+	  var selectedItem = $(this).find(":checked").val();
+
+      //console.log("vocabulary option");
+      //console.log(selectedItem);
+
+      if (selectedItem*1 == 0) {
+      	  //console.log("helloword0");
+      	  //document.getElementById("algschoice").disabled= true;
+          document.getElementById("algs").disabled= true;
+          for(var i = 0; i < algsItems.length; i++){  
+          	     //console.log(algsItems[i].value);
+                 algsItems[i].disabled = true;
+              
+          }
+      } 
+      if  (selectedItem*1 == 1) {
+      	  //console.log("helloword1");
+      	  //document.getElementById("algschoice").disabled= false;
+          document.getElementById("algs").disabled= false;
+          for(var i = 0; i < algsItems.length; i++){  
+          	     //console.log(algsItems[i].value);
+                 algsItems[i].disabled = false;
+              
+          }
+      }
+  });
+
+});
+</script>
+
+
+<script>
+$(document).ready(function(){
+
+$('input[type="radio"]').click(function() {
+    setActiveBox($(this));            
+});   
+
+function setActiveBox($radioButton) {
+    if(!($radioButton instanceof jQuery)) {
+        $radioButton = $($radioButton);
+    }
+    
+    var value = $radioButton.attr("value");
+    //$(".box").hide();
+    //$("." + value).show();
+    saveData("activeRadio",value);    
+}
+
+function saveData(key,value) {
+       localStorage.setItem(key,value) || (document.cookie = key + "=" + value);
+}
+
+function getData(key) {
+    return localStorage.getItem(key) || document.cookie.match(new RegExp(key + "\=(.+?)(?=;)"))[1];
+}
+
+//check stored radioButton on page load
+var $radioButton = $("[value=" + getData("activeRadio") + "]");
+$($radioButton).attr("checked",true);
+setActiveBox($radioButton);
+
 });
 </script>
 
@@ -623,40 +735,53 @@ $(document).ready(function(){
        </div>
        -->
       <div>
-        <button type="button" id="wlevel" >+</button> Vocabulary list
+        <button type="button" id="wlevel" >+</button> Simplify the vocabulary
         <!--
         <hr/>
         -->
          <div class="params" id="wlevelitem" style="display:none;">
            <br/>
-           <dt> <small>Please enter a list of known vocabulary.  The system will attempt to simplify all words outside this list. 
-           (<a href ="http://cd1.edb.hkedcity.net/cd/eng/vocab09/appendix_1_content.htm">Use the [Primary 3|Primary 6|Secondary 3|Secondary 6] vocabulary list from the Hong Kong Education Bureau</a> )</small>
-            <br/>
-            <br/>
+           <input type="radio" style="height:12px; width:12px;" name="vocabulary" value="0" checked>
+           <small>The system will use the <b>Secondary 6</b> vocabulary list from the <a href ="http://cd1.edb.hkedcity.net/cd/eng/vocab09/appendix_1_content.htm" target="_blank">Hong Kong Education Bureau</a> </small>
+           <br/>
+           <br/>
+           <input type="radio" style="height:12px; width:12px;" name="vocabulary" value="1">
+           <small>Please enter a list of known vocabulary.  The system will attempt to simplify all words outside this list. 
+           <br/>
+           <br/>
+           <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use the </small>
             <select class="wordlevel" name=wordlevel id=wordlevel onchange="this.form.submit()">         
               <!--
               <option value="0">custom</option>
               -->   
+              <option value="5">OGDEN's BASIC ENGLISH</option>
               <option value="1">Primary 3</option>
               <option value="2">Primary 6</option>
               <option value="3">Secondary 3</option>
               <option value="4" selected>Secondary 6</option>
+              <option value="6">CET-4</option>
+              <option value="7">CET-6</option>
               <!--
               <option value="5" >All</option>
               -->
            </select> 
+           <small> vocabulary list (<small>"Primary 3", "Primary 6", "Secondary 3", and "Secondary 6" lists are from <a href ="http://cd1.edb.hkedcity.net/cd/eng/vocab09/appendix_1_content.htm" target="_blank">Hong Kong Education Bureau</a>; "CET-4" and "CET-6" lists are from <a href="https://en.wikipedia.org/wiki/College_English_Test" target"_blank">National English level test in the People's Republic of China</a>; "OGDEN's BASIC ENGLISH" is from <a href ="http://ogden.basic-english.org/words.html" target="_blank">OGDEN's BASIC ENGLISH</a></small>)</small>
            <br/>
-            <textarea name=words rows=6 cols=51 >{{ words|safe}}</textarea> 
+            <textarea name=words id=words rows=6 cols=51 >{{ words|safe}}</textarea> 
          </div>
       </div>
 
       <br/>
       <div>
-       <button type="button" id="slevel" >+</button> Sentence editing 
+       <button type="button" id="slevel" >+</button> Simplify sentence structures 
       <br/>
        <div id="slevelitem" style="display:none;">
           <br/>
-          <dt> <small>The Selection:</small> <button type="button" id="rlevel" >Remove all</button> 
+          <input type="radio" style="height:12px; width:12px;"  name="sentence" value="0" checked>
+          <small>Simplify all complex structures as follows</small>
+          <br/>
+          <input type="radio" style="height:12px; width:12px;"  name="sentence" value="1">
+          <small>Simplify selected structures only:</small> <!--<button type="button" id="rlevel" >Remove all</button> -->
           <div id="algschoice">
                {{ form.algs }} 
           </div>

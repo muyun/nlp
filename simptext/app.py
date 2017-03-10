@@ -44,6 +44,10 @@ word1 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 1, 1)
 word2 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 2, 1)
 word3 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 3, 1)
 word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
+word5 = wordcal.get_words('./simptext/dataset/basic.txt')
+word6 = wordcal.get_words('./simptext/dataset/cet4.txt')
+word7 = wordcal.get_words('./simptext/dataset/cet6.txt') + word6
+
 #word_end = time.time()
 
 #word_during = word_end - word_start
@@ -110,8 +114,8 @@ def show_entries():
     #print "level-", request.form.getlist('wordlevel')
     ending = "" # check the ending of the entries
 
-    global word1, word2, word3, word4
-    words = word4
+    global word1, word2, word3, word4, word5, word6, word7
+    words = []
     #words = []
     if len(etxt) > 0:
         #print "etxt: ", etxt[0]
@@ -159,12 +163,18 @@ def show_entries():
     	        words = word3	
     	    if int(wordlevel) == 4:
     	        words = word4
+            if int(wordlevel) == 5:
+                words = word5
+            if int(wordlevel) == 6:
+                words = word6
+            if int(wordlevel) == 7:
+                words = word7 
             if int(wordlevel) == 0:
             	#error = 'Please include at least one word in the wordlist'
                 flag = "flag"
 
         #import pdb; pdb.set_trace()  
-        if len(wordlist) > 0 and len(words) != 4496 and len(words) != 1918 and len(words) != 1002 and len(words) != 3257 : # word4 by default
+        if len(wordlist) > 0 and len(words) != 4496 and len(words) != 1918 and len(words) != 1002 and len(words) != 3257: # word4 by default
             words = []    
     	    for w in wordlist.split(','):
     		w = w.strip()
@@ -176,9 +186,7 @@ def show_entries():
         
     words = list(set(words))
     #import pdb; pdb.set_trace()
-
-        
-        #print "words:", words
+    print "words:", words
     """ 
             if int(wordlevel) == 0:
                 words = _words
@@ -195,7 +203,7 @@ def show_entries():
     """
         #import pdb; pdb.set_trace()
     if len(words) == 0:
-        words= ""
+        words= word4
     
     print "flag: ", flag
 
@@ -367,7 +375,7 @@ def print_words():
         #print "etxt[0]: ", etxt[0]
         error = "Please submit the input firstly."
 
-    global word1, word2, word3, word4
+    global word1, word2, word3, word4, word5, word6, word7
     if len(etxt) > 0:
         #print "etxt_print: ", etxt
         #se = str(etxt[0]).split(',')
@@ -391,7 +399,12 @@ def print_words():
             words = word3 
         if int(level) == 4:
             words = word4
-
+        if int(level) == 5:
+            words = word5
+        if int(level) == 6:
+            words = word6
+        if int(level) == 7:
+            words = word7
         if int(level) == 0:
             error = "No words in this level."
 
@@ -530,9 +543,14 @@ def add_entry():
     #wordlevel = "4"
     #form.wordlevel.default = 4
     #print "wordlevel0: ", wordlevel
-    wordlevel = request.form['wordlevel']
-    if not wordlevel:
+    vocabulary_opinion = int(request.form['vocabulary'])
+    print "vocabulary_opinion:", vocabulary_opinion
+    
+    wordlevel = ""
+    if vocabulary_opinion == 0:
         wordlevel = "4"
+    if vocabulary_opinion == 1:
+        wordlevel = request.form['wordlevel']
     #form.process()
     #wordlevel = form.wordlevel.data
     print "wordlevel_init: ", wordlevel
@@ -541,7 +559,7 @@ def add_entry():
     #wordlevel = form.wordlevel.data
  
     words = []
-    global word1, word2, word3, word4
+    global word1, word2, word3, word4, word5, word6, word7
     if int(wordlevel) == 1:
         words = word1
     if int(wordlevel) == 2:
@@ -550,14 +568,26 @@ def add_entry():
         words = word3   
     if int(wordlevel) == 4:
         words = word4
+    if int(wordlevel) == 5:
+        words = word5
+    if int(wordlevel) == 6:
+        words = word6
+    if int(wordlevel) == 7:
+        words = word7       
     if int(wordlevel) == 0:
         error = "No words in this level."
 
-    _wordinput = str(request.form['words']).split(",")
-    #wordinput_ = list(set(_wordinput+words))
-    wordinput_ = list(set(_wordinput))
-    wordinput = ",".join(x for x in wordinput_)
-    #print "_wordinput: ", wordinput
+    wordinput = ""
+    if vocabulary_opinion == 1:
+        _wordinput = str(request.form['words']).split(",")
+        #wordinput_ = list(set(_wordinput+words))
+        wordinput_ = list(set(_wordinput))
+        wordinput = ",".join(x for x in wordinput_)
+        print "wordinput_int: ", _wordinput
+
+    if vocabulary_opinion == 0:
+    	wordinput = ",".join(x for x in words)
+
     #print "wordlevel:", wordlevel
     db = get_db()
     #db.execute('insert into params (words, level, algs) values (?, ?, ?)', [_wordinput, wordlevel, alg])
@@ -565,11 +595,19 @@ def add_entry():
     db.commit()
 
     #algs0 = form.algs.data
-    #print "algs0: ", algs0
-    print "algs_init:", form.algs.data
+    #print "algs0: ", algs0 
+    sentence_opinion = int(request.form['sentence'])
+    print "sentence_opinion:", sentence_opinion
+    _algs = []
+    if sentence_opinion == 0:
+        _algs = [u'1', u'2', u'3', u'4', u'5', u'6', u'7', u'8', u'9', u'10']
+    if sentence_opinion == 1:
+        _algs = form.algs.data
+        
+    print "algs_init:", _algs
 
     alg = ""
-    alg = ' '.join(str(e) for e in form.algs.data)
+    alg = ' '.join(str(e) for e in _algs)
     print "alg_init: ", alg
     #wordlist = ""
     #_wordlist = request.form['words']

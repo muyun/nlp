@@ -257,6 +257,17 @@ def get_wordnet_list(w):
 
     return list(set(wordnet))
 
+def get_words(fin):
+    words = []
+    flist = open(fin,'r')
+    ltines = flist.readlines()
+    for l in ltines:
+        if l:
+            words.append(l.strip())
+        else:
+            break
+    return words
+
 """
 def cal_stat_info(filename):
     #filename="/Users/zhaowenlong/workspace/proj/dev.nlp/web/simptext/dataset/coinco/coinco_172.xml"

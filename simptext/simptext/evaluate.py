@@ -21,6 +21,7 @@ from algs import base
 #import wordcal
 
 import difflib
+import nltk
 
 # the English stopwords and extend with punctuation
 #stopwords = nltk.corpus.stopwords.words('english')
@@ -692,10 +693,109 @@ def cal_mturk_sent_t1(t1, filename):
     return num_sentences, num_splitted_sentences
 
 
+def cal_mturk_sent_v2(base_file):
+    start_time = time.time()
+    num_sentences = 0
+    num_splitted_sentences = 0
+    #data = json.load(open(datafile))
+    docs = OrderedDict() # store the info - docs[sentence] = [id,...]
+
+    #soup = BeautifulSoup(open(filename), "lxml")
+
+    # number of sentences, based on the 'sent' tag
+    #sentences = soup.find_all("instance")
+    #num_sentences = len(sentences)
+
+    #p = re.compile(r'<.*?>')
+    #import pdb; pdb.set_trace()
+    output = OrderedDict()
+    #f = open(filename, 'rU')
+    num = 0
+    res = ""
+
+    #f = open(filename, 'rU')
+    #f = open(filename, 'rU')
+    #gt = dt_sent.read_xlsx_file(filename, 2, 2)
+    sents = dt_sent.read_xlsx_file(base_file, 1, 1)  # the original sentence
+    models = dt_sent.read_xlsx_file(base_file, 1, 2)  # gold answer
+    #answer = dt_sent.read_xlsx_file(base_file, 1, 5)  # the split answer
+    #algs = dt_sent.read_xlsx_file(base_file, 1, 7)  # The alg type
+    #cresults = dt_sent.read_xlsx_file(base_file, 1, 3)   # the current result
+    #ground_truth = dt_sent.read_xlsx_file()
+    
+    num_output = 0
+    line = ""
+    #_output = OrderedDict()
+
+    #import pdb; pdb.set_trace()
+    for se in sents:
+        se = se.strip('\n')
+        print sents[num]
+        ret = []
+        ratios = []
+        average = 0
+        if se:
+            num_output += 1
+            #print line
+            #print models[num]
+            #print cresults[num] 
+            model_outputs = models[num].split('.')
+
+            _res, alg0 = dt_sent._simp_syn_sent(str(se))
+
+         #import pdb; pdb.set_trace()
+        #_res =  relcl(str(se))
+            if len(_res) > 0:
+                (s1, s1_child, s2, s2_child, res, alg) = dt_sent.get_split_ret_(_res)
+            #print "res: ", res
+            else:
+                res = _res
+            system_outputs = res.split('.')
+            #import pdb; pdb.set_trace()
+            print "system_outputs: ", system_outputs
+            
+            algs = ""
+            if len(alg0) > 0:
+                algs = alg0 + "@" + alg
+
+            #import pdb; pdb.set_trace()
+            alpha = 0.9
+            for m in model_outputs:
+                for s in system_outputs:
+                    #(simi, ratio) = check_partial_set_sent_similar(m, str(s))
+                    ratio = nltk.translate.bleu_score.sentence_bleu([m], str(s),weights = (0.5, 0.5))
+                    ratio_ = alpha * nltk.translate.bleu_score.sentence_bleu([m], str(s),weights = (0.5, 0.5)) - (1 - alpha) * nltk.translate.bleu_score.sentence_bleu([s], str(se),weights = (0.5, 0.5))
+                    if ratio: # similar
+                        ratios.append(ratio)
+                        _ret = (m, str(s), ratio)
+                        ret.append(_ret)
+           
+        #import pdb; pdb.set_trace()
+        if len(ratios) != 0:
+            average = sum(ratios)/len(ratios)            
+        if len(ret) == 0:
+            ret = ""
+
+        #import pdb; pdb.set_trace()
+        output[num] = [se,
+                           models[num],
+                           res,
+                           algs,
+                           ret,
+                           average]
+
+        with codecs.open('_mturk_evaluate_adverb.csv', 'a', encoding='utf-8') as outfile:
+            wr = csv.writer(outfile, delimiter = ',', quoting = csv.QUOTE_ALL)
+            wr.writerow(output[num])
+
+        num += 1
+
+    return num_output
+
 
 def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/"
-    dir = "/home/wenlzhao/workspace/simptext/simptext/"
+    #dir = "/home/wenlzhao/workspace/simptext/simptext/"
     # print the inter data in the syntactic simplification
     #filename = dir + "utils/semeval/test/lexsub_test.xml"
     filename = dir + "utils/mturk/lex.mturk.txt"
@@ -731,7 +831,15 @@ def main():
     #start_time = time.time()
     t1 = dir + "dataset/3.xlsx"
     filename = "wiki_3.csv"
-    info = cal_mturk_sent_t1(t1, filename)
+    #info = cal_mturk_sent_t1(t1, filename)
+    
+    adverb_excel = dir + "dataset/mturk_splits_adverb.xlsx"
+    #coordi_excel = dir + "dataset/mturk_splits_coordi.xlsx"
+    #subordi_excel = dir + "dataset/mturk_splits_subordi.xlsx"
+    #punct_excel = dir + "dataset/mturk_splits_punct.xlsx"
+    #adject_excel = dir + "dataset/mturk_splits_adject.xlsx"
+    #appos_excel = dir + "dataset/mturk_splits_appos.xlsx"
+    info = cal_mturk_sent_v2(adverb_excel)
     #end_time = time.time()
     #print "The total time:", end_time - start_time
     
