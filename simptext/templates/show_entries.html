@@ -429,6 +429,25 @@ setActiveBox($radioButton);
 });
 </script>
 
+<script>
+$(document).ready(function(){
+
+$('#cselect').click(function(){
+
+  if(localStorage.getItem("checkedbox") == 'true') {
+    $(this).prop(checked, 'false');
+    localStorage.setItem("checkedbox", 'false');
+
+  }
+  else {
+    $(this).prop(checked, 'true');
+     localStorage.setItem("checkedbox", 'true');
+  }
+
+});
+
+});
+</script>
 
 <!--
 <script>
@@ -678,8 +697,6 @@ $(document).ready(function(){
         {% endif %}
    {% endfor %} 
   </li>
-  {% endif %}
-
 
   {% if s1_output|length == 0  %}
     {% if s2_output|length == 0  %}
@@ -713,6 +730,19 @@ $(document).ready(function(){
 {% endif %}
 
     <br/>
+{% if sdefinition|length > 0 %}
+   <small>The definition in <strong>bold</strong> words:</small><br/>
+   {% for item in sdefinition %}   
+      {% for key, value in item.iteritems() %}
+          <small>[<strong>{{ key |safe }}</strong>]: {{ value |safe}}</small>
+      {% endfor %}
+
+    {% endfor %}
+
+    {% endif %}
+
+    {% endif %}
+    
     <br/>
     <br/>
     <br/>
@@ -735,7 +765,8 @@ $(document).ready(function(){
        </div>
        -->
       <div>
-        <button type="button" id="wlevel" >+</button> Simplify the vocabulary
+        <input type="checkbox" name="cselect" id="cselect" value="1"> Simplify the vocabulary
+        <button type="button" id="wlevel" >+</button> 
         <!--
         <hr/>
         -->
@@ -773,7 +804,8 @@ $(document).ready(function(){
 
       <br/>
       <div>
-       <button type="button" id="slevel" >+</button> Simplify sentence structures 
+      <input type="checkbox" name="cselect" id="cselect" value="2"> Simplify sentence structures
+       <button type="button" id="slevel" >+</button> 
       <br/>
        <div id="slevelitem" style="display:none;">
           <br/>

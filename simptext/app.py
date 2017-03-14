@@ -18,6 +18,8 @@ import json
 
 import time
 
+from nltk.corpus import wordnet as wn
+
 app = Flask(__name__)
 app.config.from_object(__name__)
 #app.config.from_object('config.DevelopmentConfig')
@@ -94,6 +96,19 @@ def close_db(error):
     """Closes the database again at the end of the request."""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
+
+def get_definition(soutput):
+    result = []
+    for item in soutput: 
+        #import pdb; pdb.set_trace()
+        if isinstance(item, dict):
+            res = {}
+            #import pdb; pdb.set_trace()
+            k = item.keys()[0]
+            if len(item.values()) == 1 and len(wn.synsets(k)) > 0:
+                res[k] = wn.synsets(k)[0].definition()
+                result.append(res)
+    return result
 
 @app.route('/')
 def show_entries():
@@ -350,9 +365,16 @@ def show_entries():
     print "s2_output: ", s2_output
     print "s2_child_output: ", s2_child_output
     print "s_outputs: ", s_outputs
-    
+
+
+    # get the definiton of the 
+    sdefinition= {}
+    sdefinition = get_definition(s_outputs)
+    print "sdefinition: ", sdefinition
+    #import pdb; pdb.set_trace()
+     
     #return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output, flag=flag)
-    return render_template('show_entries.html', form=form, words=_words, entries=entries, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output, flag=flag)
+    return render_template('show_entries.html', form=form, words=_words, entries=entries, sdefinition=sdefinition, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output, flag=flag)
     #return render_template('show_entries.html', form=form)
 
 @app.route('/print', methods=['GET','POST'])
@@ -517,32 +539,7 @@ def test():
     return(str(select)) # just to see what select is
 
 
-# this view let the user add new entries if they are logged in
-@app.route('/add', methods=['GET','POST'])
-def add_entry():
-    #if not session.get('logged_in'):
-    #    abort(401)
-
-    form = EntryForm()
-    inputs = ""
-    inputs = request.form['input']
-    print "input_init: ", inputs
-    #wordinput = ""
-    #print "wordinput: ", wordinput
-    #
-    #words = ""
-    wordinput = ""
-    #_wordinput = request.form['wordinput']
-    #words = form.words.data
-    #global word1, word2, word3, word4
-    #wordinput = ",".join(x for x in word4)
-    #wordinput = ""
-    #print "_wordinput_init: ", wordinput
-    #wordlevel = ""
-    #wordlevel = request.form['wordlevel']
-    #wordlevel = "4"
-    #form.wordlevel.default = 4
-    #print "wordlevel0: ", wordlevel
+def get_words(inputs):
     vocabulary_opinion = int(request.form['vocabulary'])
     print "vocabulary_opinion:", vocabulary_opinion
     
@@ -586,16 +583,28 @@ def add_entry():
         print "wordinput_int: ", _wordinput
 
     if vocabulary_opinion == 0:
-    	wordinput = ",".join(x for x in words)
+        wordinput = ",".join(x for x in words)
 
     #print "wordlevel:", wordlevel
-    db = get_db()
+    #db = get_db()
     #db.execute('insert into params (words, level, algs) values (?, ?, ?)', [_wordinput, wordlevel, alg])
-    db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
-    db.commit()
+    #db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
+    #db.commit()
 
+    return wordinput, wordlevel
+
+
+def get_sentences():
+    #wordinput = ""
+    #print "wordinput: ", wordinput
+    #
+    #words = ""
+    #wordinput = ""
     #algs0 = form.algs.data
     #print "algs0: ", algs0 
+    #selected_sent = request.form.getlist('cselect')
+    #if not selected_sent:
+    #print "selected_sent:", selected_sent
     sentence_opinion = int(request.form['sentence'])
     print "sentence_opinion:", sentence_opinion
     _algs = []
@@ -615,22 +624,70 @@ def add_entry():
     s1 = ""
     s2 = ""
 
-    #db.session.add(models.Entry(txt, wordinput, wordlevel, alg, s1, s2))
-    #db.session.commit()
-    db = get_db()
-    db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
+    return alg, s1, s2
+
+
+# this view let the user add new entries if they are logged in
+@app.route('/add', methods=['GET','POST'])
+def add_entry():
+    form = EntryForm()
+    inputs = ""
+    inputs = request.form['input']
+    print "input_init: ", inputs
+    #if not session.get('logged_in'):
+    #    abort(401)
+
+    #_wordinput = request.form['wordinput']
+    #words = form.words.data
+    #global word1, word2, word3, word4
+    #wordinput = ",".join(x for x in word4)
+    #wordinput = ""
+    #print "_wordinput_init: ", wordinput
+    #wordlevel = ""
+    #wordlevel = request.form['wordlevel']
+    #wordlevel = "4"
+    #form.wordlevel.default = 4
+    #print "wordlevel0: ", wordlevel
+    global word4
+
+    cselect = request.form.getlist('cselect')
+    #if not selected_voc:
+    print "cselect:", cselect
+    if len(cselect) == 0:
+        print "There is no selection"
+    if len(cselect) == 1:
+        if int(cselect[0]) == 1: # vocabulary
+            wordinput, wordlevel = get_words(inputs)
+            db = get_db()    
+            #db.execute('insert into params (words, level, algs) values (?, ?, ?)', [_wordinput, wordlevel, alg])
+            db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
+            db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
+               [inputs, wordinput, wordlevel, "", "", ""])
+            db.commit()
+
+        if int(cselect[0]) == 2: # sentence
+            alg, s1, s2 = get_sentences()
+            wordinput = ",".join(x for x in word4)
+
+            db = get_db()
+            db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
+               [inputs, wordinput, "4", alg, s1, s2])
+
+            #db.execute('update params set level=? WHERE id = (SELECT MAX(id) FROM params)', [wordlevel])
+            #db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
+            db.commit()
+
+    if len(cselect) == 2:
+        wordinput, wordlevel = get_words(inputs)
+        alg, s1, s2 = get_sentences()
+
+        db = get_db()
+        db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
                [inputs, wordinput, wordlevel, alg, s1, s2])
 
-    #db.execute('insert into params (words, level, algs) values (?, ?, ?)',
-    #           [wordinput, wordlevel, alg])
-
-    db.execute('update params set level=? WHERE id = (SELECT MAX(id) FROM params)', [wordlevel])
-    db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
-    """
-    db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
-               [inputs, wordinput, wordlevel, alg, s1, s2])
-    """
-    db.commit()
+        db.execute('update params set level=? WHERE id = (SELECT MAX(id) FROM params)', [wordlevel])
+        db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
+        db.commit()
 
     #return render_template('show_entries.html', text=text)
     return redirect(url_for('show_entries'))
