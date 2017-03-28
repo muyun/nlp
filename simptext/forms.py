@@ -45,6 +45,7 @@ class EntryForm(Form):
     #words=StringField('password', [validators.Length(min=4, max=25)])
     #password= PasswordField('password',[validators.DataRequired()])
     wordinput = TextField('wordinput')
+    cselect = MultiCheckboxField('The choices:', choices = [(1, '1'), (2, '2')], default=[1,2])
     wordlevel = SelectField('The level:', choices = [(0, 'custom'), (1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')], default=4)
     algs = MultiCheckboxField('The simplification procedures:', 
                                  choices = AVAILABLE_CHOICES, default=[1,2,3,4,5,6,7,8,9,10])
@@ -55,6 +56,7 @@ class EntryForm(Form):
 # The function is used in setting
 class ParamForm(Form):
     wordinput = TextField("wordinput")
+    cselect = MultiCheckboxField('The choices:', choices = [(1, '1'), (2, '2')], default=[1,2])
     wordlevel = SelectField('The level:', choices = [(0, 'custom'), (1, 'level 1'), (2, 'level 2'), (3, 'level 3'), (4, 'level 4')], default=4)
     algs = MultiCheckboxField('The simplification procedures:', 
                                  choices = AVAILABLE_CHOICES, default=[1,2,3,4,5,6,7,8,9,10])

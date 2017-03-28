@@ -115,6 +115,26 @@ def check_word_(strs, words):
     #return ' '.join(str(w) for w in output)
     return tokens
 
+def _check_word_(sent):
+    """ check the word is words list, and return the string """
+    #output=[]
+    #output= OrderedDict()
+    print "check the sentence: ", sent
+
+    tokens = []
+    #tags = []
+    if len(sent) > 0:
+        tokens = wordpunct_tokenize(sent)
+        for ind in range(len(tokens)):
+            tokens_dict = {}
+            _output = []
+            _output.append(tokens[ind])
+
+            tokens_dict[tokens[ind]] = _output
+            tokens[ind] = tokens_dict
+            
+    #print "tokens:", tokens
+    return tokens
 
 def check_word(sent, words):
     """ check the word is words list, and return the string """
@@ -163,7 +183,7 @@ def get_word_candidates(sent, s_dict):
     return lst
 """
 
-def get_word_candidates(sent, s_dict, referenced):
+def get_word_candidates(sent, s_dict, referenced,wordlist):
     #named_entities_person, named_entities_org = chunk_sent_ner(sent)
     #print ("named_entities_person, named_entities_org")
     #print (named_entities_person, named_entities_org, sent)
@@ -178,7 +198,6 @@ def get_word_candidates(sent, s_dict, referenced):
             _lst.append(x)
     #print "_lst"
     #print _lst, s_dict
-
 
     sentence = chunk_sent(sent, s_dict, _lst)
     #print("sentence")

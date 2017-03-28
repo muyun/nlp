@@ -429,23 +429,16 @@ setActiveBox($radioButton);
 });
 </script>
 
-<script>
-$(document).ready(function(){
-
-$('#cselect').click(function(){
-
-  if(localStorage.getItem("checkedbox") == 'true') {
-    $(this).prop(checked, 'false');
-    localStorage.setItem("checkedbox", 'false');
-
-  }
-  else {
-    $(this).prop(checked, 'true');
-     localStorage.setItem("checkedbox", 'true');
-  }
-
-});
-
+<script type=text/javascript>
+$(function() { // Shorthand for $(document).ready(function() {  
+      $('#cselect :checkbox').each(function() { // Load previous values
+            $(this).prop('checked', localStorage.getItem(this.id) === 'true');
+      });
+      $('#cselect').click(function() {
+            $('#cselect :checkbox').each(function() { // Save current values
+                  localStorage.setItem(this.id, $(this).prop('checked'));
+            });
+      });
 });
 </script>
 
@@ -731,10 +724,10 @@ $(document).ready(function(){
 
     <br/>
 {% if sdefinition|length > 0 %}
-   <small>The definition in <strong>bold</strong> words:</small><br/>
+   <small>Notes:</small><br/>
    {% for item in sdefinition %}   
       {% for key, value in item.iteritems() %}
-          <small>[<strong>{{ key |safe }}</strong>]: {{ value |safe}}</small>
+          <small>[<strong>{{ key |safe }}</strong>]: {{ value |safe}}</small><br/>
       {% endfor %}
 
     {% endfor %}
@@ -765,7 +758,7 @@ $(document).ready(function(){
        </div>
        -->
       <div>
-        <input type="checkbox" name="cselect" id="cselect" value="1"> Simplify the vocabulary
+        <input type="checkbox" name="cselect" id="cselect1" style="height:15px; width:20px;" value="1" checked="checked"> Simplify the vocabulary
         <button type="button" id="wlevel" >+</button> 
         <!--
         <hr/>
@@ -804,7 +797,7 @@ $(document).ready(function(){
 
       <br/>
       <div>
-      <input type="checkbox" name="cselect" id="cselect" value="2"> Simplify sentence structures
+      <input type="checkbox" name="cselect" id="cselect2" style="height:15px; width:20px;" value="2" checked="checked"> Simplify sentence structures
        <button type="button" id="slevel" >+</button> 
       <br/>
        <div id="slevelitem" style="display:none;">

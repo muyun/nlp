@@ -3,7 +3,6 @@
  Logical Model - controller
 
  @author wenlong
-
 """
 import os
 from sqlite3 import dbapi2 as sqlite3
@@ -49,7 +48,6 @@ word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
 word5 = wordcal.get_words('./simptext/dataset/basic.txt')
 word6 = wordcal.get_words('./simptext/dataset/cet4.txt')
 word7 = wordcal.get_words('./simptext/dataset/cet6.txt') + word6
-
 #word_end = time.time()
 
 #word_during = word_end - word_start
@@ -125,15 +123,17 @@ def show_entries():
     	entries = ""
     flag = ""
 
-    #print "algs-", request.form.getlist('algs')
-    #print "level-", request.form.getlist('wordlevel')
+    wordlevel = "0"
+    if len(etxt) > 0:
+        wordlevel = str(etxt[0][3])
+
     ending = "" # check the ending of the entries
 
-    global word1, word2, word3, word4, word5, word6, word7
+    global word1, word2, word3, word4, word5,word6,word7
+    #words = word1[:10]
     words = []
-    #words = []
     if len(etxt) > 0:
-        #print "etxt: ", etxt[0]
+        print "etxt: ", etxt[0]
     
         db.execute('delete from entries where id = (SELECT MAX(id) FROM entries);')
         #db.commit()
@@ -146,30 +146,37 @@ def show_entries():
         db.commit()
 
         #print "ptxt_init_:", ptxt
+
         wordlist = ""
         if len(ptxt) > 0:
             wordlist = str(ptxt[0][1])
             #print "_wordlist:", wordlist
 
+        #import pdb; pdb.set_trace()
         #words = []
         #global word1, word2, word3, word4
         #_txt = str(txt).split('\'')
         #se = str(etxt[0]).split(',')
         entries = str(etxt[0][1])
         #wordlist = str(etxt[0][2])
-        wordlevel = str(etxt[0][3])
+        #wordlevel = str(etxt[0][3])
         print "se2: ", str(etxt[0][4])
+        #algs = range(1,10)
         algs = []
         if len(str(etxt[0][4])) > 0:
-            algs = [int(i) for i in str(etxt[0][4]).split()]    
+            algs = [int(i) for i in str(etxt[0][4]).split()]
+        cselect = []
+        if len(str(etxt[0][5])) > 0:
+            cselect = [int(i) for i in str(etxt[0][5]).split()]
+        
     #form.algs.choices =  ''.join(str(e) for e in algs)
-
         print "entries: ", entries
         #print "wordlist: ", wordlist
         print "wordlevel: ", wordlevel
         print "algs: ", algs
+        print "cselect: ", cselect
 
-        if len(wordlist) == 0:
+        if len(wordlist) == 0 and len(cselect) >=1:
             if int(wordlevel) == 1:
     	        words = word1
             if int(wordlevel) == 2:
@@ -183,26 +190,33 @@ def show_entries():
             if int(wordlevel) == 6:
                 words = word6
             if int(wordlevel) == 7:
-                words = word7 
+                words = word7
             if int(wordlevel) == 0:
             	#error = 'Please include at least one word in the wordlist'
                 flag = "flag"
 
-        #import pdb; pdb.set_trace()  
-        if len(wordlist) > 0 and len(words) != 4496 and len(words) != 1918 and len(words) != 1002 and len(words) != 3257: # word4 by default
-            words = []    
+        #import pdb; pdb.set_trace()
+        """
+        if len(wordlist) > 0 and len(words) != 4496 and len(words) != 1918 and len(words) != 1002 and len(words) != 3257 : # word4 by default
+            #words = []    
     	    for w in wordlist.split(','):
     		w = w.strip()
     		words.append(w)
-        
-        #if len(wordlist) > 0:
-        #    words = wordlist.split(',')
+        """
+
+        #import pdb; pdb.set_trace()
+        if len(wordlist) > 0:
+            words = wordlist.split(',')
             #import pdb; pdb.set_trace()
-        
-    words = list(set(words))
-    #import pdb; pdb.set_trace()
-    print "words:", words
-    """ 
+
+        #import pdb; pdb.set_trace()
+        words = list(set(words))
+        #import pdb; pdb.set_trace()
+        print "words:", len(words)
+
+        if not wordlevel or int(wordlevel) == 0 :
+            words = ""
+        """ 
             if int(wordlevel) == 0:
                 words = _words
             else:
@@ -215,11 +229,12 @@ def show_entries():
                 if int(wordlevel) == 4:
                     words = list(_words) + list(word4)
                     #print "words4: ", words
-    """
-        #import pdb; pdb.set_trace()
+        """
+    #import pdb; pdb.set_trace()
     if len(words) == 0:
         words= word4
-    
+    #if len(etxt) == 0 and int(wordlevel) == 0:
+    #    words = ""
     print "flag: ", flag
 
     #import pdb; pdb.set_trace()
@@ -236,6 +251,7 @@ def show_entries():
     s2 = ""
     s1_child = ""
     s2_child = ""
+    sdefinition= {}  # the words in bold definition from wordnet
 
     """
     if len(entries) == 0:
@@ -247,18 +263,13 @@ def show_entries():
         s2_output = wordcal.check_word(s2, words)
     """
         #s_outputs = wordcal.check_word(entries, words)
-
-    #import pdb; pdb.set_trace()
     begin_time1 = time.time()
-    #if len(entries) >0 :
-    #    s_outputs = wordcal.check_word(entries, words)
-
     if len(entries) == 0:
         s_outputs = {}
   
-    elif len(entries) > 1 and d.check(entries[1]) and len(algs) > 0 and len(flag) == 0: #Syntactic simplification firstly
+    elif len(entries) > 1 and len(cselect) ==2 and d.check(entries[1]) and len(algs) > 0 and len(flag) == 0: #Syntactic simplification firstly
         #print "entries-:", entries
-        #tokens = StanfordTokenizer().tokenize(entries)
+        
         entries_list =   StanfordTokenizer().tokenize(entries)
         #ending = ""
         if entries_list[-1] not in endings:
@@ -275,7 +286,7 @@ def show_entries():
 
         begin_time2 = time.time()
 
-        _syn_ret, alg1 = dt_sent.simp_syn_sent(entries, algs)
+        _syn_ret, alg1 = dt_sent.simp_syn_sent(_entries, algs)
         #BUG here, todo
         """
         if len(_syn_ret) > 0:
@@ -293,8 +304,12 @@ def show_entries():
             else:
             	s1_output = wordcal.check_word(s1, words)
         """
-        #import pdb; pdb.set_trace()
+        start_check_word_time = time.time()
         s_outputs = wordcal.check_word(entries, words)
+
+        end_check_word_time = time.time()
+        print "The time of check_word function: ", end_check_word_time - start_check_word_time
+
         if len(_syn_ret) > 0:
             (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
 
@@ -302,55 +317,86 @@ def show_entries():
             print "The time of split function: ", split_time
 
             begin_time3 = time.time()
-            #s_tags = wordcal.get_pos(entries)
-            s_outputs = wordcal.check_word(entries, words)  
+            # s_tags = wordcal.get_pos(entries)
+            # s_outputs = wordcal.check_word(entries, words)
             referenced = []
+            if len(ret) > 0:  # there is the child: 3 layer
+                # import pdb; pdb.set_trace()
+                if (s1_child) > 0:
+                    # s1_child_output = wordcal.check_word(s1_child, words)
+                    s1_child_output, referenced = wordcal.get_word_candidates(s1_child, s_outputs, referenced, words)
+                # s1_output = wordcal.check_word(s1, words)
+                s1_output, referenced = wordcal.get_word_candidates(s1, s_outputs, referenced, words)
 
-            #import pdb; pdb.set_trace()
-            if len(ret) > 0: # there is the child: 3 layer
-                if int(wordlevel) != 5:
-                #import pdb; pdb.set_trace()         
-                    if(s1_child) > 0:
-                        #s1_child_output = wordcal.check_word(s1_child, words)
-                        s1_child_output, referenced = wordcal.get_word_candidates(s1_child, s_outputs, referenced)
-                    #s1_output = wordcal.check_word(s1, words)
-                    s1_output,referenced = wordcal.get_word_candidates(s1, s_outputs, referenced)
-                
-                    if (s2_child) > 0:
-                        #s2_child_output = wordcal.check_word(s2_child, words)
-                        s2_child_output,referenced = wordcal.get_word_candidates(s2_child, s_outputs,referenced)
-                #import pdb; pdb.set_trace()
-                    #s2_output = wordcal.check_word(s2, words)
-                    s2_output,referenced = wordcal.get_word_candidates(s2, s_outputs,referenced)
-
-                """
-                if int(wordlevel) == 5:
-                    if (s1_child) > 0:
-                        s1_child_output = unicode(s1_child).split()
-                    s1_output = unicode(s1).split()
-
-                    if (s2_child) >0:
-                        s2_child_output = unicode(s1_child).split()
-                    s2_output = unicode(s1).split()
-                """
+                if (s2_child) > 0:
+                    # s2_child_output = wordcal.check_word(s2_child, words)
+                    s2_child_output, referenced = wordcal.get_word_candidates(s2_child, s_outputs, referenced, words)
+                # import pdb; pdb.set_trace()
+                # s2_output = wordcal.check_word(s2, words)
+                s2_output, referenced = wordcal.get_word_candidates(s2, s_outputs, referenced, words)
 
             wordcal_time = time.time() - begin_time3
             print "The time of wordcal function: ", wordcal_time
 
-    elif len(entries) > 1 and len(algs) == 0: # not english words
+        # get the definiton of the 
+        sdefinition = get_definition(s_outputs)
+
+    elif len(entries) > 1 and (len(algs) == 0 and (len(cselect) == 1 and int(cselect[0]) == 1)):
         #s_outputs = unicode(entries)
         if not d.check(entries[1]): # not english words
             s_outputs = unicode(entries)
         else:
-            s_outputs = entries.split()
+            #s_outputs = entries.split()
+            s_outputs = wordcal.check_word(entries, words)
+            sdefinition = get_definition(s_outputs)
+
+    elif len(entries) > 1 and (len(cselect) == 1 and int(cselect[0]) == 2):
+        if not d.check(entries[1]): # not english words
+            s_outputs = unicode(entries)
+        else:
+            entries_list =  StanfordTokenizer().tokenize(entries)
+        #ending = ""
+            if entries_list[-1] not in endings:
+                entries_list.append('.')
+            elif entries_list[-1] == '!':
+                ending = '!'
+                entries_list[-1] = '.'
+            elif entries_list[-1] == '?':
+                ending = '?'
+                entries_list[-1] = '.'
+            else:
+                pass
+            _entries = ' '.join(entries_list)
+
+            #s_outputs = wordcal._check_word_(entries)
+            _syn_ret, alg1 = dt_sent.simp_syn_sent(_entries, algs)
+
+            if len(_syn_ret) > 0:
+                (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
+
+                if len(ret) > 0:  # there is the child: 3 layer
+                # import pdb; pdb.set_trace()
+                    if (s1_child) > 0:
+                        s1_child_output = s1_child.split()
+                # s1_output = wordcal.check_word(s1, words)
+                    s1_output = s1.split()
+
+                    if (s2_child) > 0:
+                        s2_child_output = s2_child.split()
+                    s2_output = s2.split()
+
+    elif len(entries) > 1 and len(cselect) == 0:
+        s_outputs = entries.split()
+                        
     #elif len(entries) > 1:
     #    s_outputs = wordcal.check_word(entries, words)
+    
     else:
         pass
 
-    #print "words:", words
-    #_words = '\r\n'.join(x for x in words)
-    #_words =   list(set(words))
+    #import pdb; pdb.set_trace()
+    #print "words:", list(set(words))    
+    #words = '\r\n'.join(x for x in list(set(words)))
     begin_words_sort_time = time.time()
     words.sort(key = lambda k : k.lower()) 
     _words = '\r\n'.join(x for x in words)
@@ -360,21 +406,25 @@ def show_entries():
     all_time = time.time() - begin_time1
     print "The time of all functions: ", all_time
 
+    if ending: # including '?' or '!'
+        if len(s_outputs)>0:
+            s_outputs[-1] = ending
+        if len(s2_output)>0:
+            s2_output[-1] = ending
+        if len(s2_child_output) > 0:
+            s2_child_output[-1] = ending
+
     print "s1_output: ", s1_output
     print "s1_child_output: ", s1_child_output
     print "s2_output: ", s2_output
     print "s2_child_output: ", s2_child_output
     print "s_outputs: ", s_outputs
-
-
-    # get the definiton of the 
-    sdefinition= {}
-    sdefinition = get_definition(s_outputs)
     print "sdefinition: ", sdefinition
+
     #import pdb; pdb.set_trace()
-     
+    
     #return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output, flag=flag)
-    return render_template('show_entries.html', form=form, words=_words, entries=entries, sdefinition=sdefinition, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output, flag=flag)
+    return render_template('show_entries.html', form=form,words=_words, entries=entries, sdefinition=sdefinition, s_outputs=s_outputs, s1_child=s1_child, s1_child_output=s1_child_output, s1_output=s1_output, s2_child=s2_child, s2_child_output=s2_child_output, s2_output=s2_output, flag=flag)
     #return render_template('show_entries.html', form=form)
 
 @app.route('/print', methods=['GET','POST'])
@@ -391,7 +441,7 @@ def print_words():
 
     words = []
     #etxt = "test"
-    #print "etxt_init: ", etxt
+    print "etxt_init: ", etxt
     if len(etxt) == 0:
         #print "etxt: ", etxt
         #print "etxt[0]: ", etxt[0]
@@ -399,7 +449,7 @@ def print_words():
 
     global word1, word2, word3, word4, word5, word6, word7
     if len(etxt) > 0:
-        #print "etxt_print: ", etxt
+        print "etxt_print: ", etxt
         #se = str(etxt[0]).split(',')
         #entries = str(etxt[0][1])
         #wordlist = str(etxt[0][2])
@@ -427,6 +477,7 @@ def print_words():
             words = word6
         if int(level) == 7:
             words = word7
+
         if int(level) == 0:
             error = "No words in this level."
 
@@ -504,7 +555,7 @@ def submit_words():
     #_wordinput = word4
     #wordlevel = json.loads(request.args.get('wordlevel'));
     #print "wordinput: ", wordinput
-    #print "_wordinput: ", _wordinput
+    print "_wordinput: ", _wordinput
     #print "wordlevel:", wordlevel
     db = get_db()
     #db.execute('insert into params (words, level, algs) values (?, ?, ?)', [_wordinput, wordlevel, alg])
@@ -538,8 +589,8 @@ def test():
     print "select:", str(select)
     return(str(select)) # just to see what select is
 
-
 def get_words(inputs):
+    form = EntryForm()
     vocabulary_opinion = int(request.form['vocabulary'])
     print "vocabulary_opinion:", vocabulary_opinion
     
@@ -557,34 +608,39 @@ def get_words(inputs):
  
     words = []
     global word1, word2, word3, word4, word5, word6, word7
-    if int(wordlevel) == 1:
-        words = word1
-    if int(wordlevel) == 2:
-        words = word2
-    if int(wordlevel) == 3:
-        words = word3   
-    if int(wordlevel) == 4:
-        words = word4
-    if int(wordlevel) == 5:
-        words = word5
-    if int(wordlevel) == 6:
-        words = word6
-    if int(wordlevel) == 7:
-        words = word7       
-    if int(wordlevel) == 0:
-        error = "No words in this level."
-
     wordinput = ""
-    if vocabulary_opinion == 1:
-        _wordinput = str(request.form['words']).split(",")
-        #wordinput_ = list(set(_wordinput+words))
-        wordinput_ = list(set(_wordinput))
-        wordinput = ",".join(x for x in wordinput_)
-        print "wordinput_int: ", _wordinput
+    #import pdb; pdb.set_trace()
+    if len(inputs) == 0:  # we consider the case as the refresh the level
+        if int(wordlevel) == 1:
+            words = word1
+        if int(wordlevel) == 2:
+            words = word2
+        if int(wordlevel) == 3:
+            words = word3   
+        if int(wordlevel) == 4:
+            words = word4
+        if int(wordlevel) == 5:
+            words = word5
+        if int(wordlevel) == 6:
+            words = word6
+        if int(wordlevel) == 7:
+            words = word7
+        if int(wordlevel) == 0:
+            error = "No words in this level."
 
-    if vocabulary_opinion == 0:
         wordinput = ",".join(x for x in words)
-
+    else:
+        if vocabulary_opinion == 1:
+            wordlist = request.form['words']
+            if len(wordlist) > 0:
+                #import pdb; pdb.set_trace()
+                _wordinput = str(wordlist).splitlines()
+                #wordinput_ = list(set(_wordinput+words))
+                wordinput_ = list(set(_wordinput))
+                wordinput =  ",".join(x for x in wordinput_)
+        if vocabulary_opinion == 0:
+            wordinput = ",".join(x for x in words)
+    
     #print "wordlevel:", wordlevel
     #db = get_db()
     #db.execute('insert into params (words, level, algs) values (?, ?, ?)', [_wordinput, wordlevel, alg])
@@ -595,6 +651,7 @@ def get_words(inputs):
 
 
 def get_sentences():
+    form = EntryForm()
     #wordinput = ""
     #print "wordinput: ", wordinput
     #
@@ -630,39 +687,46 @@ def get_sentences():
 # this view let the user add new entries if they are logged in
 @app.route('/add', methods=['GET','POST'])
 def add_entry():
-    form = EntryForm()
-    inputs = ""
-    inputs = request.form['input']
-    print "input_init: ", inputs
     #if not session.get('logged_in'):
     #    abort(401)
 
+    form = EntryForm()
+    inputs = ""
+    inputs = request.form['input']
+    print "input_add: ", inputs
+    #wordinput = ""
+    #print "wordinput: ", wordinput
+    #
+    #words = ""
+    #wordinput = ""
     #_wordinput = request.form['wordinput']
     #words = form.words.data
     #global word1, word2, word3, word4
     #wordinput = ",".join(x for x in word4)
     #wordinput = ""
-    #print "_wordinput_init: ", wordinput
-    #wordlevel = ""
-    #wordlevel = request.form['wordlevel']
-    #wordlevel = "4"
-    #form.wordlevel.default = 4
-    #print "wordlevel0: ", wordlevel
-    global word4
 
+    global word4
     cselect = request.form.getlist('cselect')
+    str_cselect = ' '.join(str(e) for e in cselect)
+    #str_cselect = " ".join(cselect)
+    print "str_cselect:", str_cselect
+    
     #if not selected_voc:
-    print "cselect:", cselect
+    #print "cselect:", cselect
     if len(cselect) == 0:
-        print "There is no selection"
+        db = get_db()    
+        db.execute('insert into entries (inputs, words, level, algs, cselect, s1, s2) values (?, ?, ?, ?, ?, ?,?)',
+               [inputs, "", "", "", str_cselect, "", ""])
+        db.commit()
+
     if len(cselect) == 1:
         if int(cselect[0]) == 1: # vocabulary
             wordinput, wordlevel = get_words(inputs)
             db = get_db()    
             #db.execute('insert into params (words, level, algs) values (?, ?, ?)', [_wordinput, wordlevel, alg])
             db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
-            db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
-               [inputs, wordinput, wordlevel, "", "", ""])
+            db.execute('insert into entries (inputs, words, level, algs, cselect, s1, s2) values (?, ?, ?, ?, ?, ?, ?)',
+               [inputs, wordinput, wordlevel, "", str_cselect, "", ""])
             db.commit()
 
         if int(cselect[0]) == 2: # sentence
@@ -670,8 +734,8 @@ def add_entry():
             wordinput = ",".join(x for x in word4)
 
             db = get_db()
-            db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
-               [inputs, wordinput, "4", alg, s1, s2])
+            db.execute('insert into entries (inputs, words, level, algs, cselect, s1, s2) values (?, ?, ?, ?, ?, ?, ?)',
+               [inputs, wordinput, "4", alg, str_cselect, s1, s2])
 
             #db.execute('update params set level=? WHERE id = (SELECT MAX(id) FROM params)', [wordlevel])
             #db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
@@ -682,8 +746,8 @@ def add_entry():
         alg, s1, s2 = get_sentences()
 
         db = get_db()
-        db.execute('insert into entries (inputs, words, level, algs, s1, s2) values (?, ?, ?, ?, ?, ?)',
-               [inputs, wordinput, wordlevel, alg, s1, s2])
+        db.execute('insert into entries (inputs, words, level, algs, cselect, s1, s2) values (?, ?, ?, ?, ?, ?, ?)',
+               [inputs, wordinput, wordlevel, alg, str_cselect, s1, s2])
 
         db.execute('update params set level=? WHERE id = (SELECT MAX(id) FROM params)', [wordlevel])
         db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
@@ -743,4 +807,5 @@ def setting():
 if __name__ == '__main__':
     app.run(debug=True)
     #app.run(host='144.214.20.231',port = 5001,debug=True, threaded=True)
+    #app.run(host='127.0.0.1',port = 5000,debug=True, threaded=True)
     #app.run(host='144.214.20.231',debug=True, threaded=True)

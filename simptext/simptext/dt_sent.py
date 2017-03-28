@@ -903,8 +903,8 @@ def simp_syn_sent(sent, _algs=range(1,11)):
     
     #TODO: use the tree structure, Check again
     node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
-    for node in result.nodes.items():
-        node_list.append(base.get_triples(node))
+    for _node in result.nodes.items():
+        node_list.append(base.get_triples(_node))
         #node_list[base.get_triples[0]] = base.get_triples(node)
 
     alg = ""
