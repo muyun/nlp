@@ -2,15 +2,27 @@
 <li id="merge-s1">  {# TODO: update the bad solution #}
    {% for item in s1_output %} 
         {% if item is mapping %} {# not change #}
-   
-          {% for key, value in item.iteritems() %}
-            <select>
-              {% for v in value %}
-                 <option value={{ v }} >{{ v |safe}} </option>
-              {% endfor %}
-            </select>
-         
-          {% endfor %}
+            {% for key, value in item.iteritems() %}
+              {% if value|length == 1 %}
+                {% if sdefinition|length > 0 %}
+                   {% for sitem in sdefinition %}   
+                       {% for skey, svalue in sitem.iteritems() %}
+                         {% if skey == key %}
+                           <span class="tooltip"><b>{{ key |safe }}</b> 
+                             <span class="tooltiptext">{{ svalue |safe}}</span>
+                           </span>
+                         {% endif %} 
+                       {% endfor %}
+                   {% endfor %}
+                {% endif %}
+              {% else %}
+                <select>
+                  {% for v in value %}
+                     <option value={{ v }} >{{ v |safe}} </option>
+                  {% endfor %}
+                </select>
+              {% endif %}
+           {% endfor %}
 
         {% else %}
            {{ item |safe }}
@@ -23,15 +35,27 @@
 <li id="merge-s2">  {# TODO: update the bad solution #}
    {% for item in s2_output %} 
         {% if item is mapping %} {# not change #}
-   
-          {% for key, value in item.iteritems() %}
-            <select>
-              {% for v in value %}
-                 <option value={{ v }} >{{ v |safe}} </option>
-              {% endfor %}
-            </select>
-         
-          {% endfor %}
+            {% for key, value in item.iteritems() %}
+              {% if value|length == 1 %}
+                {% if sdefinition|length > 0 %}
+                   {% for sitem in sdefinition %}   
+                       {% for skey, svalue in sitem.iteritems() %}
+                         {% if skey == key %}
+                           <span class="tooltip"><b>{{ key |safe }}</b> 
+                             <span class="tooltiptext">{{ svalue |safe}}</span>
+                           </span>
+                         {% endif %} 
+                       {% endfor %}
+                   {% endfor %}
+                {% endif %}
+              {% else %}
+                <select>
+                  {% for v in value %}
+                     <option value={{ v }} >{{ v |safe}} </option>
+                  {% endfor %}
+                </select>
+              {% endif %}
+           {% endfor %}
 
         {% else %}
            {{ item |safe }}
@@ -49,15 +73,27 @@
 <li id="merge-s">  {# TODO: update the bad solution #}
    {% for item in s_outputs %} 
         {% if item is mapping %} {# not change #}
-   
-          {% for key, value in item.iteritems() %}
-            <select>
-              {% for v in value %}
-                 <option value={{ v }} >{{ v |safe}} </option>
-              {% endfor %}
-            </select>
-         
-          {% endfor %}
+            {% for key, value in item.iteritems() %}
+              {% if value|length == 1 %}
+                {% if sdefinition|length > 0 %}
+                   {% for sitem in sdefinition %}   
+                       {% for skey, svalue in sitem.iteritems() %}
+                         {% if skey == key %}
+                           <span class="tooltip"><b>{{ key |safe }}</b> 
+                             <span class="tooltiptext">{{ svalue |safe}}</span>
+                           </span>
+                         {% endif %} 
+                       {% endfor %}
+                   {% endfor %}
+                {% endif %}
+              {% else %}
+                <select>
+                  {% for v in value %}
+                     <option value={{ v }} >{{ v |safe}} </option>
+                  {% endfor %}
+                </select>
+              {% endif %}
+           {% endfor %}
 
         {% else %}
            {{ item |safe }}

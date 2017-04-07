@@ -262,9 +262,7 @@ $(document).ready(function(){
         }
     });
 });
-</script>
 
-<script>
 $(document).ready(function(){
     $('#slevel').click(function(){
         //$('#slevelitem').toggle();
@@ -429,16 +427,65 @@ setActiveBox($radioButton);
 });
 </script>
 
-<script type=text/javascript>
+<script>
 $(function() { // Shorthand for $(document).ready(function() {  
-      $('#cselect :checkbox').each(function() { // Load previous values
+      $('#cselect1 :checkbox').each(function() { // Load previous values
             $(this).prop('checked', localStorage.getItem(this.id) === 'true');
       });
-      $('#cselect').click(function() {
-            $('#cselect :checkbox').each(function() { // Save current values
+      $('#cselect1').click(function() {
+            $('#cselect1 :checkbox').each(function() { // Save current values
                   localStorage.setItem(this.id, $(this).prop('checked'));
             });
       });
+
+      $('#cselect2 :checkbox').each(function() { // Load previous values
+            $(this).prop('checked', localStorage.getItem(this.id) === 'true');
+      });
+      $('#cselect2').click(function() {
+            $('#cselect2 :checkbox').each(function() { // Save current values
+                  localStorage.setItem(this.id, $(this).prop('checked'));
+            });
+      });
+});
+</script>
+
+<script>
+$(document).ready(function(){
+
+var formValues = JSON.parse(localStorage.getItem('formValues')) || {};
+var $checkboxes = $("#checkbox-container :checkbox");
+
+function allChecked(){
+  return $checkboxes.length === $checkboxes.filter(":checked").length;
+}
+
+
+function handleButtonClick(){
+  $checkboxes.prop("checked", allChecked()? false : true)
+}
+
+function updateStorage(){
+  $checkboxes.each(function(){
+    formValues[this.id] = this.checked;
+  });
+
+  localStorage.setItem("formValues", JSON.stringify(formValues));
+}
+
+$button.on("click", function() {
+  handleButtonClick();
+  updateStorage();
+});
+
+$checkboxes.on("change", function(){
+  updateStorage();
+});
+
+// On page load
+$.each(formValues, function(key, value) {
+  $("#" + key).prop('checked', value);
+});
+
 });
 </script>
 
@@ -540,7 +587,17 @@ $(document).ready(function(){
    
           {% for key, value in item.iteritems() %}
             {% if value|length == 1 %}
-                <strong>{{ key |safe }}</strong>
+                {% if sdefinition|length > 0 %}
+                   {% for sitem in sdefinition %}   
+                       {% for skey, svalue in sitem.iteritems() %}
+                         {% if skey == key %}
+                           <span class="tooltip"><b>{{ key |safe }}</b> 
+                             <span class="tooltiptext">{{ svalue |safe}}</span>
+                           </span>
+                         {% endif %} 
+                       {% endfor %}
+                   {% endfor %}
+                {% endif %}
             {% else %}
                 <select>
                   {% for v in value %}
@@ -584,7 +641,17 @@ $(document).ready(function(){
    
           {% for key, value in item.iteritems() %}
            {% if value|length == 1 %}
-               <strong>{{ key |safe }}</strong>
+                {% if sdefinition|length > 0 %}
+                   {% for sitem in sdefinition %}   
+                       {% for skey, svalue in sitem.iteritems() %}
+                         {% if skey == key %}
+                           <span class="tooltip"><b>{{ key |safe }}</b> 
+                             <span class="tooltiptext">{{ svalue |safe}}</span>
+                           </span>
+                         {% endif %} 
+                       {% endfor %}
+                   {% endfor %}
+                {% endif %}
             {% else %}
                <select>
               {% for v in value %}
@@ -620,10 +687,19 @@ $(document).ready(function(){
   draggable="true" ondragenter="dragenter(event)" ondragstart="dragstart(event)">
    {% for item in s2_child_output %}  
         {% if item is mapping %} {# not change #}
-   
           {% for key, value in item.iteritems() %}
             {% if value|length == 1 %}
-              <strong>{{ key |safe }}</strong>
+                {% if sdefinition|length > 0 %}
+                   {% for sitem in sdefinition %}   
+                       {% for skey, svalue in sitem.iteritems() %}
+                         {% if skey == key %}
+                           <span class="tooltip"><b>{{ key |safe }}</b> 
+                             <span class="tooltiptext">{{ svalue |safe}}</span>
+                           </span>
+                         {% endif %} 
+                       {% endfor %}
+                   {% endfor %}
+                {% endif %}
             {% else %}
               <select>
               {% for v in value %}
@@ -667,7 +743,17 @@ $(document).ready(function(){
    
           {% for key, value in item.iteritems() %}
             {% if value|length == 1 %}
-                <strong>{{ key |safe }}</strong>
+                {% if sdefinition|length > 0 %}
+                   {% for sitem in sdefinition %}   
+                       {% for skey, svalue in sitem.iteritems() %}
+                         {% if skey == key %}
+                           <span class="tooltip"><b>{{ key |safe }}</b> 
+                             <span class="tooltiptext">{{ svalue |safe}}</span>
+                           </span>
+                         {% endif %} 
+                       {% endfor %}
+                   {% endfor %}
+                {% endif %}
             {% else %}
                <select>
               {% for v in value %}
@@ -698,8 +784,19 @@ $(document).ready(function(){
         {% if item is mapping %} {# not change #}
    
           {% for key, value in item.iteritems() %}
-            {% if value|length == 1 %}
-                <strong>{{ key |safe }}</strong>
+            {% if value|length == 1 %}  
+                {% if sdefinition|length > 0 %}
+                   {% for sitem in sdefinition %}   
+                       {% for skey, svalue in sitem.iteritems() %}
+                         {% if skey == key %}
+                           <span class="tooltip"><b>{{ key |safe }}</b> 
+                             <span class="tooltiptext">{{ svalue |safe}}</span>
+                           </span>
+                         {% endif %} 
+                       {% endfor %}
+                   {% endfor %}
+                {% endif %}
+           
             {% else %}
                <select>
               {% for v in value %}
@@ -722,6 +819,7 @@ $(document).ready(function(){
 
 {% endif %}
 
+<!--
     <br/>
 {% if sdefinition|length > 0 %}
    <small>Notes:</small><br/>
@@ -733,9 +831,9 @@ $(document).ready(function(){
     {% endfor %}
 
     {% endif %}
-
+--> 
     {% endif %}
-    
+  
     <br/>
     <br/>
     <br/>
@@ -757,7 +855,7 @@ $(document).ready(function(){
            <button id="hide">Hide</button>
        </div>
        -->
-      <div>
+      <div id="checkbox-container">
         <input type="checkbox" name="cselect" id="cselect1" style="height:15px; width:20px;" value="1" checked="checked"> Simplify the vocabulary
         <button type="button" id="wlevel" >+</button> 
         <!--
