@@ -395,7 +395,7 @@ $(document).ready(function(){
 
 <script>
 $(document).ready(function(){
-
+// this keeps the radio choices
 $('input[type="radio"]').click(function() {
     setActiveBox($(this));            
 });   
@@ -416,7 +416,7 @@ function saveData(key,value) {
 }
 
 function getData(key) {
-    return localStorage.getItem(key) || document.cookie.match(new RegExp(key + "\=(.+?)(?=;)"))[1];
+    return localStorage.getItem(key) || document.cookie.match(new RegExp(key + "\=(.+?)(?=;)"))[9];
 }
 
 //check stored radioButton on page load
@@ -427,65 +427,29 @@ setActiveBox($radioButton);
 });
 </script>
 
-<script>
-$(function() { // Shorthand for $(document).ready(function() {  
-      $('#cselect1 :checkbox').each(function() { // Load previous values
-            $(this).prop('checked', localStorage.getItem(this.id) === 'true');
-      });
-      $('#cselect1').click(function() {
-            $('#cselect1 :checkbox').each(function() { // Save current values
-                  localStorage.setItem(this.id, $(this).prop('checked'));
-            });
-      });
-
-      $('#cselect2 :checkbox').each(function() { // Load previous values
-            $(this).prop('checked', localStorage.getItem(this.id) === 'true');
-      });
-      $('#cselect2').click(function() {
-            $('#cselect2 :checkbox').each(function() { // Save current values
-                  localStorage.setItem(this.id, $(this).prop('checked'));
-            });
-      });
-});
-</script>
 
 <script>
-$(document).ready(function(){
+// this keeps the checkbox choices
+$(document).ready(function() {
+  $('input[name="cselect"]').click( function() {
+    var checkboxId = $(this).attr('id');
+    console.log(checkboxId);
+    if ($(this).is(":checked")) {
+    	console.log("hello");
+    	localStorage.setItem(checkboxId, 1);
 
-var formValues = JSON.parse(localStorage.getItem('formValues')) || {};
-var $checkboxes = $("#checkbox-container :checkbox");
-
-function allChecked(){
-  return $checkboxes.length === $checkboxes.filter(":checked").length;
-}
-
-
-function handleButtonClick(){
-  $checkboxes.prop("checked", allChecked()? false : true)
-}
-
-function updateStorage(){
-  $checkboxes.each(function(){
-    formValues[this.id] = this.checked;
+    } else {
+    	localStorage.removeItem(checkboxId);
+    }
   });
 
-  localStorage.setItem("formValues", JSON.stringify(formValues));
-}
-
-$button.on("click", function() {
-  handleButtonClick();
-  updateStorage();
-});
-
-$checkboxes.on("change", function(){
-  updateStorage();
-});
-
-// On page load
-$.each(formValues, function(key, value) {
-  $("#" + key).prop('checked', value);
-});
-
+  for (var i = 0, len = localStorage.length; i < len; i++) {
+    var key = localStorage.key(i);
+    var value = localStorage[key];
+    if (value == 1) {
+      $('#' + key).attr("checked", "checked");
+    }
+  }
 });
 </script>
 
@@ -855,8 +819,8 @@ $(document).ready(function(){
            <button id="hide">Hide</button>
        </div>
        -->
-      <div id="checkbox-container">
-        <input type="checkbox" name="cselect" id="cselect1" style="height:15px; width:20px;" value="1" checked="checked"> Simplify the vocabulary
+      <div class="mycheck">
+        <input type="checkbox" name="cselect" id="cselect1" style="height:15px; width:20px;" value="1"> Simplify the vocabulary
         <button type="button" id="wlevel" >+</button> 
         <!--
         <hr/>
@@ -895,7 +859,7 @@ $(document).ready(function(){
 
       <br/>
       <div>
-      <input type="checkbox" name="cselect" id="cselect2" style="height:15px; width:20px;" value="2" checked="checked"> Simplify sentence structures
+      <input type="checkbox" name="cselect" id="cselect2" style="height:15px; width:20px;" value="2" > Simplify sentence structures
        <button type="button" id="slevel" >+</button> 
       <br/>
        <div id="slevelitem" style="display:none;">

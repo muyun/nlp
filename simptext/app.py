@@ -61,6 +61,14 @@ from string import capwords
 import enchant
 d = enchant.Dict("en_US")
 
+
+_TAGMAP = {
+  'NN' : 'noun',
+  'VB' : 'verb',
+  'RB' : 'adv',
+  'JJ' : 'adj'
+}
+
 def connect_db():
     """Connects to the specific database."""
     rv = sqlite3.connect(app.config['DATABASE'])
@@ -95,7 +103,7 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
-def get_definition(soutput):
+def get_definition(entries, soutput):
     result = []
     for item in soutput: 
         #import pdb; pdb.set_trace()
@@ -104,8 +112,34 @@ def get_definition(soutput):
             #import pdb; pdb.set_trace()
             k = item.keys()[0]
             if len(item.values()) == 1 and len(wn.synsets(k)) > 0:
-                res[k] = wn.synsets(k)[0].definition()
+                #res[k] = wn.synsets(k)[0].definition()
+
+                #import pdb; pdb.set_trace()
+                wd = wordcal.word_map_supersense(k)
+                print(wd)
+                # get the supersense tag from the AMALGrAM 2.0
+                _sst = 'FOOD'
+                # add pos_tag to meet the format:
+                _pos_tags = wordcal.get_pos(entries)
+
+                #import pdb; pdb.set_trace()
+                # now only for verb and nn
+                if _pos_tags[k] == 'VBD' or _pos_tags[k] == 'VBG':
+                    _pos_tags[k] == 'VB'
+                #if _pos_tags[k] == ''
+                
+                if _pos_tags[k] in _TAGMAP:
+                    k_pos_tags = _TAGMAP[_pos_tags[k]]
+                    sst = k_pos_tags + "." + _sst.lower() # like 'noun.possession'
+                    if (sst in wd):
+                        res[k] = wn.synset(wd[sst]).definition()
+                    else:
+                        res[k] = wn.synsets(k)[0].definition()
+                else:
+                    res[k] = wn.synsets(k)[0].definition()
+
                 result.append(res)
+
     return result
 
 @app.route('/')
@@ -129,7 +163,7 @@ def show_entries():
 
     ending = "" # check the ending of the entries
 
-    global word1, word2, word3, word4, word5,word6,word7
+    global word1, word2, word3, word4, word5, word6, word7
     #words = word1[:10]
     words = []
     if len(etxt) > 0:
@@ -338,8 +372,10 @@ def show_entries():
             wordcal_time = time.time() - begin_time3
             print "The time of wordcal function: ", wordcal_time
 
-        # get the definiton of the 
-        sdefinition = get_definition(s_outputs)
+        # get the definiton of the
+
+        import pdb; pdb.set_trace()
+        sdefinition = get_definition(entries, s_outputs)
 
     elif len(entries) > 1 and (len(algs) == 0 and (len(cselect) == 1 and int(cselect[0]) == 1)):
         #s_outputs = unicode(entries)
@@ -805,6 +841,9 @@ def setting():
 
 
 if __name__ == '__main__':
+    #entries = "He eats an apple ."
+    #soutput=[u'He', u'eats', u',', u'an', u'a', {u'apple': [u'apple']}, u'.']
+    #get_definition(entries, soutput)
     app.run(debug=True)
     #app.run(host='144.214.20.231',port = 5001,debug=True, threaded=True)
     #app.run(host='127.0.0.1',port = 5000,debug=True, threaded=True)

@@ -25,6 +25,7 @@ from nltk.stem import WordNetLemmatizer
 wnl = WordNetLemmatizer()
 
 import string
+import re
 
 #import sys
 #sys.setrecursionlimit(1000)
@@ -159,6 +160,20 @@ def get_pos(sent):
         tokens[tag[0].lower()] = tag[1]
 
     return tokens
+    
+
+def word_map_supersense(w):
+    wdict={}
+    for synset in wn.synsets(w):
+        #print(synset)
+        #print(synset.lexname())
+
+        #import pdb; pdb.set_trace()
+        match = re.search(r'(\w+.\w.\d+)', str(synset)) # like Synset('gift.n.01')
+        if match:
+            wdict[synset.lexname()] = match.group()
+
+    return wdict
 
 """
 def get_word_candidates(sent, s_dict):
