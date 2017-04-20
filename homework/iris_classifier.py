@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 
 from sklearn.datasets import load_iris
 
@@ -6,6 +7,9 @@ from sklearn.model_selection import train_test_split
 
 import pandas as pd
 from pandas.tools.plotting import scatter_matrix
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 import mglearn
 
@@ -35,10 +39,27 @@ def get_iris_dataset():
     # 3. inspect the data
     # convert Numpy array int oa pandas DataFrame
     iris_dataframe = pd.DataFrame(X_train, columns=iris_dataset.feature_names)
-    grr = scatter_matrix(iris_dataframe, c=y_train, figsize=(15,15), marker='o', hist_kwds={'bins':20}, s=60, alpha=.8, cmap=mglearn.cm3)
+
+    # pdb; pdb.set_trace()
+    grr = pd.scatter_matrix(iris_dataframe, c=y_train, figsize=(15,15), marker='o', hist_kwds={'bins':20}, s=60, alpha=.8, cmap=mglearn.cm3)
+    #plt.show()
 
 
+    # The modelu
+    from sklearn.neighbors import KNeighborsClassifier
+    knn = KNeighborsClassifier(n_neighbors=1)
+    # build the model on the training set
+    knn.fit(X_train, y_train)
 
+    # the prediction
+    X_new = np.array([[5, 2.9, 1, 0.2]])
+    prediction = knn.predict(X_new)
+    print("Prediction: {}".format(prediction))
+    print("Predicted target name: {}".format(iris_dataset['target_names'][prediction]))
+
+    y_pred = knn.predict(X_test)
+    print("Test set predictions:\n {}".format(y_pred))
+    print("Test set score: {:.2f}".format(np.mean(y_pred==y_test)))
 
 if __name__ == '__main__':
     get_iris_dataset()

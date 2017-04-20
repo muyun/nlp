@@ -5,15 +5,13 @@
             {% for key, value in item.iteritems() %}
               {% if value|length == 1 %}
                 {% if sdefinition|length > 0 %}
-                   {% for sitem in sdefinition %}   
-                       {% for skey, svalue in sitem.iteritems() %}
+                   {% for skey, svalue in sdefinition.iteritems() %}
                          {% if skey == key %}
                            <span class="tooltip"><b>{{ key |safe }}</b> 
                              <span class="tooltiptext">{{ svalue |safe}}</span>
                            </span>
                          {% endif %} 
-                       {% endfor %}
-                   {% endfor %}
+                    {% endfor %}
                 {% endif %}
               {% else %}
                 <select>
@@ -38,15 +36,13 @@
             {% for key, value in item.iteritems() %}
               {% if value|length == 1 %}
                 {% if sdefinition|length > 0 %}
-                   {% for sitem in sdefinition %}   
-                       {% for skey, svalue in sitem.iteritems() %}
+                   {% for skey, svalue in sdefinition.iteritems() %}
                          {% if skey == key %}
                            <span class="tooltip"><b>{{ key |safe }}</b> 
                              <span class="tooltiptext">{{ svalue |safe}}</span>
                            </span>
                          {% endif %} 
-                       {% endfor %}
-                   {% endfor %}
+                  {% endfor %}
                 {% endif %}
               {% else %}
                 <select>
@@ -76,15 +72,13 @@
             {% for key, value in item.iteritems() %}
               {% if value|length == 1 %}
                 {% if sdefinition|length > 0 %}
-                   {% for sitem in sdefinition %}   
-                       {% for skey, svalue in sitem.iteritems() %}
+                   {% for skey, svalue in sdefinition.iteritems() %}
                          {% if skey == key %}
                            <span class="tooltip"><b>{{ key |safe }}</b> 
                              <span class="tooltiptext">{{ svalue |safe}}</span>
                            </span>
                          {% endif %} 
                        {% endfor %}
-                   {% endfor %}
                 {% endif %}
               {% else %}
                 <select>

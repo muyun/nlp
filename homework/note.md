@@ -4,7 +4,10 @@
   * morphology: about word formation  
   * syntax: how words combine to form phrases and sentences  
   * semantics: the meaning of sentences  
-  * pragmatics:  use context in order to interpret an utterance's meaning   
+  * pragmatics:  use context in order to interpret an utterance's meaning  
+
+##### note about WordNet 
+  During WordNet development synsets are organized into forty-five lexicographer files based on syntactic category and logical groupings.
 
 ##### note about NLP
   * Part-of-speech (POS) tagging  
@@ -60,5 +63,6 @@
    - the rule is to decode early, unicode everywhere, encode late
 
 
-   
+#### reference
+* [List of WordNet lexicographer file names and numbers](https://wordnet.princeton.edu/man/lexnames.5WN.html)
  

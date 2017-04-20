@@ -1,0 +1,9 @@
+1	Apple	apple	NNP	O-FOOD	0		FOOD	
+2	is	be	VBZ	O-stative	0		stative	
+3	an	an	DT	O	0			
+4	American	american	JJ	O	0			
+5	multinational	multinational	NN	O	0			
+6	technology	technology	NN	O-ACT	0		ACT	
+7	company	company	NN	O-GROUP	0		GROUP	
+8	.	.	.	O	0			
+

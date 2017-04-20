@@ -61,6 +61,7 @@ from string import capwords
 import enchant
 d = enchant.Dict("en_US")
 
+import re
 
 _TAGMAP = {
   'NN' : 'noun',
@@ -103,22 +104,45 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
+def get_sst(entries):
+
+    #import pdb; pdb.set_trace()
+    _sst = wordcal._get_sst(entries)
+
+    #import pdb; pdb.set_trace()
+    dict_sst = {}
+    #items = re.findall(r'(\w+\|\w+)', _sst) #['eats|consumption', 'apple|FOOD']
+    items = _sst.split()
+    for item in items:
+        match = re.search(r'(\w+\|\w+)', item)
+        if match:
+            elems = match.group().split('|')
+            dict_sst[elems[0].lower()] = elems[1]
+            
+    return dict_sst
+
 def get_definition(entries, soutput):
-    result = []
+    res = {}
     for item in soutput: 
         #import pdb; pdb.set_trace()
         if isinstance(item, dict):
-            res = {}
+            #res = {}
             #import pdb; pdb.set_trace()
             k = item.keys()[0]
             if len(item.values()) == 1 and len(wn.synsets(k)) > 0:
                 #res[k] = wn.synsets(k)[0].definition()
 
                 #import pdb; pdb.set_trace()
-                wd = wordcal.word_map_supersense(k)
+                wd = wordcal.map_word_supersense(k)
                 print(wd)
                 # get the supersense tag from the AMALGrAM 2.0
-                _sst = 'FOOD'
+                #_sst = 'FOOD'
+
+                #import pdb; pdb.set_trace()
+                dict_sst = get_sst(entries)
+                if len(dict_sst)>0 and k.lower() in dict_sst:
+                    _sst = dict_sst[k]
+                    
                 # add pos_tag to meet the format:
                 _pos_tags = wordcal.get_pos(entries)
 
@@ -138,9 +162,11 @@ def get_definition(entries, soutput):
                 else:
                     res[k] = wn.synsets(k)[0].definition()
 
-                result.append(res)
 
-    return result
+                #import pdb; pdb.set_trace()
+                #result.append(res)
+
+    return res
 
 @app.route('/')
 def show_entries():
@@ -374,7 +400,7 @@ def show_entries():
 
         # get the definiton of the
 
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         sdefinition = get_definition(entries, s_outputs)
 
     elif len(entries) > 1 and (len(algs) == 0 and (len(cselect) == 1 and int(cselect[0]) == 1)):
@@ -384,7 +410,7 @@ def show_entries():
         else:
             #s_outputs = entries.split()
             s_outputs = wordcal.check_word(entries, words)
-            sdefinition = get_definition(s_outputs)
+            sdefinition = get_definition(entries,s_outputs)
 
     elif len(entries) > 1 and (len(cselect) == 1 and int(cselect[0]) == 2):
         if not d.check(entries[1]): # not english words
@@ -841,7 +867,7 @@ def setting():
 
 
 if __name__ == '__main__':
-    #entries = "He eats an apple ."
+    #entries = "Apple is an American multinational technology company ."
     #soutput=[u'He', u'eats', u',', u'an', u'a', {u'apple': [u'apple']}, u'.']
     #get_definition(entries, soutput)
     app.run(debug=True)

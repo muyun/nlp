@@ -14,7 +14,6 @@ import nltk
 from nltk.corpus import wordnet as wn
 
 #Use StanfordTokenizer
-#from nltk.tokenize import StanfordTokenizer
 from nltk.tokenize import wordpunct_tokenize
 from nltk.tokenize import StanfordTokenizer
 from nltk.tag import StanfordPOSTagger
@@ -27,11 +26,12 @@ wnl = WordNetLemmatizer()
 import string
 import re
 
-#import sys
-#sys.setrecursionlimit(1000)
-
 # the Models about the training model about the word rank
 from models import rank
+
+# about the supersense tagger
+from sst import sst
+
 
 def get_word_pos(w):
     "return the word@pos from NLTK"
@@ -162,7 +162,7 @@ def get_pos(sent):
     return tokens
     
 
-def word_map_supersense(w):
+def map_word_supersense(w):
     wdict={}
     for synset in wn.synsets(w):
         #print(synset)
@@ -175,12 +175,41 @@ def word_map_supersense(w):
 
     return wdict
 
+def _get_sst(sent):
+    _sst = ""
+    filename = '_example'
+
+    #import pdb; pdb.set_trace()
+    #write_file(_path+filename, sent)
+    _sst = sst.exec_ssh(filename, sent)
+
+    #import pdb; pdb.set_trace()
+    print(_sst)
+
+    return _sst
+
+    """
+    dict_sst = {}
+    #items = re.findall(r'(\w+\|\w+)', _sst) #['eats|consumption', 'apple|FOOD']
+    items = _sst.split()
+    for item in items:
+        match = re.search(r'(\w+\|\w+)', item)
+        if match:
+            elems = match.group().split('|')
+            dict_sst[elems[0]] = elems[1]
+
+    #import pdb; pdb.set_trace()
+    return dict_sst
+    """
+    
+
 """
+    
 def get_word_candidates(sent, s_dict):
     #
     lst = []
 
-    _lst = []
+    _lst = []str
     for x in s_dict:
         if type(x) is dict:
             _lst.extend(x.keys())

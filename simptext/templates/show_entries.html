@@ -552,15 +552,13 @@ $(document).ready(function(){
           {% for key, value in item.iteritems() %}
             {% if value|length == 1 %}
                 {% if sdefinition|length > 0 %}
-                   {% for sitem in sdefinition %}   
-                       {% for skey, svalue in sitem.iteritems() %}
+                   {% for skey, svalue in sdefinition.iteritems() %}
                          {% if skey == key %}
                            <span class="tooltip"><b>{{ key |safe }}</b> 
                              <span class="tooltiptext">{{ svalue |safe}}</span>
                            </span>
                          {% endif %} 
-                       {% endfor %}
-                   {% endfor %}
+                  {% endfor %}
                 {% endif %}
             {% else %}
                 <select>
@@ -606,15 +604,13 @@ $(document).ready(function(){
           {% for key, value in item.iteritems() %}
            {% if value|length == 1 %}
                 {% if sdefinition|length > 0 %}
-                   {% for sitem in sdefinition %}   
-                       {% for skey, svalue in sitem.iteritems() %}
+                   {% for skey, svalue in sdefinition.iteritems() %}
                          {% if skey == key %}
                            <span class="tooltip"><b>{{ key |safe }}</b> 
                              <span class="tooltiptext">{{ svalue |safe}}</span>
                            </span>
                          {% endif %} 
                        {% endfor %}
-                   {% endfor %}
                 {% endif %}
             {% else %}
                <select>
@@ -654,15 +650,14 @@ $(document).ready(function(){
           {% for key, value in item.iteritems() %}
             {% if value|length == 1 %}
                 {% if sdefinition|length > 0 %}
-                   {% for sitem in sdefinition %}   
-                       {% for skey, svalue in sitem.iteritems() %}
+                       {% for skey, svalue in sdefinition.iteritems() %}
                          {% if skey == key %}
                            <span class="tooltip"><b>{{ key |safe }}</b> 
                              <span class="tooltiptext">{{ svalue |safe}}</span>
                            </span>
                          {% endif %} 
                        {% endfor %}
-                   {% endfor %}
+
                 {% endif %}
             {% else %}
               <select>
@@ -708,15 +703,13 @@ $(document).ready(function(){
           {% for key, value in item.iteritems() %}
             {% if value|length == 1 %}
                 {% if sdefinition|length > 0 %}
-                   {% for sitem in sdefinition %}   
-                       {% for skey, svalue in sitem.iteritems() %}
+                   {% for skey, svalue in sdefinition.iteritems() %}
                          {% if skey == key %}
                            <span class="tooltip"><b>{{ key |safe }}</b> 
                              <span class="tooltiptext">{{ svalue |safe}}</span>
                            </span>
                          {% endif %} 
                        {% endfor %}
-                   {% endfor %}
                 {% endif %}
             {% else %}
                <select>
@@ -750,15 +743,13 @@ $(document).ready(function(){
           {% for key, value in item.iteritems() %}
             {% if value|length == 1 %}  
                 {% if sdefinition|length > 0 %}
-                   {% for sitem in sdefinition %}   
-                       {% for skey, svalue in sitem.iteritems() %}
+                   {% for skey, svalue in sdefinition.iteritems() %}
                          {% if skey == key %}
                            <span class="tooltip"><b>{{ key |safe }}</b> 
                              <span class="tooltiptext">{{ svalue |safe}}</span>
                            </span>
                          {% endif %} 
                        {% endfor %}
-                   {% endfor %}
                 {% endif %}
            
             {% else %}
@@ -782,21 +773,8 @@ $(document).ready(function(){
   {% endif %}
 
 {% endif %}
-
-<!--
-    <br/>
-{% if sdefinition|length > 0 %}
-   <small>Notes:</small><br/>
-   {% for item in sdefinition %}   
-      {% for key, value in item.iteritems() %}
-          <small>[<strong>{{ key |safe }}</strong>]: {{ value |safe}}</small><br/>
-      {% endfor %}
-
-    {% endfor %}
-
-    {% endif %}
---> 
-    {% endif %}
+ 
+{% endif %}
   
     <br/>
     <br/>
