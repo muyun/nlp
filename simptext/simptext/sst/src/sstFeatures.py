@@ -207,6 +207,7 @@ if __name__=='__main__' and not os.path.exists(LEXDIR+'/wordnet_supersenses.json
             nSupersenseEntries += 1
             outF.write(json.dumps(entry)+'\n')
     print('done:',nSupersenseEntries,'entries', file=sys.stderr)
+"""
 if __name__!='__main__':
     print('loading WordNet supersense lexicon...', file=sys.stderr, end=' ')
     with open(LEXDIR+'/wordnet_supersenses.json') as inF:
@@ -218,6 +219,7 @@ if __name__!='__main__':
             senseTrie[entry["lemmas"]] = supersenses
             nSupersenseEntries += 1
         print('done:',nSupersenseEntries,'entries', file=sys.stderr)
+"""
 
 @memoize
 def _isO(label):

@@ -180,11 +180,13 @@ def _get_sst(sent):
     filename = '_example'
 
     #import pdb; pdb.set_trace()
+    sst_start = time.time()
     #write_file(_path+filename, sent)
     _sst = sst.exec_ssh(filename, sent)
-
     #import pdb; pdb.set_trace()
     print(_sst)
+    sst_end = time.time()
+    print "The time of sst function: ", sst_end - sst_start
 
     return _sst
 

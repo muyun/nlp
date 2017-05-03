@@ -40,16 +40,6 @@ app.config.update(dict(
 from simptext import dt_sent, wordcal
 #import simptext
 
-#word_start = time.time()
-word1 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 1, 1)
-word2 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 2, 1)
-word3 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 3, 1)
-word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
-word5 = wordcal.get_words('./simptext/dataset/basic.txt')
-word6 = wordcal.get_words('./simptext/dataset/cet4.txt')
-word7 = wordcal.get_words('./simptext/dataset/cet6.txt') + word6
-#word_end = time.time()
-
 #word_during = word_end - word_start
 #print "word_during: ", word_during
 #words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
@@ -63,6 +53,35 @@ d = enchant.Dict("en_US")
 
 import re
 
+# sst
+from simptext.sst.src.pyutil.ds.trie import Trie
+senseTrie = Trie()
+nSupersenseEntries=0
+print('loading WordNet supersense lexicon...')
+with open('./simptext/sst/lex/wordnet_supersenses.json') as inF:
+    for ln in inF:
+        entry = json.loads(ln.strip())
+        allsupersenses = entry["supersenses"]
+        supersenses = {"v": [sst for sst in allsupersenses if sst.islower() and '.' not in sst],
+             "n": [sst for sst in allsupersenses if sst.isupper() and '.' not in sst]}
+        senseTrie[entry["lemmas"]] = supersenses
+        nSupersenseEntries += 1
+    print('done:',nSupersenseEntries,'entries')
+
+#from simptext.sst.src.pyutil.corpus import mwe_lexicons
+#lexfiles = './simptext/sst/mwelex/{semcor_mwes,wordnet_mwes,said,phrases_dot_net,wikimwe,enwikt}.json'
+#mwe_lexicons.load_lexicons(lexfiles)
+
+#word_start = time.time()
+word1 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 1, 1)
+word2 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 2, 1)
+word3 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 3, 1)
+word4 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 4, 1)
+word5 = wordcal.get_words('./simptext/dataset/basic.txt')
+word6 = wordcal.get_words('./simptext/dataset/cet4.txt')
+word7 = wordcal.get_words('./simptext/dataset/cet6.txt') + word6
+#word_end = time.time()
+
 _TAGMAP = {
   'NN' : 'noun',
   'VB' : 'verb',
@@ -70,6 +89,7 @@ _TAGMAP = {
   'JJ' : 'adj'
 }
 
+#------------------------------------
 def connect_db():
     """Connects to the specific database."""
     rv = sqlite3.connect(app.config['DATABASE'])
@@ -105,7 +125,6 @@ def close_db(error):
         g.sqlite_db.close()
 
 def get_sst(entries):
-
     #import pdb; pdb.set_trace()
     _sst = wordcal._get_sst(entries)
 
@@ -123,13 +142,14 @@ def get_sst(entries):
 
 def get_definition(entries, soutput):
     res = {}
+    tag = 0
     for item in soutput: 
         #import pdb; pdb.set_trace()
         if isinstance(item, dict):
             #res = {}
             #import pdb; pdb.set_trace()
             k = item.keys()[0]
-            if len(item.values()) == 1 and len(wn.synsets(k)) > 0:
+            if len(wn.synsets(k)) > 0:
                 #res[k] = wn.synsets(k)[0].definition()
 
                 #import pdb; pdb.set_trace()
@@ -139,7 +159,11 @@ def get_definition(entries, soutput):
                 #_sst = 'FOOD'
 
                 #import pdb; pdb.set_trace()
-                dict_sst = get_sst(entries)
+                if tag == 0:
+                    dict_sst = get_sst(entries)
+                    tag = 1
+                _sst = ""
+                k = k.lower()
                 if len(dict_sst)>0 and k.lower() in dict_sst:
                     _sst = dict_sst[k]
                     
