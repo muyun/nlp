@@ -323,6 +323,7 @@ $(document).ready(function(){
 
 	  //document.getElementById("wordlevel").disabled= true;
      // document.getElementById("words").disabled= true;
+
       //
       $('#wlevelitem').click(function() {
 	  var selectedItem = $(this).find(":checked").val();
@@ -394,6 +395,53 @@ $(document).ready(function(){
 
 
 <script>
+// this keeps the checkbox choices
+$(document).ready(function() {
+
+  //document.getElementById("cselect1").checked = true;
+  //document.getElementById("cselect2").checked = true;
+  var clicked = false;
+  var entry = {{entries|tojson}};
+  console.log(entry);
+
+  if (!entry.length){
+  	   console.log("entry is empty");
+  	   document.getElementById("cselect1").checked = true;
+  	   document.getElementById("cselect2").checked = true;
+  	   localStorage.setItem($('#cselect1').attr('id'), 1); 
+  	   localStorage.setItem($('#cselect2').attr('id'), 1); 
+  } 
+
+  $('input[name="cselect"]').click( function() {
+  	//window.clicked = true;
+  	//console.log("Theclicked");
+  	//console.log(window.clicked);
+
+    var checkboxId = $(this).attr('id');
+    console.log(checkboxId);
+    if ($(this).is(":checked")) {
+    	console.log("checked");
+    	localStorage.setItem(checkboxId, 1);
+
+    } else {
+    	console.log("unchecked");
+    	localStorage.removeItem(checkboxId);
+    }
+  });
+
+  for (var i = 0, len = localStorage.length; i < len; i++) {
+    var key = localStorage.key(i);
+    var value = localStorage[key];
+    if (value == 1) {
+      $('#' + key).attr("checked", "checked");
+    }
+  }
+
+});
+</script>
+
+
+<script>
 $(document).ready(function(){
 // this keeps the radio choices
 $('input[type="radio"]').click(function() {
@@ -416,7 +464,9 @@ function saveData(key,value) {
 }
 
 function getData(key) {
-    return localStorage.getItem(key) || document.cookie.match(new RegExp(key + "\=(.+?)(?=;)"))[9];
+    //return localStorage.getItem(key) || document.cookie.match(new RegExp(key + "\=(.+?)(?=;)"))[9];
+    // to fix the bug
+    return localStorage.getItem(key);
 }
 
 //check stored radioButton on page load
@@ -424,32 +474,6 @@ var $radioButton = $("[value=" + getData("activeRadio") + "]");
 $($radioButton).attr("checked",true);
 setActiveBox($radioButton);
 
-});
-</script>
-
-
-<script>
-// this keeps the checkbox choices
-$(document).ready(function() {
-  $('input[name="cselect"]').click( function() {
-    var checkboxId = $(this).attr('id');
-    console.log(checkboxId);
-    if ($(this).is(":checked")) {
-    	console.log("hello");
-    	localStorage.setItem(checkboxId, 1);
-
-    } else {
-    	localStorage.removeItem(checkboxId);
-    }
-  });
-
-  for (var i = 0, len = localStorage.length; i < len; i++) {
-    var key = localStorage.key(i);
-    var value = localStorage[key];
-    if (value == 1) {
-      $('#' + key).attr("checked", "checked");
-    }
-  }
 });
 </script>
 
