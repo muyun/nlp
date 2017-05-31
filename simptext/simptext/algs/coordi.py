@@ -552,6 +552,7 @@ def main():
     sent = "I ate fish and he drank wine."
     sent = "I ate fish and Peter drank wine."
     sent = "Mary ate a pineapple and John ate an orange. "
+    sent = "brought a gift and left ."
     #print(simp_coordi_sent(sent))
     print(simp_syn_sent_(sent))    
 

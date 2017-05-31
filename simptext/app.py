@@ -40,19 +40,6 @@ app.config.update(dict(
 from simptext import dt_sent, wordcal
 #import simptext
 
-#word_during = word_end - word_start
-#print "word_during: ", word_during
-#words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
-from nltk.tokenize import StanfordTokenizer
-endings = ['.', '!', '?']
-
-from string import capwords
-
-import enchant
-d = enchant.Dict("en_US")
-
-import re
-
 # sst
 from simptext.sst.src.pyutil.ds.trie import Trie
 senseTrie = Trie()
@@ -68,10 +55,6 @@ with open('./simptext/sst/lex/wordnet_supersenses.json') as inF:
         nSupersenseEntries += 1
     print('done:',nSupersenseEntries,'entries')
 
-#from simptext.sst.src.pyutil.corpus import mwe_lexicons
-#lexfiles = './simptext/sst/mwelex/{semcor_mwes,wordnet_mwes,said,phrases_dot_net,wikimwe,enwikt}.json'
-#mwe_lexicons.load_lexicons(lexfiles)
-
 #word_start = time.time()
 word1 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 1, 1)
 word2 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 2, 1)
@@ -82,6 +65,20 @@ word6 = wordcal.get_words('./simptext/dataset/cet4.txt')
 word7 = wordcal.get_words('./simptext/dataset/cet6.txt') + word6
 #word_end = time.time()
 
+#word_during = word_end - word_start
+#print "word_during: ", word_during
+#words = dt_sent.get_edblist('simptext/dataset/EDB_List.txt')
+from nltk.tokenize import StanfordTokenizer
+endings = ['.', '!', '?']
+
+from string import capwords
+
+import enchant
+d = enchant.Dict("en_US")
+
+import re
+import ast
+
 _TAGMAP = {
   'NN' : 'noun',
   'VB' : 'verb',
@@ -89,7 +86,31 @@ _TAGMAP = {
   'JJ' : 'adj'
 }
 
-#------------------------------------
+#Buddhika---------------------------------------------------------------------
+global lst_lastnames
+global lst_malenames
+global lst_femalenames
+
+lastnamelines = open('dist.all.last','r').readlines()
+malenamelines = open('dist.male.first','r').readlines()
+femalenamelines = open('dist.female.first','r').readlines()
+
+lst_lastnames = []
+lst_malenames = []
+lst_femalenames = []
+
+#Load name lists
+for line in lastnamelines:
+    tab_delimit = line.split(' ')
+    lst_lastnames.append(str(tab_delimit[0]).strip())
+for line in malenamelines:
+    tab_delimit = line.split(' ')
+    lst_malenames.append(str(tab_delimit[0]).strip())
+for line in femalenamelines:
+    tab_delimit = line.split(' ')
+    lst_femalenames.append(str(tab_delimit[0]).strip())
+#-----------------------------------------------------------------------------
+
 def connect_db():
     """Connects to the specific database."""
     rv = sqlite3.connect(app.config['DATABASE'])
@@ -103,6 +124,78 @@ def init_db():
     with app.open_resource('schema.sql', mode='r') as f:
         db.cursor().executescript(f.read())
     db.commit()
+
+def get_sst(entries):
+    _sst = ""
+    #import pdb; pdb.set_trace()
+    _sst = wordcal._get_sst(entries)
+
+    #import pdb; pdb.set_trace()
+    dict_sst = {}
+    #items = re.findall(r'(\w+\|\w+)', _sst) #['eats|consumption', 'apple|FOOD']
+    if len(_sst) > 0:
+        items = _sst.split()
+        for item in items:
+            match = re.search(r'(\w+\|\w+)', item)
+            if match:
+                elems = match.group().split('|')
+                dict_sst[elems[0].lower()] = elems[1]
+            
+    return dict_sst
+
+def get_definition(entries, soutput):
+    res = {}
+    tag = 0
+    #import pdb; pdb.set_trace()
+    for item in soutput: 
+        #import pdb; pdb.set_trace()
+        if isinstance(item, dict):
+            #res = {}
+            #import pdb; pdb.set_trace()
+            k = item.keys()[0]
+            if len(item.values()) > 0 and len(item.values()[0]) == 1 and len(wn.synsets(k)) > 0:
+                #res[k] = wn.synsets(k)[0].definition()
+
+                #import pdb; pdb.set_trace()
+                wd = wordcal.map_word_supersense(k)
+                print(wd)
+                # get the supersense tag from the AMALGrAM 2.0
+                #_sst = 'FOOD'
+
+                #import pdb; pdb.set_trace()
+                if tag == 0:
+                    dict_sst = get_sst(entries)
+                    tag = 1
+
+                #import pdb; pdb.set_trace()
+                _sst = ""
+                k = k.lower()
+                if len(dict_sst)>0 and k.lower() in dict_sst:
+                    _sst = dict_sst[k]
+                               
+                # add pos_tag to meet the format:
+                _pos_tags = wordcal.get_pos(entries)
+
+                #import pdb; pdb.set_trace()
+                # now only for verb and nn
+                if _pos_tags[k] == 'VBD' or _pos_tags[k] == 'VBG':
+                    _pos_tags[k] == 'VB'
+                #if _pos_tags[k] == ''
+                
+                if _pos_tags[k] in _TAGMAP:
+                    k_pos_tags = _TAGMAP[_pos_tags[k]]
+                    sst = k_pos_tags + "." + _sst.lower() # like 'noun.possession'
+                    if (sst in wd):
+                        res[k] = wn.synset(wd[sst]).definition()
+                    else:
+                        res[k] = wn.synsets(k)[0].definition()
+                else:
+                    res[k] = wn.synsets(k)[0].definition()
+
+                #import pdb; pdb.set_trace()
+                #result.append(res)
+
+    return res
 
 @app.cli.command('initdb')
 def initdb_command():
@@ -124,76 +217,13 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
-def get_sst(entries):
-    #import pdb; pdb.set_trace()
-    _sst = wordcal._get_sst(entries)
-
-    #import pdb; pdb.set_trace()
-    dict_sst = {}
-    #items = re.findall(r'(\w+\|\w+)', _sst) #['eats|consumption', 'apple|FOOD']
-    items = _sst.split()
-    for item in items:
-        match = re.search(r'(\w+\|\w+)', item)
-        if match:
-            elems = match.group().split('|')
-            dict_sst[elems[0].lower()] = elems[1]
-            
-    return dict_sst
-
-def get_definition(entries, soutput):
-    res = {}
-    tag = 0
-    for item in soutput: 
-        #import pdb; pdb.set_trace()
-        if isinstance(item, dict):
-            #res = {}
-            #import pdb; pdb.set_trace()
-            k = item.keys()[0]
-            if len(wn.synsets(k)) > 0:
-                #res[k] = wn.synsets(k)[0].definition()
-
-                #import pdb; pdb.set_trace()
-                wd = wordcal.map_word_supersense(k)
-                print(wd)
-                # get the supersense tag from the AMALGrAM 2.0
-                #_sst = 'FOOD'
-
-                #import pdb; pdb.set_trace()
-                if tag == 0:
-                    dict_sst = get_sst(entries)
-                    tag = 1
-                _sst = ""
-                k = k.lower()
-                if len(dict_sst)>0 and k.lower() in dict_sst:
-                    _sst = dict_sst[k]
-                    
-                # add pos_tag to meet the format:
-                _pos_tags = wordcal.get_pos(entries)
-
-                #import pdb; pdb.set_trace()
-                # now only for verb and nn
-                if _pos_tags[k] == 'VBD' or _pos_tags[k] == 'VBG':
-                    _pos_tags[k] == 'VB'
-                #if _pos_tags[k] == ''
-                
-                if _pos_tags[k] in _TAGMAP:
-                    k_pos_tags = _TAGMAP[_pos_tags[k]]
-                    sst = k_pos_tags + "." + _sst.lower() # like 'noun.possession'
-                    if (sst in wd):
-                        res[k] = wn.synset(wd[sst]).definition()
-                    else:
-                        res[k] = wn.synsets(k)[0].definition()
-                else:
-                    res[k] = wn.synsets(k)[0].definition()
-
-
-                #import pdb; pdb.set_trace()
-                #result.append(res)
-
-    return res
-
 @app.route('/')
 def show_entries():
+    #Buddhika----------------------------
+    global lst_lastnames
+    global lst_malenames
+    global lst_femalenames
+    #------------------------------------
     form = EntryForm()
     # the the latest text from database
     #m = db.session.query(db.func.max(models.Entry.id).label("max_id")).one()
@@ -213,7 +243,7 @@ def show_entries():
 
     ending = "" # check the ending of the entries
 
-    global word1, word2, word3, word4, word5, word6, word7
+    global word1, word2, word3, word4, word5,word6,word7
     #words = word1[:10]
     words = []
     if len(etxt) > 0:
@@ -252,7 +282,6 @@ def show_entries():
         cselect = []
         if len(str(etxt[0][5])) > 0:
             cselect = [int(i) for i in str(etxt[0][5]).split()]
-        
     #form.algs.choices =  ''.join(str(e) for e in algs)
         print "entries: ", entries
         #print "wordlist: ", wordlist
@@ -260,7 +289,7 @@ def show_entries():
         print "algs: ", algs
         print "cselect: ", cselect
 
-        if len(wordlist) == 0 and len(cselect) >=1:
+        if len(wordlist) == 0 and len(cselect) >= 1:
             if int(wordlevel) == 1:
     	        words = word1
             if int(wordlevel) == 2:
@@ -335,7 +364,7 @@ def show_entries():
     s2 = ""
     s1_child = ""
     s2_child = ""
-    sdefinition= {}  # the words in bold definition from wordnet
+    sdefinition = {}
 
     """
     if len(entries) == 0:
@@ -351,11 +380,12 @@ def show_entries():
     if len(entries) == 0:
         s_outputs = {}
   
-    elif len(entries) > 1 and len(cselect) ==2 and d.check(entries[1]) and len(algs) > 0 and len(flag) == 0: #Syntactic simplification firstly
+    elif len(entries) > 1 and d.check(entries[1]) and len(cselect)==2 and len(algs) > 0 and len(flag) == 0: #Syntactic simplification firstly
         #print "entries-:", entries
         
         entries_list =   StanfordTokenizer().tokenize(entries)
         #ending = ""
+        """
         if entries_list[-1] not in endings:
             entries_list.append('.')
         elif entries_list[-1] == '!':
@@ -366,11 +396,15 @@ def show_entries():
             entries_list[-1] = '.'
         else:
             pass
+        """
         _entries = ' '.join(entries_list)
 
         begin_time2 = time.time()
 
-        _syn_ret, alg1 = dt_sent.simp_syn_sent(_entries, algs)
+        #_syn_ret, alg1 = dt_sent.simp_syn_sent(_entries, None, algs)
+        #Buddhika------------------------------------------------------------------------------------------------
+        _syn_ret, alg1 = dt_sent.simp_syn_sent(_entries,lst_lastnames,lst_malenames,lst_femalenames, None, algs)
+        #--------------------------------------------------------------------------------------------------------
         #BUG here, todo
         """
         if len(_syn_ret) > 0:
@@ -389,13 +423,16 @@ def show_entries():
             	s1_output = wordcal.check_word(s1, words)
         """
         start_check_word_time = time.time()
-        s_outputs = wordcal.check_word(entries, words)
+        s_outputs, s_outputs_no_split = wordcal.check_word(entries, words)
 
         end_check_word_time = time.time()
         print "The time of check_word function: ", end_check_word_time - start_check_word_time
 
         if len(_syn_ret) > 0:
-            (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
+            #(s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
+            #Buddhika-----------------------------------------------------------------------------------------------
+            (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs,lst_lastnames,lst_malenames,lst_femalenames)
+            #-------------------------------------------------------------------------------------------------------
 
             split_time = time.time() - begin_time2
             print "The time of split function: ", split_time
@@ -421,27 +458,29 @@ def show_entries():
 
             wordcal_time = time.time() - begin_time3
             print "The time of wordcal function: ", wordcal_time
+        else:
+            s_outputs = s_outputs_no_split
 
-        # get the definiton of the
-
-        #import pdb; pdb.set_trace()
+        #sdefinition = get_definition(s_outputs)
         sdefinition = get_definition(entries, s_outputs)
 
-    elif len(entries) > 1 and (len(algs) == 0 and (len(cselect) == 1 and int(cselect[0]) == 1)):
+    elif len(entries) > 1 and len(algs) == 0 and (len(cselect) == 1 and int(cselect[0]) == 1):
         #s_outputs = unicode(entries)
         if not d.check(entries[1]): # not english words
             s_outputs = unicode(entries)
         else:
             #s_outputs = entries.split()
-            s_outputs = wordcal.check_word(entries, words)
+            s_outputs, s_outputs_no_split = wordcal.check_word(entries, words)
+            
             sdefinition = get_definition(entries,s_outputs)
-
+            
     elif len(entries) > 1 and (len(cselect) == 1 and int(cselect[0]) == 2):
         if not d.check(entries[1]): # not english words
             s_outputs = unicode(entries)
         else:
             entries_list =  StanfordTokenizer().tokenize(entries)
         #ending = ""
+            """
             if entries_list[-1] not in endings:
                 entries_list.append('.')
             elif entries_list[-1] == '!':
@@ -452,13 +491,20 @@ def show_entries():
                 entries_list[-1] = '.'
             else:
                 pass
+            """
             _entries = ' '.join(entries_list)
 
             #s_outputs = wordcal._check_word_(entries)
-            _syn_ret, alg1 = dt_sent.simp_syn_sent(_entries, algs)
+            #_syn_ret, alg1 = dt_sent.simp_syn_sent(_entries, None, algs)
+            #Buddhika----------------------------------------------------
+            _syn_ret, alg1 = dt_sent.simp_syn_sent(_entries,lst_lastnames,lst_malenames,lst_femalenames, None, algs)
+            #------------------------------------------------------------
 
             if len(_syn_ret) > 0:
-                (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
+                #(s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
+                #Buddhika-------------------------------------------------------------------------------------------------------------------
+                (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs,lst_lastnames,lst_malenames,lst_femalenames)
+                #---------------------------------------------------------------------------------------------------------------------------
 
                 if len(ret) > 0:  # there is the child: 3 layer
                 # import pdb; pdb.set_trace()
@@ -473,10 +519,7 @@ def show_entries():
 
     elif len(entries) > 1 and len(cselect) == 0:
         s_outputs = entries.split()
-                        
-    #elif len(entries) > 1:
     #    s_outputs = wordcal.check_word(entries, words)
-    
     else:
         pass
 
@@ -500,13 +543,36 @@ def show_entries():
         if len(s2_child_output) > 0:
             s2_child_output[-1] = ending
 
+    print "type of _s1_child_output: ", type(s1_child_output)
+    #print "keys of _s1_child_output: ", s1_child_output.keys()   
+    print "_s1_child_output: ", s1_child_output
+    if len(s1_child_output) > 0:
+        #s1_last_element = sorted(s1_child_output.keys())[-1]
+        s1_last_element = s1_child_output[-1]
+        print "s1_last_element:", s1_last_element
+        if s1_last_element[-1] == '.':   
+            _s1_last_element = s1_last_element[0:len(s1_last_element)-1]
+            s1_child_output[-1] = _s1_last_element
+            s1_child_output.append(".")
+    print "s1_child_output: ", s1_child_output
+
+    print "_s2_child_output: ", s2_child_output
+    if len(s2_child_output) > 0:
+        #s1_last_element = sorted(s1_child_output.keys())[-1]
+        s2_last_element = s2_child_output[-1]
+        print "s2_last_element:", s2_last_element
+        if s2_last_element[-1] == '.':   
+            _s2_last_element = s2_last_element[0:len(s2_last_element)-1]
+            s2_child_output[-1] = _s2_last_element
+            s2_child_output.append(".")
+    print "s2_child_output: ", s2_child_output
+
     print "s1_output: ", s1_output
     print "s1_child_output: ", s1_child_output
     print "s2_output: ", s2_output
     print "s2_child_output: ", s2_child_output
     print "s_outputs: ", s_outputs
     print "sdefinition: ", sdefinition
-
     #import pdb; pdb.set_trace()
     
     #return render_template('show_entries.html', form=form, entries=entries, s_outputs=s_outputs, s1_output=s1_output, s2_output=s2_output, flag=flag)
@@ -735,7 +801,6 @@ def get_words(inputs):
 
     return wordinput, wordlevel
 
-
 def get_sentences():
     form = EntryForm()
     #wordinput = ""
@@ -793,15 +858,14 @@ def add_entry():
 
     global word4
     cselect = request.form.getlist('cselect')
+    cselect = request.form.getlist('cselect')
     str_cselect = ' '.join(str(e) for e in cselect)
     #str_cselect = " ".join(cselect)
     print "str_cselect:", str_cselect
-    
-    #if not selected_voc:
-    #print "cselect:", cselect
+
     if len(cselect) == 0:
         db = get_db()    
-        db.execute('insert into entries (inputs, words, level, algs, cselect, s1, s2) values (?, ?, ?, ?, ?, ?,?)',
+        db.execute('insert into entries (inputs, words, level, algs,cselect, s1, s2) values (?, ?, ?, ?, ?, ?, ?)',
                [inputs, "", "", "", str_cselect, "", ""])
         db.commit()
 
@@ -812,7 +876,7 @@ def add_entry():
             #db.execute('insert into params (words, level, algs) values (?, ?, ?)', [_wordinput, wordlevel, alg])
             db.execute('update params set words=? WHERE id = (SELECT MAX(id) FROM params)', [wordinput])
             db.execute('insert into entries (inputs, words, level, algs, cselect, s1, s2) values (?, ?, ?, ?, ?, ?, ?)',
-               [inputs, wordinput, wordlevel, "", str_cselect, "", ""])
+               [inputs, wordinput, wordlevel, "", str_cselect,"", ""])
             db.commit()
 
         if int(cselect[0]) == 2: # sentence
@@ -891,10 +955,7 @@ def setting():
 
 
 if __name__ == '__main__':
-    #entries = "Apple is an American multinational technology company ."
-    #soutput=[u'He', u'eats', u',', u'an', u'a', {u'apple': [u'apple']}, u'.']
-    #get_definition(entries, soutput)
-    app.run(debug=True)
-    #app.run(host='144.214.20.231',port = 5001,debug=True, threaded=True)
+    #app.run(debug=True)
+    app.run(host='144.214.20.231',port=5001,debug=True, threaded=True)
     #app.run(host='127.0.0.1',port = 5000,debug=True, threaded=True)
     #app.run(host='144.214.20.231',debug=True, threaded=True)

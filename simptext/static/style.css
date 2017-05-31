@@ -65,8 +65,8 @@ h2 {
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 300px;
-    background-color: #000000;
-    color: #FFFAF0;
+    background-color: #fff;
+    color: #7f7f7f;
     text-align: center;
     border-radius: 6px;
     padding: 5px 0;
