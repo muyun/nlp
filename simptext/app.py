@@ -40,21 +40,6 @@ app.config.update(dict(
 from simptext import dt_sent, wordcal
 #import simptext
 
-# sst
-from simptext.sst.src.pyutil.ds.trie import Trie
-senseTrie = Trie()
-nSupersenseEntries=0
-print('loading WordNet supersense lexicon...')
-with open('./simptext/sst/lex/wordnet_supersenses.json') as inF:
-    for ln in inF:
-        entry = json.loads(ln.strip())
-        allsupersenses = entry["supersenses"]
-        supersenses = {"v": [sst for sst in allsupersenses if sst.islower() and '.' not in sst],
-             "n": [sst for sst in allsupersenses if sst.isupper() and '.' not in sst]}
-        senseTrie[entry["lemmas"]] = supersenses
-        nSupersenseEntries += 1
-    print('done:',nSupersenseEntries,'entries')
-
 #word_start = time.time()
 word1 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 1, 1)
 word2 = dt_sent.read_xlsx_file('./simptext/dataset/wordlist.xlsx', 2, 1)
@@ -75,16 +60,6 @@ from string import capwords
 
 import enchant
 d = enchant.Dict("en_US")
-
-import re
-import ast
-
-_TAGMAP = {
-  'NN' : 'noun',
-  'VB' : 'verb',
-  'RB' : 'adv',
-  'JJ' : 'adj'
-}
 
 #Buddhika---------------------------------------------------------------------
 global lst_lastnames
@@ -125,78 +100,6 @@ def init_db():
         db.cursor().executescript(f.read())
     db.commit()
 
-def get_sst(entries):
-    _sst = ""
-    #import pdb; pdb.set_trace()
-    _sst = wordcal._get_sst(entries)
-
-    #import pdb; pdb.set_trace()
-    dict_sst = {}
-    #items = re.findall(r'(\w+\|\w+)', _sst) #['eats|consumption', 'apple|FOOD']
-    if len(_sst) > 0:
-        items = _sst.split()
-        for item in items:
-            match = re.search(r'(\w+\|\w+)', item)
-            if match:
-                elems = match.group().split('|')
-                dict_sst[elems[0].lower()] = elems[1]
-            
-    return dict_sst
-
-def get_definition(entries, soutput):
-    res = {}
-    tag = 0
-    #import pdb; pdb.set_trace()
-    for item in soutput: 
-        #import pdb; pdb.set_trace()
-        if isinstance(item, dict):
-            #res = {}
-            #import pdb; pdb.set_trace()
-            k = item.keys()[0]
-            if len(item.values()) > 0 and len(item.values()[0]) == 1 and len(wn.synsets(k)) > 0:
-                #res[k] = wn.synsets(k)[0].definition()
-
-                #import pdb; pdb.set_trace()
-                wd = wordcal.map_word_supersense(k)
-                print(wd)
-                # get the supersense tag from the AMALGrAM 2.0
-                #_sst = 'FOOD'
-
-                #import pdb; pdb.set_trace()
-                if tag == 0:
-                    dict_sst = get_sst(entries)
-                    tag = 1
-
-                #import pdb; pdb.set_trace()
-                _sst = ""
-                k = k.lower()
-                if len(dict_sst)>0 and k.lower() in dict_sst:
-                    _sst = dict_sst[k]
-                               
-                # add pos_tag to meet the format:
-                _pos_tags = wordcal.get_pos(entries)
-
-                #import pdb; pdb.set_trace()
-                # now only for verb and nn
-                if _pos_tags[k] == 'VBD' or _pos_tags[k] == 'VBG':
-                    _pos_tags[k] == 'VB'
-                #if _pos_tags[k] == ''
-                
-                if _pos_tags[k] in _TAGMAP:
-                    k_pos_tags = _TAGMAP[_pos_tags[k]]
-                    sst = k_pos_tags + "." + _sst.lower() # like 'noun.possession'
-                    if (sst in wd):
-                        res[k] = wn.synset(wd[sst]).definition()
-                    else:
-                        res[k] = wn.synsets(k)[0].definition()
-                else:
-                    res[k] = wn.synsets(k)[0].definition()
-
-                #import pdb; pdb.set_trace()
-                #result.append(res)
-
-    return res
-
 @app.cli.command('initdb')
 def initdb_command():
     """Creates the database tables."""
@@ -216,6 +119,19 @@ def close_db(error):
     """Closes the database again at the end of the request."""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
+
+def get_definition(soutput):
+    result = []
+    for item in soutput: 
+        #import pdb; pdb.set_trace()
+        if isinstance(item, dict):
+            res = {}
+            #import pdb; pdb.set_trace()
+            k = item.keys()[0]
+            if len(item.values()) == 1 and len(wn.synsets(k)) > 0:
+                res[k] = wn.synsets(k)[0].definition()
+                result.append(res)
+    return result
 
 @app.route('/')
 def show_entries():
@@ -423,16 +339,13 @@ def show_entries():
             	s1_output = wordcal.check_word(s1, words)
         """
         start_check_word_time = time.time()
-        s_outputs, s_outputs_no_split = wordcal.check_word(entries, words)
+        s_outputs = wordcal.check_word(entries, words)
 
         end_check_word_time = time.time()
         print "The time of check_word function: ", end_check_word_time - start_check_word_time
 
         if len(_syn_ret) > 0:
-            #(s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
-            #Buddhika-----------------------------------------------------------------------------------------------
-            (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs,lst_lastnames,lst_malenames,lst_femalenames)
-            #-------------------------------------------------------------------------------------------------------
+            (s1, s1_child, s2, s2_child, ret, alg2) = dt_sent._get_split_ret(_syn_ret, algs)
 
             split_time = time.time() - begin_time2
             print "The time of split function: ", split_time
@@ -444,25 +357,25 @@ def show_entries():
             if len(ret) > 0:  # there is the child: 3 layer
                 # import pdb; pdb.set_trace()
                 if (s1_child) > 0:
-                    # s1_child_output = wordcal.check_word(s1_child, words)
-                    s1_child_output, referenced = wordcal.get_word_candidates(s1_child, s_outputs, referenced, words)
-                # s1_output = wordcal.check_word(s1, words)
-                s1_output, referenced = wordcal.get_word_candidates(s1, s_outputs, referenced, words)
+                    s1_child_output = wordcal.check_word(s1_child, words)
+                    #s1_child_output, referenced = wordcal.get_word_candidates(s1_child, s_outputs, referenced, words)
+                s1_output = wordcal.check_word(s1, words)
+                #s1_output, referenced = wordcal.get_word_candidates(s1, s_outputs, referenced, words)
 
                 if (s2_child) > 0:
-                    # s2_child_output = wordcal.check_word(s2_child, words)
-                    s2_child_output, referenced = wordcal.get_word_candidates(s2_child, s_outputs, referenced, words)
+                    s2_child_output = wordcal.check_word(s2_child, words)
+                    #s2_child_output, referenced = wordcal.get_word_candidates(s2_child, s_outputs, referenced, words)
                 # import pdb; pdb.set_trace()
-                # s2_output = wordcal.check_word(s2, words)
-                s2_output, referenced = wordcal.get_word_candidates(s2, s_outputs, referenced, words)
+                s2_output = wordcal.check_word(s2, words)
+                #s2_output, referenced = wordcal.get_word_candidates(s2, s_outputs, referenced, words)
 
             wordcal_time = time.time() - begin_time3
             print "The time of wordcal function: ", wordcal_time
         else:
-            s_outputs = s_outputs_no_split
+            #s_outputs = s_outputs_no_split
+            pass
 
-        #sdefinition = get_definition(s_outputs)
-        sdefinition = get_definition(entries, s_outputs)
+        sdefinition = get_definition(s_outputs)
 
     elif len(entries) > 1 and len(algs) == 0 and (len(cselect) == 1 and int(cselect[0]) == 1):
         #s_outputs = unicode(entries)
@@ -470,9 +383,9 @@ def show_entries():
             s_outputs = unicode(entries)
         else:
             #s_outputs = entries.split()
-            s_outputs, s_outputs_no_split = wordcal.check_word(entries, words)
+            s_outputs= wordcal.check_word(entries, words)
             
-            sdefinition = get_definition(entries,s_outputs)
+            sdefinition = get_definition(s_outputs)
             
     elif len(entries) > 1 and (len(cselect) == 1 and int(cselect[0]) == 2):
         if not d.check(entries[1]): # not english words
@@ -542,30 +455,6 @@ def show_entries():
             s2_output[-1] = ending
         if len(s2_child_output) > 0:
             s2_child_output[-1] = ending
-
-    print "type of _s1_child_output: ", type(s1_child_output)
-    #print "keys of _s1_child_output: ", s1_child_output.keys()   
-    print "_s1_child_output: ", s1_child_output
-    if len(s1_child_output) > 0:
-        #s1_last_element = sorted(s1_child_output.keys())[-1]
-        s1_last_element = s1_child_output[-1]
-        print "s1_last_element:", s1_last_element
-        if s1_last_element[-1] == '.':   
-            _s1_last_element = s1_last_element[0:len(s1_last_element)-1]
-            s1_child_output[-1] = _s1_last_element
-            s1_child_output.append(".")
-    print "s1_child_output: ", s1_child_output
-
-    print "_s2_child_output: ", s2_child_output
-    if len(s2_child_output) > 0:
-        #s1_last_element = sorted(s1_child_output.keys())[-1]
-        s2_last_element = s2_child_output[-1]
-        print "s2_last_element:", s2_last_element
-        if s2_last_element[-1] == '.':   
-            _s2_last_element = s2_last_element[0:len(s2_last_element)-1]
-            s2_child_output[-1] = _s2_last_element
-            s2_child_output.append(".")
-    print "s2_child_output: ", s2_child_output
 
     print "s1_output: ", s1_output
     print "s1_child_output: ", s1_child_output
@@ -801,6 +690,7 @@ def get_words(inputs):
 
     return wordinput, wordlevel
 
+
 def get_sentences():
     form = EntryForm()
     #wordinput = ""
@@ -955,7 +845,7 @@ def setting():
 
 
 if __name__ == '__main__':
-    #app.run(debug=True)
-    app.run(host='144.214.20.231',port=5001,debug=True, threaded=True)
+    app.run(debug=True)
+    #app.run(host='144.214.20.231',debug=True, threaded=True)
     #app.run(host='127.0.0.1',port = 5000,debug=True, threaded=True)
     #app.run(host='144.214.20.231',debug=True, threaded=True)

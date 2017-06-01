@@ -332,15 +332,21 @@ $(document).ready(function(){
       //console.log(selectedItem);
 
       if (selectedItem*1 == 0) {
-      	  //console.log("helloword0");
+      	  console.log("helloword0");
       	  document.getElementById("wordlevel").disabled= true;
           document.getElementById("words").disabled= true;
+          document.getElementById("selectedwords").style.display = 'none';
       } 
       if  (selectedItem*1 == 1) {
-      	  //console.log("helloword1");
+      	  console.log("helloword1");
       	  document.getElementById("wordlevel").disabled= false;
           document.getElementById("words").disabled= false;
+
+          document.getElementById("selectedwords").style.display = 'inline';
+
       }
+
+      $('#wlevelitem').show();
   });
 
           document.getElementById("algs").disabled= true;
@@ -377,6 +383,8 @@ $(document).ready(function(){
                  algsItems[i].disabled = true;
               
           }
+
+          document.getElementById("algschoice").style.display = 'none';
       } 
       if  (selectedItem*1 == 1) {
       	  //console.log("helloword1");
@@ -387,7 +395,11 @@ $(document).ready(function(){
                  algsItems[i].disabled = false;
               
           }
+
+          document.getElementById("algschoice").style.display = 'inline';
       }
+
+      $('#slevelitem').show();
   });
 
 });
@@ -410,6 +422,8 @@ $(document).ready(function() {
   	   document.getElementById("cselect2").checked = true;
   	   localStorage.setItem($('#cselect1').attr('id'), 1); 
   	   localStorage.setItem($('#cselect2').attr('id'), 1); 
+      
+
   } 
 
   $('input[name="cselect"]').click( function() {
@@ -436,6 +450,29 @@ $(document).ready(function() {
       $('#' + key).attr("checked", "checked");
     }
   }
+
+   
+    var selectedItem = $(this).find(":checked").val();
+
+      console.log("vocabulary option");
+      //console.log(selectedItem);
+
+      if (selectedItem*1 == 0) {
+          console.log("helloword0");
+          document.getElementById("wordlevel").disabled= true;
+          document.getElementById("words").disabled= true;
+          document.getElementById("selectedwords").style.display = 'none';
+      } 
+      if  (selectedItem*1 == 1) {
+          console.log("helloword1");
+          document.getElementById("wordlevel").disabled= false;
+          document.getElementById("words").disabled= false;
+
+          document.getElementById("selectedwords").style.display = 'inline';
+
+      }
+
+      $('#wlevelitem').show();    
 
 });
 </script>
@@ -837,6 +874,7 @@ $(document).ready(function(){
            <small>Please enter a list of known vocabulary.  The system will attempt to simplify all words outside this list. 
            <br/>
            <br/>
+           <div id="selectedwords">
            <dt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use the </small>
             <select class="wordlevel" name=wordlevel id=wordlevel onchange="this.form.submit()">         
               <!--
@@ -856,6 +894,7 @@ $(document).ready(function(){
            <small> vocabulary list (<small>"Primary 3", "Primary 6", "Secondary 3", and "Secondary 6" lists are from <a href ="http://cd1.edb.hkedcity.net/cd/eng/vocab09/appendix_1_content.htm" target="_blank">Hong Kong Education Bureau</a>; "CET-4" and "CET-6" lists are from <a href="https://en.wikipedia.org/wiki/College_English_Test" target"_blank">National English level test in the People's Republic of China</a>; "OGDEN's BASIC ENGLISH" is from <a href ="http://ogden.basic-english.org/words.html" target="_blank">OGDEN's BASIC ENGLISH</a></small>)</small>
            <br/>
             <textarea name=words id=words rows=6 cols=51 >{{ words|safe}}</textarea> 
+           </div>
          </div>
       </div>
 

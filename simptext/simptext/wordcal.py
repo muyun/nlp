@@ -14,6 +14,7 @@ import nltk
 from nltk.corpus import wordnet as wn
 
 #Use StanfordTokenizer
+#from nltk.tokenize import StanfordTokenizer
 from nltk.tokenize import wordpunct_tokenize
 from nltk.tokenize import StanfordTokenizer
 from nltk.tag import StanfordPOSTagger
@@ -24,14 +25,12 @@ from nltk.stem import WordNetLemmatizer
 wnl = WordNetLemmatizer()
 
 import string
-import re
+
+#import sys
+#sys.setrecursionlimit(1000)
 
 # the Models about the training model about the word rank
 from models import rank
-
-# about the supersense tagger
-from sst import sst
-
 
 def get_word_pos(w):
     "return the word@pos from NLTK"
@@ -116,26 +115,6 @@ def check_word_(strs, words):
     #return ' '.join(str(w) for w in output)
     return tokens
 
-def _check_word_(sent):
-    """ check the word is words list, and return the string """
-    #output=[]
-    #output= OrderedDict()
-    print "check the sentence: ", sent
-
-    tokens = []
-    #tags = []
-    if len(sent) > 0:
-        tokens = wordpunct_tokenize(sent)
-        for ind in range(len(tokens)):
-            tokens_dict = {}
-            _output = []
-            _output.append(tokens[ind])
-
-            tokens_dict[tokens[ind]] = _output
-            tokens[ind] = tokens_dict
-            
-    #print "tokens:", tokens
-    return tokens
 
 def check_word(sent, words):
     """ check the word is words list, and return the string """
@@ -160,58 +139,12 @@ def get_pos(sent):
         tokens[tag[0].lower()] = tag[1]
 
     return tokens
-    
 
-def map_word_supersense(w):
-    wdict={}
-    for synset in wn.synsets(w):
-        #print(synset)
-        #print(synset.lexname())
-
-        #import pdb; pdb.set_trace()
-        match = re.search(r'(\w+.\w.\d+)', str(synset)) # like Synset('gift.n.01')
-        if match:
-            wdict[synset.lexname()] = match.group()
-
-    return wdict
-
-def _get_sst(sent):
-    _sst = ""
-    filename = '_example'
-
-    #import pdb; pdb.set_trace()
-    sst_start = time.time()
-    #write_file(_path+filename, sent)
-    _sst = sst.exec_ssh(filename, sent)
-    #import pdb; pdb.set_trace()
-    print(_sst)
-    sst_end = time.time()
-    print "The time of sst function: ", sst_end - sst_start
-
-    return _sst
-
-    """
-    dict_sst = {}
-    #items = re.findall(r'(\w+\|\w+)', _sst) #['eats|consumption', 'apple|FOOD']
-    items = _sst.split()
-    for item in items:
-        match = re.search(r'(\w+\|\w+)', item)
-        if match:
-            elems = match.group().split('|')
-            dict_sst[elems[0]] = elems[1]
-
-    #import pdb; pdb.set_trace()
-    return dict_sst
-    """
-    
-
-"""
-    
 def get_word_candidates(sent, s_dict):
     #
     lst = []
 
-    _lst = []str
+    _lst = []
     for x in s_dict:
         if type(x) is dict:
             _lst.extend(x.keys())
@@ -227,71 +160,7 @@ def get_word_candidates(sent, s_dict):
             lst.append(w)
 
     return lst
-"""
-
-def get_word_candidates(sent, s_dict, referenced,wordlist):
-    #named_entities_person, named_entities_org = chunk_sent_ner(sent)
-    #print ("named_entities_person, named_entities_org")
-    #print (named_entities_person, named_entities_org, sent)
-
-    lst = []
-
-    _lst = []
-    for x in s_dict:
-        if type(x) is dict:
-            _lst.extend(x.keys())
-        else:
-            _lst.append(x)
-    #print "_lst"
-    #print _lst, s_dict
-
-    sentence = chunk_sent(sent, s_dict, _lst)
-    #print("sentence")
-    #print (sentence)
-    #print(sent)
-    for w in sentence.split():
-    #for w in sent.split():
-        #import pdb; pdb.set_trace()
-        #print("w, _lst")
-        #print (w, _lst)
-        if '_' in w:
-            w = w.replace("_", " ")
-        if w in _lst:
-
-            print(w)
-            ind = _lst.index(w)
-            #print (referenced, s_dict[ind], w, sent)
-            if s_dict[ind] == {w: [w, 'He','She']} or s_dict[ind] == {w: [w, 'She']} or s_dict[ind] == {w: [w, 'He']} or s_dict[ind] == {w: [w, 'They']} or s_dict[ind] == {w: [w, 'It'] }:
-                if w in referenced:
-                    lst.append(s_dict[ind])
-                else:
-                    lst.append(w)
-                    referenced.append(w)
-            else:
-                lst.append(s_dict[ind])
-        else:
-            lst.append(w)
-
-    return lst, referenced
     
-def chunk_sent(sent, s_dict, _lst):
-    for c in _lst:
-        #print ("c")
-
-        #ind = _lst.index(c)
-        #print (c)
-        if ' ' in c:
-            #print ("c joinned")
-            c_joinned = c.replace(" ", "_")
-            sent = sent.replace(c,  c_joinned)
-            #sent = sent.replace("_", " " )
-            #print sent
-
-    sentence =[]
-    for w in sent.split():
-        sentence.append(w)
-    return " ".join(sentence)
-   
 
 def _check_word(sent, tags, words):
     """ get the candidates of the difficult words """

@@ -6,9 +6,7 @@
    about data processing of the sentences 
 
 @author wenlong
-
 @TODO: update the software construction
-
 """
 
 import os, sys, re, codecs
@@ -18,20 +16,23 @@ from bs4 import BeautifulSoup
 
 from collections import OrderedDict
 import openpyxl, json, csv
-
+from nltk import sent_tokenize
 from nltk.tokenize import StanfordTokenizer
 #from nltk.tokenize import wordpunct_tokenize
-from nltk.tag import StanfordPOSTagger
-eng_tagger = StanfordPOSTagger('english-bidirectional-distsim.tagger')
+#from nltk.tag import StanfordPOSTagger
+#eng_tagger = StanfordPOSTagger('english-bidirectional-distsim.tagger')
 # use the wrapper or use the standard lib?
 from nltk.parse.stanford import StanfordDependencyParser
 eng_parser = StanfordDependencyParser(model_path=u'edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz')
-
+eng_tok = StanfordTokenizer()
 # for Roget's Thesaurus (1911)
 #from utils.algs import punct, coordi, subordi, adverb, parti, adjec, appos, passive, paratax
 
 #the algs about the syntax
 from algs import base, punct, coordi, subordi, adverb, parti, adjec, appos, passive, paratax, relcl
+#Buddhika--------------------------------------------------------------------------------------------------------------------------------
+#from algs import base, new_punct, new_coordi, new_subordi, new_adverb, new_parti, new_adject, new_appos, new_passive, new_paratax, new_relcl
+#----------------------------------------------------------------------------------------------------------------------------------------
 #import algs
 # the models
 
@@ -833,10 +834,15 @@ def simp_coinco_sent(filename, sent_file):
     return num_sentences, num_splitted_sentences    
 
 
-def simp_syn_sent(sent, _algs=range(1,11)):
+#def simp_syn_sent(sent, parse_tree, _algs=range(1,10)):
+def simp_syn_sent(sent,lnames,mnames,fnames, parse_tree, _algs=range(1,11)):
     strs = ""
-    begin_time = time.time()
+    #Buddhika-----------------------
+    node_dict = {} 
+    token_dict = {}
+    #-------------------------------
     # define dic of the ALG according to the one in the form
+    """
     algs_lst_ = [
         subordi.simp_subordi_sent,
         adverb.simp_adverb_sent,
@@ -846,8 +852,8 @@ def simp_syn_sent(sent, _algs=range(1,11)):
         relcl.simp_relcl_sent,
         passive.simp_passive_sent       
     ]
-
-    algs_lst = [
+    """
+    """
         paratax.simp_paratax_sent,
         punct.simp_punct_sent,
         adjec.simp_adjec_sent,
@@ -857,12 +863,26 @@ def simp_syn_sent(sent, _algs=range(1,11)):
         coordi.simp_coordi_sent,
         parti.simp_parti_sent,
         relcl.simp_relcl_sent,
-        passive.simp_passive_sent       
-    ]
-
+        passive.simp_passive_sent 
+     
+       """
     """
+    algs_lst = [
+        new_paratax.check_paratax,
+        new_punct.check_punct,
+        new_adject.check_adject,
+        new_subordi.check_subordi,
+        new_appos.check_appos,
+        new_adverb.check_adverb,
+        new_coordi.check_coordi,
+        new_parti.check_parti,
+        new_relcl.check_relcl,
+        new_passive.simp_passive_sent       
+    ]
+    """
+    
     # order the ALG for the better performance(precision/recall)
-    _algs_lst_ = [
+    algs_lst = [
         paratax.simp_paratax_sent,
         #punct.simp_punct_sent,
         subordi.simp_subordi_sent,
@@ -873,12 +893,13 @@ def simp_syn_sent(sent, _algs=range(1,11)):
         coordi.simp_coordi_sent,
         passive.simp_passive_sent
     ]
-    """
+    
     # the original tokens in the sent
     #import pdb; pdb.set_trace()
     #print "syn sent: ", sent
     #import pdb; pdb.set_trace()
-    tokens = StanfordTokenizer().tokenize(sent)
+    #tokens = StanfordTokenizer().tokenize(sent)
+    tokens = eng_tok.tokenize(sent)
     #tokens = wordpunct_tokenize(strs)
     #tokens.insert(0, '')
     
@@ -889,23 +910,43 @@ def simp_syn_sent(sent, _algs=range(1,11)):
         strs = "I ate an apple. I ate an orange ."
         alg = "coordi"
     """
+    #Buddhika-------------------------
+    for idx,tok in enumerate(tokens):
+        token_dict[idx+1] = tok
+    #---------------------------------
+
     tokens.insert(0, '')
-    #taggers = eng_tagger.tag(sent.split())
 
-    result = list(eng_parser.raw_parse(sent))[0]
-    root = result.root['word']
-    end_time = time.time()
-    print "The time of parser: ", end_time - begin_time
 
-    #import pdb; pdb.set_trace()
-    #w = result.tree()
-    #print "parse_tree:", w
-    
+
     #TODO: use the tree structure, Check again
     node_list = [] # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
-    for _node in result.nodes.items():
-        node_list.append(base.get_triples(_node))
-        #node_list[base.get_triples[0]] = base.get_triples(node)
+    if parse_tree == None:
+        begin_time = time.time()
+        result = list(eng_parser.raw_parse(sent))[0]
+        end_time = time.time()
+        print "The time of parser: ", end_time - begin_time
+
+        for node in result.nodes.items():
+            #for node in parse_tree.nodes.items():
+            #print("### original ###")
+            #print node
+            node_list.append(base.get_triples(node))
+            #node_list[base.get_triples[0]] = base.get_triples(node)
+    else:
+        begin_time = time.time()
+        for node in parse_tree:
+            #print node
+            #print("### tree ###")
+            #print node
+            node_list.append(base.get_triples(node))
+        end_time = time.time()
+        print "The time of parser (Tree LOADED):  ", end_time - begin_time
+
+    #Buddhika-----------------
+    for nd in node_list[1:]:
+        node_dict[nd[0]] = nd
+    #-------------------------
 
     alg = ""
     #import pdb; pdb.set_trace()
@@ -914,7 +955,7 @@ def simp_syn_sent(sent, _algs=range(1,11)):
         for ind in _algs:
             #import pdb; pdb.set_trace()
             # if the alg in the choices
-            #print "dt_sent_strs: ", strs
+            print "dt_sent_strs $$ : ", strs
             if len(strs) > 0:
                 end_time = time.time()
                 print "The time of alg: ", end_time - begin_time
@@ -924,17 +965,21 @@ def simp_syn_sent(sent, _algs=range(1,11)):
                 print "_alg: ", algs_lst[ind-1]
                 #print "tokens: ", tokens
                 strs = algs_lst[ind-1](tokens,node_list)
+                #Buddhika------------------------------------------------------------------------
+                #strs = algs_lst[ind-1](sent,token_dict,node_list,node_dict,lnames,mnames,fnames,tokens)
+                #--------------------------------------------------------------------------------
                 #print "strs in alg: ", strs
 
     #import pdb; pdb.set_trace()
     end_time = time.time()
     print "The time of alg: ", end_time - begin_time
 
-    #print "strs: ", strs
+    print "strs: ", strs
     return (strs, alg)
 
 
-def _simp_syn_sent(sent, _algs=range(1,8)):
+#def _simp_syn_sent(sent, parsed_tree, _algs=range(1,8)):
+def _simp_syn_sent(sent, _algs=range(1,10)):
     strs = ""
     
     """ 
@@ -1041,7 +1086,6 @@ def _simp_syn_sent(sent, _algs=range(1,8)):
                                                 return strs, alg
 
     return strs, alg
-     
 
 def get_split_ret(_str):
     """
@@ -1068,6 +1112,22 @@ def get_split_ret_(_str):
         _strs.pop()
 
     s1 = _strs[0] + ' . '
+
+    l = list(list(parsed_sent) for parsed_sent in eng_parser.raw_parse_sents(s1))
+
+    #print "############"
+
+    for li in l:
+        # print li[0]
+        # root = li.root['word']
+        # w = result.tree()
+        print "parse_tree:"
+        # TODO: use the tree structure, Check again
+        node_list = []  # dict (4 -> 4, u'said', u'VBD', u'root', [[18], [22], [16], [3]])
+        for node in li[0].nodes.items():
+            print node
+
+
     print "S1: ", s1
     s1_child = ""
     s2 = ""
@@ -1116,15 +1176,19 @@ def get_split_ret_(_str):
     return s1, s1_child, s2, s2_child, ret, algs
 
 
+#def _get_split_ret(_str, _algs,lnames,mnames,fnames):
 def _get_split_ret(_str, _algs):
     print "S1+S2: ", _str
     ret = ""
 
-    _strs = _str.split(' .')
+    _strs = _str.split('.')
     if len(_strs[-1]) == 0:
         _strs.pop()
 
-    s1 = _strs[0] + ' . '
+    s1 = _strs[0] + ' .' #Buddhika
+    #s1 = _strs[0]
+
+    #s2 = _strs[1] + ' .'
     print "S1: ", s1
     s1_child = ""
     s2 = ""
@@ -1132,22 +1196,40 @@ def _get_split_ret(_str, _algs):
     #syn_ret = ""
     algs = ""
 
+
     #import pdb; pdb.set_trace()
     if len(_strs) == 1 or len(_strs[1]) == 0:
         return s1, s1_child, s2, s2_child, _str, algs
+
+
+    begin_time = time.time()
+    sentences = _str
+
+    parse_tree_s1, parse_tree_s2 = get_parsed_trees(sentences)
+
+    end_time = time.time()
+    print "The time of parser: ", end_time - begin_time
      
-    #s1_child, alg1 = _simp_syn_sent(s1)
-    s1_child, alg1 = simp_syn_sent(s1, _algs)
+    s1_child, alg1 = _simp_syn_sent(s1)
+    #s1_child, alg1 = simp_syn_sent(s1, parse_tree_s1, _algs)
+    #Buddhika---------------------------------------------------------------------
+    #s1_child, alg1 = simp_syn_sent(s1,lnames,mnames,fnames, parse_tree_s1, _algs)
+    #-----------------------------------------------------------------------------
     print "S11+S12: ", s1_child
     print "alg1: ", alg1
     
     #print "str2: ", _strs[1]
 
     #import pdb; pdb.set_trace()
-    s2 = _strs[1] + ' .'
+    s2 = _strs[1] + ' .' #Buddhika
+    #s2 = _strs[1]
+
     print "S2: ", s2
-    #s2_child, alg2 = _simp_syn_sent(s2)
-    s2_child, alg2 = simp_syn_sent(s2, _algs)
+    s2_child, alg2 = _simp_syn_sent(s2)
+    #s2_child, alg2 = simp_syn_sent(s2, parse_tree_s2,_algs)
+    #Buddhika---------------------------------------------------------------------
+    #s2_child, alg2 = simp_syn_sent(s2,lnames,mnames,fnames, parse_tree_s2,_algs)
+    #-----------------------------------------------------------------------------
     print "S21+S22: ", s2_child
     print "alg2: ", alg2
 
@@ -1172,7 +1254,15 @@ def _get_split_ret(_str, _algs):
 
     return s1, s1_child, s2, s2_child, ret, algs
 
+def get_parsed_trees(sentences):
+    l = list(list(parsed_sent) for parsed_sent in eng_parser.raw_parse_sents(sent_tokenize(sentences)))
+
+    parse_tree_s1 = l[0][0].nodes.items()
+    parse_tree_s2 = l[1][0].nodes.items()
+
+    return  parse_tree_s1,  parse_tree_s2
 # Main test
+
 def main():
     dir="/Users/zhaowenlong/workspace/proj/dev.nlp/simptext/simptext/"
 
