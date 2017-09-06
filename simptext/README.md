@@ -5,5 +5,5 @@
 * running
     > python app.py  
 
-##### Copyright 2017 cityU 
+##### Copyright (c) 2016-2017 cityU
       
