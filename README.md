@@ -1,5 +1,5 @@
 ##### 
-#####  Linguistics
+##### About Linguistics
    * phonetics: the sounds of your language
    * phonology: the distribution of speech sounds
    * morphology: about word formation
@@ -20,9 +20,11 @@
     PP -> PRP NP   
     VP -> V NP | VP PP  
 
-#####  WordNet
+##### WordNet
     During WordNet development synsets are organized into forty-five lexicographer files based on syntactic category and logical groupings.
 
+
+##### Deep learning
 
 ##### About Flask and Python
   * Use virtual Environments 
