@@ -1,4 +1,5 @@
 #### courses
+ * [COS495 Natural Language Processing](https://www.cs.princeton.edu/courses/archive/spring18/cos495/schedule/)
  * [CS224n: Natural Language Processing with Deep Learning](http://web.stanford.edu/class/cs224n/)
  * [Oxford Deep NLP 2017 course](https://github.com/oxford-cs-deepnlp-2017/lectures)
  * [CS287: Natural Language Processing](http://cs287.fas.harvard.edu/)
