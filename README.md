@@ -21,7 +21,7 @@
     VP -> V NP | VP PP  
 
 ##### WordNet
-    During WordNet development synsets are organized into forty-five lexicographer files based on syntactic category and logical groupings.
+  *  During WordNet development synsets are organized into forty-five lexicographer files based on syntactic category and logical groupings.
 
 
 ##### Deep learning
