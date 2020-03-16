@@ -1,4 +1,8 @@
-##### 
+##### Project Description
+This is an industry implementation for Our paper [A Customizable Editor for Text Simplification](https://drive.google.com/file/d/0B8JbPdkDj7JZblBqcWVhVWdFTUE/view), which has been accepted for publication at COLING 2016 on Computational Linguistics, Osaka,Japan.
+
+
+
 ##### About Linguistics
    * phonetics: the sounds of your language
    * phonology: the distribution of speech sounds
